@@ -12,7 +12,7 @@ class Game:
         pygame.display.set_caption('PyazzaMarket')
 
     def start(self):
-        stock = Stock(RED, 100, [100], None, 1)
+        stock = Stock(RED, 100, [100, 280, 280, 360, 460, 900], None, 1)
         while self.running:
             self.clock.tick(FPS)
             stock.draw(self.window)
