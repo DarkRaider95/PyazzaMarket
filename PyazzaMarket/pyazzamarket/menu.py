@@ -8,16 +8,14 @@ from .constants import WIDTH, HEIGHT, WHITE, BLACK
 # Inizializzazione della finestra di gioco
 pygame.display.set_caption("Menu di Gioco")
 
-clock = pygame.time.Clock()
-
-
 class Menu:
-    def __init__(self, width, height):  #each player initialised with its data
+    def __init__(self, width, height, clock):  #each player initialised with its data
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
         self.width = width
         self.height = height
         self.num_players = 2
+        self.clock = clock
         self.manager = UIManager((WIDTH, HEIGHT))
         
         # Bottone "Inizia partita"
@@ -54,9 +52,6 @@ class Menu:
                                             manager=self.manager,
                                             object_id="PLAYER2",
                                             initial_text="Player2")
-        
-        entry_line1.text = "Player1"
-        entry_line2.text = "Player2"
 
         self.entry_lines = [entry_line1, entry_line2]
 
@@ -67,7 +62,7 @@ class Menu:
     def show_start_menu(self):        
 
         while self.running:
-            time_delta = clock.tick(60) / 1000.0
+            time_delta = self.clock.tick(60) / 1000.0
 
             for event in pygame.event.get():
 

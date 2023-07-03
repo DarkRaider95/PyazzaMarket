@@ -6,6 +6,7 @@ from pyazzamarket.menu import Menu
 
 pygame.init()
 
+clock = pygame.time.Clock()
 #FPS = 60
 
 #WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -18,9 +19,10 @@ pygame.init()
 #    return row, col
 
 def main():
-    menu = Menu(WIDTH, HEIGHT)
+    menu = Menu(WIDTH, HEIGHT, clock)
     menu.show_start_menu()
     print(menu.player_names)
+    game = Game(WIDTH, HEIGHT, clock)
     pygame.quit()
     #run = True
     #clock = pygame.time.Clock()
