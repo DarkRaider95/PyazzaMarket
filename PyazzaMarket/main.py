@@ -1,7 +1,7 @@
 # Assets: https://techwithtim.net/wp-content/uploads/2020/09/assets.zip
 import pygame
 from pyazzamarket.constants import WIDTH, HEIGHT
-#from pyazzamarket.game import Game
+from pyazzamarket.game import Game
 from pyazzamarket.menu import Menu
 
 pygame.init()
@@ -23,6 +23,7 @@ def main():
     menu.show_start_menu()
     print(menu.player_names)
     game = Game(WIDTH, HEIGHT, clock)
+    game.start()
     pygame.quit()
     #run = True
     #clock = pygame.time.Clock()
