@@ -18,13 +18,13 @@ class Game:
         #image = pygame.image.load('PyazzaMarket/assets/corner_1.png')
         #cell = Cell(RED, 500, None, 0, 0, image)
         board = Board()
-        board.initialiaze_cells()
+        board.initialiaze_cells(self.window)
+        board.draw(self.window)
 
         while self.running:
             self.clock.tick(FPS)
             
-            board.draw(self.window)
-        #    cell.drawCorner(self.window)
+            #cell.drawCorner(self.window)
             pygame.display.update()
 
             for event in pygame.event.get():
