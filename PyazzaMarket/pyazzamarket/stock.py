@@ -30,7 +30,7 @@ class Stock:
         rect = pygame.Rect(stock_x, stock_y, STOCK_WIDTH, STOCK_HEIGHT)
         logorect = pygame.Rect(logo_x, logo_y, LOGO_WIDTH, LOGO_HEIGHT)
         feesrect = pygame.Rect(price_x, price_y, PRICE_WIDTH, PRICES_HEIGHT)
-        pygame.draw.rect(screen, self.color, rect)
+        pygame.draw.rect(screen, self.color, rect, 100)
         pygame.draw.rect(screen, WHITE, logorect)
         pygame.draw.rect(screen, WHITE, feesrect)
 

@@ -1,6 +1,8 @@
 import pygame
-from .constants import FPS, WIDTH, HEIGHT, RED
+from .constants import FPS, WIDTH, HEIGHT, RED, CORNER_1
 from .stock import Stock
+from .cell import Cell
+from .board import Board
 
 class Game:
     def __init__(self, width, height, clock):
@@ -12,10 +14,17 @@ class Game:
         pygame.display.set_caption('PyazzaMarket')
 
     def start(self):
-        stock = Stock(RED, 100, [100, 280, 280, 360, 460, 900], None, 1)
+        #stock = Stock(RED, 100, [100, 280, 280, 360, 460, 900], None, 1)
+        #image = pygame.image.load('PyazzaMarket/assets/corner_1.png')
+        #cell = Cell(RED, 500, None, 0, 0, image)
+        board = Board()
+        board.initialiaze_cells()
+
         while self.running:
             self.clock.tick(FPS)
-            stock.draw(self.window)
+            
+            board.draw(self.window)
+        #    cell.drawCorner(self.window)
             pygame.display.update()
 
             for event in pygame.event.get():
