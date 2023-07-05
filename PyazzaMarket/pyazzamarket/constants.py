@@ -51,42 +51,63 @@ CELLS_DEF = {
     'ORANGE':{
         'logos': ['gled.png', 'frieskes.png', 'frio.png'],
         'value': 200,
-        'color': ORANGE
+        'color': ORANGE,
+        'penalty': [60, 160, 160, 200, 260, 500]
     },
     'LIGHT_BLUE':{
         'logos': ['finish.png', 'dash.png', 'cuore.png'],
         'value': 280,
-        'color': LIGHT_BLUE
+        'color': LIGHT_BLUE,
+        'penalty': [80,220,220,280,360,700]
     },
     'PINK':{
         'logos': ['zarotti.png', 'ponti.png', 'nostromo.png'],
         'value': 360,
-        'color': PINK
+        'color': PINK,
+        'penalty': [100, 280, 280, 360, 460, 900]
     },
     'GREEN':{
         'logos': ['barilla.png', 'euvita.png', 'galbusera.png'],
         'value': 440,
-        'color': GREEN
+        'color': GREEN,
+        'penalty': [120, 340, 340, 440, 560, 1000]
     },
     'RED':{
         'logos': ['lavazza.png', 'mangiaebevi.png', 'stella-artois.png'],
         'value': 500,
-        'color': RED
+        'color': RED,
+        'penalty': [140, 380, 380, 500, 660, 1200]
     },
     'BLUE':{
         'logos': ['san-benedetto.png', 'pepsi.png', 'schweppes.png'],
         'value': 600,
-        'color': BLUE
+        'color': BLUE,
+        'penalty': [160, 460, 460, 600, 760, 1500]
     },
     'YELLOW':{
         'logos': ['ibis.png', 'friendies.png', 'yoplait.png'],
         'value': 700,
-        'color': YELLOW
+        'color': YELLOW,
+        'penalty': [180, 560, 560, 700, 880, 1760]
     },
     'PURPLE':{
         'logos': ['cavicchioli.png', 'martini.png', 'galup.png'],
         'value': 800,
-        'color': PURPLE
+        'color': PURPLE,
+        'penalty': [200, 600, 600, 800, 1000, 2000]
     }
 
 }
+
+QUOTATION = ((220,280,410,490,500,300,700,900),
+             (180,280,380,340,500,600,700,800),
+             (600,280,360,240,500,600,200,600),
+             (200,380,360,390,500,600,1100,1000),
+             (250,180,160,440,500,700,700,400),
+             (200,280,260,390,500,400,700,200),
+             (220,280,260,540,500,600,700,800),
+             (200,280,560,540,200,550,700,800),
+             (200,260,360,490,500,600,700,900),
+             (200,280,310,140,700,600,700,800),
+             (200,230,460,340,500,650,700,800),
+             (200,580,360,540,500,550,700,800),)
