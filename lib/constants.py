@@ -42,9 +42,16 @@ CORNER_1 = ASSET_PATH + 'corner_1.png'
 CORNER_2 = ASSET_PATH + 'corner_2.png'
 CORNER_3 = ASSET_PATH + 'corner_1.png'
 CORNER_4 = ASSET_PATH + 'corner_1.png'
+CAR_YELLOW = ASSET_PATH + 'car_yellow.png'
+CAR_BLUE = ASSET_PATH + 'car_blue.png'
+CAR_BLACK = ASSET_PATH + 'car_black.png'
+CAR_RED = ASSET_PATH + 'car_red.png'
 EVENT = ASSET_PATH + 'event.png'
 FREE_STOP = ASSET_PATH + 'fermata-libera.png'
 
+# CAR DIMENSIONS
+CAR_WIDTH = 50
+CAR_HEIGHT = 50
 
 #CELLS OBJECT
 CELLS_DEF = {
@@ -110,4 +117,4 @@ QUOTATION = ((220,280,410,490,500,300,700,900),
              (200,260,360,490,500,600,700,900),
              (200,280,310,140,700,600,700,800),
              (200,230,460,340,500,650,700,800),
-             (200,580,360,540,500,550,700,800),)
+             (200,580,360,540,500,550,700,800))

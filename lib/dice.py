@@ -5,7 +5,7 @@ actual_stock_price = [200,280,360,440,500,600,700,800]
 def roll():
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
-    return [dice1, dice2]
+    return (dice1, dice2)
 
 def is_double(dice):
     return dice[0] == dice[1]
