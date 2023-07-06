@@ -80,7 +80,7 @@ class Menu:
                         print("start")
                         #start game
                         self.running = False
-                        self.updatePlayerNames()                        
+                        self.updatePlayerNames()                    
 
                     # Bottone "-" per diminuire il numero di giocatori
                     elif event.ui_element == self.minus_button and self.num_players > 2:                    

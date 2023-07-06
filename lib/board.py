@@ -5,7 +5,7 @@ from .cell import Cell
 class Board:
     
     def __init__(self):
-        self.cells = []  
+        self.cells = []
 
     def initialiaze_cells(self, screen):
         #load images
@@ -54,3 +54,17 @@ class Board:
     def draw(self, screen):
         for cell in self.cells:
             cell.draw(screen)
+
+
+    def drawPlayerCar(self, screen, cellPos, player):
+        cell = self.cells[cellPos]
+        if (cellPos % 11 != 0):
+            car_x = cell.cell_x + 5
+            car_y = cell.cell_y + CELL_HEIGHT // 2
+        else:
+            car_x = cell.cell_x + CORNER_WIDTH  // 2
+            car_y = cell.cell_y + CORNER_HEIGHT // 2
+
+        player.car.move(car_x, car_y)
+        player.car.rotate(90)
+        player.car.draw(screen)

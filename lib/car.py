@@ -2,8 +2,7 @@ import pygame
 from .constants import *
 
 class Car:
-    def __init__(self, player, car):
-        self.player = player
+    def __init__(self, car):
         self.image = pygame.image.load(car)
         self.image = pygame.transform.scale(self.image, (CAR_WIDTH, CAR_HEIGHT))
         self.angle = 0
