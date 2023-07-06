@@ -22,8 +22,10 @@ class Game:
         board = Board()
         board.initialiaze_cells(self.window)
         board.draw(self.window)
+        #stock = Stock('RED', 500, [180, 200, 555 ,848,8484,488484], None, 0)
+        #stock.draw(self.window)
         for index, player in enumerate(players):
-            board.drawPlayerCar(self.window, 0, player, index, len(players))
+            board.drawPlayerCar(self.window, 30, player, index, len(players))
 
         while self.running:
             self.clock.tick(FPS)

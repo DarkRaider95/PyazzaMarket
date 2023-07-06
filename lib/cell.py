@@ -3,7 +3,7 @@ from .constants import *
 
 class Cell:
     
-    def __init__(self, color, stock_value, logo, cell_x, cell_y, cellImage, rotate):
+    def __init__(self, color, stock_value, logo, cell_x, cell_y, cellImage, angle):
         self.color = color
         self.stock_value = stock_value        
         self.logo = logo
@@ -12,7 +12,7 @@ class Cell:
         self.cell_y = cell_y
         self.cellImage = cellImage
         self.surface = pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
-        self.rotate = rotate
+        self.angle = angle
 
     def draw(self, screen):
         #if it's not a corner draw a cell
@@ -40,17 +40,17 @@ class Cell:
         price_y = cell_color_y - stock_price.get_height() - 10
         self.surface.blit(stock_price, (price_x, price_y))
 
-        if(self.rotate != 0):
-            self.surface = pygame.transform.rotate(self.surface, self.rotate)
+        if(self.angle != 0):
+            self.surface = pygame.transform.rotate(self.surface, self.angle)
 
         screen.blit(self.surface, (self.cell_x, self.cell_y))
 
     def drawCellImage(self, screen):
         # Disponi l'immagine sulla finestra
         #self.surface.blit(self.cellImage, (0, 0))
-        if(self.rotate != 0):
+        if(self.angle != 0):
             self.surface.blit(self.cellImage, (0, 0))
-            self.surface = pygame.transform.rotate(self.surface, self.rotate)
+            self.surface = pygame.transform.rotate(self.surface, self.angle)
             screen.blit(self.surface, (self.cell_x, self.cell_y))
         else:
             screen.blit(self.cellImage, (self.cell_x, self.cell_y))

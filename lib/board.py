@@ -53,32 +53,12 @@ class Board:
         #create right side
         curr_y = curr_y+CELL_WIDTH
         curr_x, curr_y = self.createSide(curr_x, curr_y, ["YELLOW","PURPLE"], self.eventImage, self.quotationImage)
-
-
-    
-    def createBottomTriplet(self, curr_x, curr_y, color, eventCell, eventImage):
-        cellDef = CELLS_DEF[color]
-        x = 0
-        y = 0
-        for i in range(0, 4):
-            x = curr_x - CELL_WIDTH * (i + 1)
-            y = curr_y
-            
-            #cell = Cell(cellDef.color, cellDef.value, cellDef.logos[i], x, y, None)
-            if(i == eventCell):
-                cell = Cell(None, None, None, x, y, eventImage, 0)
-                self.cells.append(cell)
-            else:
-                cell = Cell(cellDef['color'], cellDef['value'], None, x, y, None, 0)
-                self.cells.append(cell)
-
-        return x, y
     
     def createSide(self, curr_x, curr_y, colors, eventImage, centralImage):        
         x = curr_x
         y = curr_y
         for i in range(0, 9):
-            x, y = Board.computeNextCoord(x, y, i, CELLS_DEF[colors[0]]['side'])
+            x, y = Board.computeNextCoord(x, y, CELLS_DEF[colors[0]]['side'])
             
             if(i == 2 or i == 6):
                 cell = Cell(None, None, None, x, y, eventImage, CELLS_DEF[colors[0]]['angle'])                
@@ -95,7 +75,7 @@ class Board:
 
         return x, y
     
-    def computeNextCoord(x, y, offset, side):
+    def computeNextCoord(x, y, side):
         if side == 'BOT':
             x = x - CELL_WIDTH
             y = y
@@ -126,5 +106,5 @@ class Board:
             car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
 
         player.car.move(car_x, car_y)
-        player.car.rotate(90)
+        player.car.rotate(cell.angle+90)
         player.car.draw(screen)
