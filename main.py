@@ -11,9 +11,8 @@ clock = pygame.time.Clock()
 def main():
     menu = Menu(WIDTH, HEIGHT, clock)
     menu.show_start_menu()
-    print(menu.player_names)
     #Game start
-    game = Game(WIDTH, HEIGHT, clock, menu.player_names)
+    game = Game(WIDTH, HEIGHT, clock, menu.player)
     game.start()
     pygame.quit()
 
