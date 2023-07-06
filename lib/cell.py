@@ -39,6 +39,10 @@ class Cell:
         price_x = (CELL_WIDTH - (CELL_WIDTH // 2)) - (stock_price.get_width() // 2)
         price_y = cell_color_y - stock_price.get_height() - 10
         self.surface.blit(stock_price, (price_x, price_y))
+
+        if(self.rotate != 0):
+            self.surface = pygame.transform.rotate(self.surface, self.rotate)
+
         screen.blit(self.surface, (self.cell_x, self.cell_y))
 
     def drawCellImage(self, screen):
@@ -46,7 +50,7 @@ class Cell:
         #self.surface.blit(self.cellImage, (0, 0))
         if(self.rotate != 0):
             self.surface.blit(self.cellImage, (0, 0))
-            self.surface = pygame.transform.rotate(self.surface, -90)
+            self.surface = pygame.transform.rotate(self.surface, self.rotate)
             screen.blit(self.surface, (self.cell_x, self.cell_y))
         else:
             screen.blit(self.cellImage, (self.cell_x, self.cell_y))
