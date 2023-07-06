@@ -40,14 +40,16 @@ ASSET_PATH = 'assets/'
 #assets path
 CORNER_1 = ASSET_PATH + 'corner_1.png'
 CORNER_2 = ASSET_PATH + 'corner_2.png'
-CORNER_3 = ASSET_PATH + 'corner_1.png'
-CORNER_4 = ASSET_PATH + 'corner_1.png'
+CORNER_3 = ASSET_PATH + 'corner_3.png'
+CORNER_4 = ASSET_PATH + 'corner_4.png'
 CAR_YELLOW = ASSET_PATH + 'car_yellow.png'
 CAR_BLUE = ASSET_PATH + 'car_blue.png'
 CAR_BLACK = ASSET_PATH + 'car_black.png'
 CAR_RED = ASSET_PATH + 'car_red.png'
 EVENT = ASSET_PATH + 'event.png'
 FREE_STOP = ASSET_PATH + 'fermata-libera.png'
+QUOTE_IMAGE = ASSET_PATH + 'quotation.png'
+CHANCE = ASSET_PATH + 'chance.png'
 
 # CAR DIMENSIONS
 CAR_WIDTH = 30
@@ -59,49 +61,65 @@ CELLS_DEF = {
         'logos': ['gled.png', 'frieskes.png', 'frio.png'],
         'value': 200,
         'color': ORANGE,
-        'penalty': [60, 160, 160, 200, 260, 500]
+        'penalty': [60, 160, 160, 200, 260, 500],
+        'side': 'BOT',
+        'angle': 0
     },
     'LIGHT_BLUE':{
         'logos': ['finish.png', 'dash.png', 'cuore.png'],
         'value': 280,
         'color': LIGHT_BLUE,
-        'penalty': [80,220,220,280,360,700]
+        'penalty': [80,220,220,280,360,700],
+        'side': 'BOT',
+        'angle': 0
     },
     'PINK':{
         'logos': ['zarotti.png', 'ponti.png', 'nostromo.png'],
         'value': 360,
         'color': PINK,
-        'penalty': [100, 280, 280, 360, 460, 900]
+        'penalty': [100, 280, 280, 360, 460, 900],
+        'side': 'LEFT',
+        'angle': -90
     },
     'GREEN':{
         'logos': ['barilla.png', 'euvita.png', 'galbusera.png'],
         'value': 440,
         'color': GREEN,
-        'penalty': [120, 340, 340, 440, 560, 1000]
+        'penalty': [120, 340, 340, 440, 560, 1000],
+        'side': 'LEFT',
+        'angle': -90
     },
     'RED':{
         'logos': ['lavazza.png', 'mangiaebevi.png', 'stella-artois.png'],
         'value': 500,
         'color': RED,
-        'penalty': [140, 380, 380, 500, 660, 1200]
+        'penalty': [140, 380, 380, 500, 660, 1200],
+        'side': 'TOP',
+        'angle': 180
     },
     'BLUE':{
         'logos': ['san-benedetto.png', 'pepsi.png', 'schweppes.png'],
         'value': 600,
         'color': BLUE,
-        'penalty': [160, 460, 460, 600, 760, 1500]
+        'penalty': [160, 460, 460, 600, 760, 1500],
+        'side': 'TOP',
+        'angle': 180
     },
     'YELLOW':{
         'logos': ['ibis.png', 'friendies.png', 'yoplait.png'],
         'value': 700,
         'color': YELLOW,
-        'penalty': [180, 560, 560, 700, 880, 1760]
+        'penalty': [180, 560, 560, 700, 880, 1760],
+        'side': 'RIGHT',
+        'angle': 90
     },
     'PURPLE':{
         'logos': ['cavicchioli.png', 'martini.png', 'galup.png'],
         'value': 800,
         'color': PURPLE,
-        'penalty': [200, 600, 600, 800, 1000, 2000]
+        'penalty': [200, 600, 600, 800, 1000, 2000],
+        'side': 'RIGHT',
+        'angle': 90
     }
 
 }
