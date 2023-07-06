@@ -1,5 +1,5 @@
 import pygame
-from .constants import FPS, WIDTH, HEIGHT, RED, CORNER_1, CAR_RED
+from .constants import FPS, WIDTH, HEIGHT, RED, CORNER_1, CAR_RED, CAR_BLUE, CAR_BLACK, CAR_YELLOW
 from .stock import Stock
 from .cell import Cell
 from .board import Board
@@ -19,11 +19,16 @@ class Game:
         #stock = Stock(RED, 100, [100, 280, 280, 360, 460, 900], None, 1)
         #image = pygame.image.load('PyazzaMarket/assets/corner_1.png')
         #cell = Cell(RED, 500, None, 0, 0, image)
-        player = Player(self.player_names[0], CAR_RED)
+        players = []
+        players.append(Player(self.player_names[0], CAR_RED))
+        players.append(Player(self.player_names[1], CAR_BLUE))
+        #players.append(Player(self.player_names[2], CAR_BLACK))
+        #players.append(Player(self.player_names[3], CAR_YELLOW))
         board = Board()
         board.initialiaze_cells(self.window)
         board.draw(self.window)
-        board.drawPlayerCar(self.window, 1, player)
+        for index, player in enumerate(players):
+            board.drawPlayerCar(self.window, 0, player, index, len(players))
 
         while self.running:
             self.clock.tick(FPS)

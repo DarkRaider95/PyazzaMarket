@@ -55,15 +55,14 @@ class Board:
         for cell in self.cells:
             cell.draw(screen)
 
-
-    def drawPlayerCar(self, screen, cellPos, player):
+    def drawPlayerCar(self, screen, cellPos, player, playerNumber, totalPlayers):
         cell = self.cells[cellPos]
         if (cellPos % 11 != 0):
             car_x = cell.cell_x + 5
-            car_y = cell.cell_y + CELL_HEIGHT // 2
+            car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
         else:
-            car_x = cell.cell_x + CORNER_WIDTH  // 2
-            car_y = cell.cell_y + CORNER_HEIGHT // 2
+            car_x = cell.cell_x + CELL_HEIGHT // 2
+            car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
 
         player.car.move(car_x, car_y)
         player.car.rotate(90)
