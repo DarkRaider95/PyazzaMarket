@@ -3,7 +3,7 @@ import sys
 from pygame_gui import UIManager
 from pygame_gui.elements import UITextEntryLine, UIButton, UIDropDownMenu
 import pygame_gui
-from .constants import WIDTH, HEIGHT, WHITE, BLACK
+from .constants import WIDTH, HEIGHT, WHITE, BLACK, CAR_BLACK, CAR_BLUE, CAR_RED, CAR_YELLOW
 
 # Inizializzazione della finestra di gioco
 pygame.display.set_caption("Menu di Gioco")
@@ -68,8 +68,7 @@ class Menu:
         self.entry_lines = [entry_line1, entry_line2]
         self.car_lines = [car_line1, car_line2]
 
-        self.player_names = ["Player1", "Player2"]
-        self.player_colors = ["RED", "BLACK"]
+        self.player = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
 
         self.font = pygame.font.Font(None, 32)
         
@@ -87,9 +86,8 @@ class Menu:
                     elif event.ui_element == self.start_button:
                         print("start")
                         #start game
-                        self.running = False
-                        self.updatePlayerNames()
-                        self.updatePlayerColors()                    
+                        self.running = False                  
+                        self.updatePlayer()
 
                     # Bottone "-" per diminuire il numero di giocatori
                     elif event.ui_element == self.minus_button and self.num_players > 2:                    
@@ -104,21 +102,21 @@ class Menu:
 
                     # Bottone "+" per aumentare il numero di giocatori
                     elif event.ui_element == self.plus_button and self.num_players < 6:
-                        self.num_players += 1
-                        entry_line = UITextEntryLine(relative_rect=pygame.Rect(WIDTH // 2 - 185, 300 + 50 * self.num_players - 1, 300, 40),
-                                             manager=self.manager,
-                                             object_id="PLAYER"+str(self.num_players),
-                                             initial_text="Player"+str(self.num_players))
-                        car_line = UIDropDownMenu(relative_rect=pygame.Rect(WIDTH // 2 + 115, 300 + 50 * self.num_players - 1, 80, 40),
-                                            options_list=['RED', 'BLACK', 'BLUE', 'YELLOW'],
-                                            starting_option='RED',
-                                            manager=self.manager,
-                                            object_id="CAR"+str(self.num_players))
-                        self.entry_lines.append(entry_line)
-                        self.car_lines.append(car_line)
-                        self.start_button.set_position((WIDTH // 2 - 100, 450 + (self.num_players - 1) * 50))
-                        self.quit_button.set_position((WIDTH // 2 - 100, 510 + (self.num_players - 1) * 50))
-                        self.player_names.append("")
+                                self.num_players += 1
+                                entry_line = UITextEntryLine(relative_rect=pygame.Rect(WIDTH // 2 - 185, 300 + 50 * self.num_players - 1, 300, 40),
+                                                            manager=self.manager,
+                                                            object_id="PLAYER"+str(self.num_players),
+                                                            initial_text="Player"+str(self.num_players))
+                                car_line = UIDropDownMenu(relative_rect=pygame.Rect(WIDTH // 2 + 115, 300 + 50 * self.num_players - 1, 80, 40),
+                                                            options_list=['RED', 'BLACK', 'BLUE', 'YELLOW'],
+                                                            starting_option='RED',
+                                                            manager=self.manager,
+                                                            object_id="CAR"+str(self.num_players))
+                                self.entry_lines.append(entry_line)
+                                self.car_lines.append(car_line)
+                                self.start_button.set_position((WIDTH // 2 - 100, 450 + (self.num_players - 1) * 50))
+                                self.quit_button.set_position((WIDTH // 2 - 100, 510 + (self.num_players - 1) * 50))
+                                self.player_names.append("")
 
                 self.manager.process_events(event)
 
@@ -143,11 +141,15 @@ class Menu:
             self.screen.blit(player_names_text, (WIDTH // 2 - player_names_text.get_width() // 2, 300))        
 
             pygame.display.flip()
+    
+    def colorToCostant(self, color):
+        colors = [{"color": "RED", "costant": CAR_RED}, {"color": "BLACK", "costant": CAR_BLACK}, {"color": "BLUE", "costant": CAR_BLUE}, {"color": "YELLOW", "costant": CAR_YELLOW}]
+        for c in colors:
+            if c["color"] == color:
+                return c["costant"]
 
-    def updatePlayerNames(self):
+    def updatePlayer(self):
         for i, entry in enumerate(self.entry_lines):
-            self.player_names[i] = entry.text
-
-    def updatePlayerColors(self):
+            self.player[i]["name"] = entry.text
         for i, car in enumerate(self.car_lines):
-            self.player_colors[i] = car.selected_option
+            self.player[i]["color"] = self.colorToCostant(car.selected_option)

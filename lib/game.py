@@ -6,24 +6,19 @@ from .board import Board
 from .player import Player
 
 class Game:
-    def __init__(self, width, height, clock, player_names):
+    def __init__(self, width, height, clock, players):
         self.clock = clock
         self.width = width
         self.height = height
         self.running = True
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('PyazzaMarket')
-        self.player_names = player_names
+        self.players = players
 
     def start(self):
-        #stock = Stock(RED, 100, [100, 280, 280, 360, 460, 900], None, 1)
-        #image = pygame.image.load('PyazzaMarket/assets/corner_1.png')
-        #cell = Cell(RED, 500, None, 0, 0, image)
         players = []
-        players.append(Player(self.player_names[0], CAR_RED))
-        players.append(Player(self.player_names[1], CAR_BLUE))
-        #players.append(Player(self.player_names[2], CAR_BLACK))
-        #players.append(Player(self.player_names[3], CAR_YELLOW))
+        for player in self.players:
+            players.append(Player(player["name"], player["color"]))
         board = Board()
         board.initialiaze_cells(self.window)
         board.draw(self.window)
