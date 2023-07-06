@@ -94,7 +94,7 @@ class Menu:
                         self.entry_lines[self.num_players-1].kill()
                         self.car_lines[self.num_players-1].kill()                        
                         self.num_players -= 1
-                        self.player_names = self.player_names[:self.num_players]                  
+                        self.player = self.player[:self.num_players]                  
                         self.entry_lines = self.entry_lines[:self.num_players]
                         self.car_lines = self.car_lines[:self.num_players]
                         self.start_button.set_position((WIDTH // 2 - 100, 450 + (self.num_players - 1) * 50))
@@ -116,7 +116,7 @@ class Menu:
                                 self.car_lines.append(car_line)
                                 self.start_button.set_position((WIDTH // 2 - 100, 450 + (self.num_players - 1) * 50))
                                 self.quit_button.set_position((WIDTH // 2 - 100, 510 + (self.num_players - 1) * 50))
-                                self.player_names.append("")
+                                self.player.append({"name":"Player"+str(self.num_players), "color": CAR_RED})
 
                 self.manager.process_events(event)
 
