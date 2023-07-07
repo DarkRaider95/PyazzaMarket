@@ -68,7 +68,7 @@ class Menu:
         self.entry_lines = [entry_line1, entry_line2]
         self.car_lines = [car_line1, car_line2]
 
-        self.player = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
+        self.players = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
 
         self.font = pygame.font.Font(None, 32)
         
@@ -94,7 +94,7 @@ class Menu:
                         self.entry_lines[self.num_players-1].kill()
                         self.car_lines[self.num_players-1].kill()                        
                         self.num_players -= 1
-                        self.player = self.player[:self.num_players]                  
+                        self.players = self.players[:self.num_players]                  
                         self.entry_lines = self.entry_lines[:self.num_players]
                         self.car_lines = self.car_lines[:self.num_players]
                         self.start_button.set_position((WIDTH // 2 - 100, 450 + (self.num_players - 1) * 50))
@@ -116,7 +116,7 @@ class Menu:
                                 self.car_lines.append(car_line)
                                 self.start_button.set_position((WIDTH // 2 - 100, 450 + (self.num_players - 1) * 50))
                                 self.quit_button.set_position((WIDTH // 2 - 100, 510 + (self.num_players - 1) * 50))
-                                self.player.append({"name":"Player"+str(self.num_players), "color": CAR_RED})
+                                self.players.append({"name":"Player"+str(self.num_players), "color": CAR_RED})
 
                 self.manager.process_events(event)
 
@@ -150,6 +150,6 @@ class Menu:
 
     def updatePlayer(self):
         for i, entry in enumerate(self.entry_lines):
-            self.player[i]["name"] = entry.text
+            self.players[i]["name"] = entry.text
         for i, car in enumerate(self.car_lines):
-            self.player[i]["color"] = self.colorToCostant(car.selected_option)
+            self.players[i]["color"] = self.colorToCostant(car.selected_option)

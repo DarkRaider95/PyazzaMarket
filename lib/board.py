@@ -16,13 +16,13 @@ class Board:
         self.quotationImage = pygame.image.load(QUOTE_IMAGE)
         self.chanceImage = pygame.image.load(CHANCE)
 
-    def initialiaze_cells(self, screen):
+    def initialiaze_cells(self):
         
         
         #create corner1
         curr_x = WIDTH - 10 - CORNER_WIDTH
         curr_y = HEIGHT - 10 - CORNER_HEIGHT
-        corner1 = Cell(None, None, None, curr_x, curr_y, self.corner1Image, 0)
+        corner1 = Cell(None, None, None, curr_x, curr_y, self.corner1Image, 90, True)
         self.cells.append(corner1)
         
         #create bottom side
@@ -30,7 +30,7 @@ class Board:
         
         #create corner2
         curr_x = curr_x-CORNER_WIDTH
-        corner2 = Cell(None, None, None, curr_x, curr_y, self.corner2Image, 0)
+        corner2 = Cell(None, None, None, curr_x, curr_y, self.corner2Image, -90, True)
         self.cells.append(corner2)
         
         #create left side
@@ -38,7 +38,7 @@ class Board:
         
         #create corner3
         curr_y = curr_y-CORNER_HEIGHT        
-        corner3 = Cell(None, None, None, curr_x, curr_y, self.corner3Image, 0)
+        corner3 = Cell(None, None, None, curr_x, curr_y, self.corner3Image, -90, True)
         self.cells.append(corner3)
         
         #create top side
@@ -47,7 +47,7 @@ class Board:
         
         #create corner4
         curr_x = curr_x + CELL_WIDTH
-        corner4 = Cell(None, None, None, curr_x, curr_y, self.corner4Image, 0)
+        corner4 = Cell(None, None, None, curr_x, curr_y, self.corner4Image, -90, True)
         self.cells.append(corner4)
         
         #create right side
@@ -96,15 +96,26 @@ class Board:
         for cell in self.cells:
             cell.draw(screen)
 
-    def drawPlayerCar(self, screen, cellPos, player, playerNumber, totalPlayers):
-        cell = self.cells[cellPos]
-        if (cellPos % 11 != 0):
-            car_x = cell.cell_x + 5
-            car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
-        else:
-            car_x = cell.cell_x + CELL_HEIGHT // 2
-            car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
+    def drawPlayerCar(self, screen, player, playerNumber, totalPlayers):
+        cell = self.cells[player.position]
+
+        if (cell.angle == 0):
+            car_x = 5
+            car_y = ((CELL_HEIGHT // totalPlayers) * playerNumber)
+            player.car.rotate(90)
+        elif(cell.angle == 180):
+            car_x = 5
+            car_y = ((CELL_HEIGHT // totalPlayers) * playerNumber)
+            player.car.rotate(0)
+        elif (cell.angle == 90):
+            car_x = ((CELL_WIDTH // totalPlayers) * playerNumber)
+            car_y = 5
+            player.car.rotate(-90)
+        elif(cell.angle == -90):
+            car_x = ((CELL_WIDTH // totalPlayers) * playerNumber)
+            car_y = 5
+            player.car.rotate(-180)
 
         player.car.move(car_x, car_y)
-        player.car.rotate(cell.angle+90)
-        player.car.draw(screen)
+        player.car.draw(cell.surface)
+        screen.blit(cell.surface, (cell.cell_x, cell.cell_y))

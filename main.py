@@ -12,7 +12,7 @@ def main():
     menu = Menu(WIDTH, HEIGHT, clock)
     menu.show_start_menu()
     #Game start
-    game = Game(WIDTH, HEIGHT, clock, menu.player)
+    game = Game(WIDTH, HEIGHT, clock, menu.players)
     game.start()
     pygame.quit()
 

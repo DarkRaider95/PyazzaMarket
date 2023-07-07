@@ -8,3 +8,8 @@ class Player:
         self.position = 0
         self.stocks = []
         self.car = Car(car)
+        self.old_position = 0
+
+    def move(self, step):
+        self.old_position = self.position
+        self.position = (self.position + step) % 40

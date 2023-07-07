@@ -21,15 +21,16 @@ class Dice:
         self.surface.blit(self.image_dice_2, (0 + DICE_WIDTH, 0))
         screen.blit(self.surface, (self.surface_x, self.surface_y))
 
-    def updateDice(self, score): # score is a tuple from roll in gameLogic
+    def updateDice(self, score, screen): # score is a tuple from roll in gameLogic
         scoreToImage = [{"score": 1, "image": DICE_1},{"score": 2, "image": DICE_2},{"score": 3, "image": DICE_3},{"score": 4, "image": DICE_4},{"score": 5, "image": DICE_5},{"score": 6, "image": DICE_6}]
         for scoreImage in scoreToImage:
             if(scoreImage["score"] == score[0]):
                 self.image_dice_1 = pygame.image.load(scoreImage["image"])
-                self.image_dice_1 = pygame.transform.scale(self.image, (DICE_WIDTH, DICE_HEIGHT))
+                self.image_dice_1 = pygame.transform.scale(self.image_dice_1, (DICE_WIDTH, DICE_HEIGHT))
             if(scoreImage["score"] == score[1]):
                 self.image_dice_2 = pygame.image.load(scoreImage["image"])
-                self.image_dice_2 = pygame.transform.scale(self.image, (DICE_WIDTH, DICE_HEIGHT))
+                self.image_dice_2 = pygame.transform.scale(self.image_dice_2, (DICE_WIDTH, DICE_HEIGHT))
             
         self.score_dice_1 = score[0]
         self.score_dice_2 = score[1]
+        self.drawDices(screen)

@@ -3,7 +3,7 @@ from .constants import *
 
 class Cell:
     
-    def __init__(self, color, stock_value, logo, cell_x, cell_y, cellImage, angle):
+    def __init__(self, color, stock_value, logo, cell_x, cell_y, cellImage, angle, isCorner = False):
         self.color = color
         self.stock_value = stock_value        
         self.logo = logo
@@ -11,7 +11,7 @@ class Cell:
         self.cell_x = cell_x
         self.cell_y = cell_y
         self.cellImage = cellImage
-        self.surface = pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
+        self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         self.angle = angle
 
     def draw(self, screen):
@@ -54,5 +54,3 @@ class Cell:
             screen.blit(self.surface, (self.cell_x, self.cell_y))
         else:
             screen.blit(self.cellImage, (self.cell_x, self.cell_y))
-
-              
