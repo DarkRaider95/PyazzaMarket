@@ -50,10 +50,20 @@ EVENT = ASSET_PATH + 'event.png'
 FREE_STOP = ASSET_PATH + 'fermata-libera.png'
 QUOTE_IMAGE = ASSET_PATH + 'quotation.png'
 CHANCE = ASSET_PATH + 'chance.png'
+DICE_1 = ASSET_PATH + 'dice1.png'
+DICE_2 = ASSET_PATH + 'dice2.png'
+DICE_3 = ASSET_PATH + 'dice3.png'
+DICE_4 = ASSET_PATH + 'dice4.png'
+DICE_5 = ASSET_PATH + 'dice5.png'
+DICE_6 = ASSET_PATH + 'dice6.png'
 
 # CAR DIMENSIONS
 CAR_WIDTH = 27
 CAR_HEIGHT = 57
+
+# DICE DIMENSIONS
+DICE_WIDTH = 50
+DICE_HEIGHT = 50
 
 #CELLS OBJECT
 CELLS_DEF = {

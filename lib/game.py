@@ -1,7 +1,5 @@
 import pygame
-from .constants import FPS, WIDTH, HEIGHT, RED, CORNER_1, CAR_RED, CAR_BLUE, CAR_BLACK, CAR_YELLOW
-from .stock import Stock
-from .cell import Cell
+from .constants import FPS, WIDTH, HEIGHT
 from .board import Board
 from .player import Player
 
@@ -25,7 +23,7 @@ class Game:
         #stock = Stock('RED', 500, [180, 200, 555 ,848,8484,488484], None, 0)
         #stock.draw(self.window)
         for index, player in enumerate(players):
-            board.drawPlayerCar(self.window, 30, player, index, len(players))
+            board.drawPlayerCar(self.window, 0, player, index, len(players))
 
         while self.running:
             self.clock.tick(FPS)
