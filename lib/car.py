@@ -17,4 +17,4 @@ class Car:
         self.y = y
 
     def rotate(self, angle):
-        self.image = pygame.transform.rotate(self.image, angle)
+        self.image = pygame.transform.rotate(self.original_image, angle)
