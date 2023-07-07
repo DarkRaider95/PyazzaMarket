@@ -2,6 +2,7 @@ import pygame
 from .constants import FPS, WIDTH, HEIGHT
 from .board import Board
 from .player import Player
+from .dice import Dice
 
 class Game:
     def __init__(self, width, height, clock, players):
@@ -12,23 +13,22 @@ class Game:
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('PyazzaMarket')
         self.players = players
+        self.board = Board()
+        self.dice = Dice()
 
     def start(self):
         players = []
         for player in self.players:
             players.append(Player(player["name"], player["color"]))
-        board = Board()
-        board.initialiaze_cells(self.window)
-        board.draw(self.window)
-        #stock = Stock('RED', 500, [180, 200, 555 ,848,8484,488484], None, 0)
-        #stock.draw(self.window)
+        self.board.initialiaze_cells(self.window)
+        self.board.draw(self.window)
+        self.dice.drawDices(self.window)
+
         for index, player in enumerate(players):
-            board.drawPlayerCar(self.window, 0, player, index, len(players))
+            self.board.drawPlayerCar(self.window, 0, player, index, len(players))
 
         while self.running:
             self.clock.tick(FPS)
-            
-            #cell.drawCorner(self.window)
             pygame.display.update()
 
             for event in pygame.event.get():
