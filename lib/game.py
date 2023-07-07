@@ -23,13 +23,13 @@ class Game:
         for player in self.players:
             players.append(Player(player["name"], player["color"]))
         
-        self.board.initialiaze_cells(self.window)
-        self.board.draw(self.window)
-        self.dice.drawDices(self.window)
+        self.board.initialiaze_cells(self.screen)
+        self.board.draw(self.screen)
+        self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
 
         for index, player in enumerate(players):
-            self.board.drawPlayerCar(self.window, 0, player, index, len(players))
+            self.board.drawPlayerCar(self.screen, 0, player, index, len(players))
 
         while self.running:
             self.clock.tick(FPS)
