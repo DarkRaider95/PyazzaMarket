@@ -10,13 +10,14 @@ class Stock:
         "5 Cedole della stesso colore",
         "6 Cedole della stesso colore",
     ]
-    def __init__(self, color, stock_value, values, logo):
+    def __init__(self, color, stock_value, values, logo, position):
         self.color = color
         self.stock_value = stock_value
         self.values = values
         self.logo = logo
         self.font_stock_value = pygame.font.Font(None, 100)
         self.fees = pygame.font.Font(None, 32)
+        self.position = position
 
     def draw(self, screen):
         #Draw stock and spaces for logo and fees

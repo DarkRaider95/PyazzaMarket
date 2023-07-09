@@ -57,6 +57,8 @@ class GameUI:
                                 object_id = 'PASS',
                                 manager=self.manager)
         
+        self.passButton.disable()
+        
 
         #self.actions_UI.add(self.launchDice)
         #self.actions_UI.add(self.buyButton)

@@ -4,12 +4,12 @@ from .stock import Stock
 
 class Cell:
     
-    def __init__(self, cellDef, color, stock_value, logo, cell_x, cell_y, cellImage, angle, isCorner = False):
+    def __init__(self, cellDef, cell_x, cell_y, logo, cellImage, angle, position, isCorner = False):
         if(cellDef is not None):
             self.color = cellDef['color']
             self.stock_value = cellDef['value']
             self.logo = logo
-            self.stocks = Cell.initialize_stock(cellDef)
+            self.stocks = Cell.initialize_stock(cellDef, position)
             self.font_stock_value = pygame.font.Font(None, 30)            
         self.cell_x = cell_x
         self.cell_y = cell_y
@@ -18,10 +18,10 @@ class Cell:
         self.angle = angle
         
 
-    def initialize_stock(cellDef):
+    def initialize_stock(cellDef, position):
         stocks = []
         for _ in range(0,2):
-            stocks.append(Stock(cellDef['color'], cellDef['value'], cellDef['penalty'], None))
+            stocks.append(Stock(cellDef['color'], cellDef['value'], cellDef['penalty'], None, position))
 
         return stocks
 
