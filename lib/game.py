@@ -51,8 +51,8 @@ class Game:
                 self.gameUI.manager.process_events(event)            
             
             self.board.draw(self.screen)
-            for player in self.players:
-                self.board.drawPlayerCar(self.screen, player, index, len(self.players))
+            for i, player in enumerate(self.players):
+                self.board.drawPlayerCar(self.screen, player, i, len(self.players))
             
             time_delta = self.clock.tick(FPS) / 1000.0
             self.gameUI.manager.update(time_delta)            
