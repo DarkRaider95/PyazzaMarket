@@ -21,3 +21,8 @@ To do list codice:
 - sistemtare la grafica
     - responsive
     - usare valori negativi dove possibile
+
+To do extra:
+- funzionalità di rete
+- eseguibili
+- ai
