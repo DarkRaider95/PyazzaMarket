@@ -23,7 +23,6 @@ class GameUI:
         self.actions_UI = UIPanel(panel_rect, manager=self.manager)
         self.actions_UI.background_colour = WHITE
         #actionLabel = self.font.render(str('AZIONI'), True, BLACK)
-        panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
         label_rect = pygame.Rect((ACTIONS_WIDTH // 2 - LABEL_WIDTH // 2, 10), (LABEL_WIDTH, LABEL_HEIGHT))
         self.actionLabel = UILabel(label_rect, "AZIONI", manager=self.manager, container=self.actions_UI)
         #self.actions_UI.blit(actionLabel, (ACTIONS_WIDTH // 2 - actionLabel.get_width() // 2, 10))
