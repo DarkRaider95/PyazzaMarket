@@ -40,17 +40,25 @@ class Cell:
         price_y = cell_color_y - stock_price.get_height() - 10
         self.surface.blit(stock_price, (price_x, price_y))
 
-        if(self.angle != 0):
-            self.surface = pygame.transform.rotate(self.surface, self.angle)
+        surfaceRotated = None
 
-        screen.blit(self.surface, (self.cell_x, self.cell_y))
+        if(self.angle != 0):        
+            surfaceRotated = pygame.transform.rotate(self.surface, self.angle)
+            
+        if(surfaceRotated is not None):
+            screen.blit(surfaceRotated, (self.cell_x, self.cell_y))
+        else:
+            screen.blit(self.surface, (self.cell_x, self.cell_y))
 
     def drawCellImage(self, screen):
         # Disponi l'immagine sulla finestra
-        #self.surface.blit(self.cellImage, (0, 0))
-        if(self.angle != 0):
-            self.surface.blit(self.cellImage, (0, 0))
-            self.surface = pygame.transform.rotate(self.surface, self.angle)
-            screen.blit(self.surface, (self.cell_x, self.cell_y))
+        self.surface.blit(self.cellImage, (0, 0))
+        
+        surfaceRotated = None
+        if(self.angle != 0):            
+            surfaceRotated = pygame.transform.rotate(self.surface, self.angle)
+            
+        if(surfaceRotated is not None):
+            screen.blit(surfaceRotated, (self.cell_x, self.cell_y))
         else:
-            screen.blit(self.cellImage, (self.cell_x, self.cell_y))
+            screen.blit(self.surface, (self.cell_x, self.cell_y))

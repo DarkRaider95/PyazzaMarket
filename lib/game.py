@@ -33,8 +33,7 @@ class Game:
             self.board.drawPlayerCar(self.screen, player, index, len(self.players))
 
         while self.running:
-            self.clock.tick(FPS)
-            pygame.display.update()
+            self.clock.tick(FPS)            
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -44,13 +43,18 @@ class Game:
                     if event.ui_element == self.gameUI.launchDice:
                         score = roll()
                         self.dice.updateDice(score,self.screen)
-                        #self.players[0].move(score[0] + score[1])
-                        self.players[0].move(1)
-                        self.board.drawPlayerCar(self.screen, self.players[0], index, len(self.players))
+                        self.players[0].move(score[0] + score[1])
+                        #self.players[0].move(1)
+                        #self.board.drawPlayerCar(self.screen, self.players[0], index, len(self.players))
+                        #self.board.draw(self.screen)
 
-                self.gameUI.manager.process_events(event)
-
-            time_delta = self.clock.tick(FPS) / 1000.0
-            self.gameUI.manager.update(time_delta)
+                self.gameUI.manager.process_events(event)            
             
+            self.board.draw(self.screen)
+            for player in self.players:
+                self.board.drawPlayerCar(self.screen, player, index, len(self.players))
+            
+            time_delta = self.clock.tick(FPS) / 1000.0
+            self.gameUI.manager.update(time_delta)            
             self.gameUI.manager.draw_ui(self.screen)
+            pygame.display.update()
