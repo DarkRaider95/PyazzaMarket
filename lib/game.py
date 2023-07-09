@@ -19,6 +19,7 @@ class Game:
         self.dice = Dice()
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
+        self.squareBalance = 2000 
         
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
@@ -30,6 +31,7 @@ class Game:
         self.board.draw(self.screen)
         self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
+        self.gameUI.draw_leaderboard(self.players, self.squareBalance)
 
         for index, player in enumerate(self.players):
             self.board.drawPlayerCar(self.screen, player, index, len(self.players))
