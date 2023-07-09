@@ -1,18 +1,30 @@
 import pygame
 from .constants import *
+from .stock import Stock
 
 class Cell:
     
-    def __init__(self, color, stock_value, logo, cell_x, cell_y, cellImage, angle, isCorner = False):
-        self.color = color
-        self.stock_value = stock_value        
-        self.logo = logo
-        self.font_stock_value = pygame.font.Font(None, 30)
+    def __init__(self, cellDef, color, stock_value, logo, cell_x, cell_y, cellImage, angle, isCorner = False):
+        if(cellDef is not None):
+            self.color = cellDef['color']
+            self.stock_value = cellDef['value']
+            self.logo = logo
+            self.stocks = Cell.initialize_stock(cellDef)
+            self.font_stock_value = pygame.font.Font(None, 30)            
         self.cell_x = cell_x
         self.cell_y = cell_y
         self.cellImage = cellImage
         self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         self.angle = angle
+        
+
+    def initialize_stock(cellDef):
+        stocks = []
+        for _ in range(0,2):
+            stocks.append(Stock(cellDef['color'], cellDef['value'], cellDef['penalty'], None))
+
+        return stocks
+
 
     def draw(self, screen):
         #if it's not a corner draw a cell

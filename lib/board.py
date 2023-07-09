@@ -22,7 +22,7 @@ class Board:
         #create corner1
         curr_x = WIDTH - 10 - CORNER_WIDTH
         curr_y = HEIGHT - 10 - CORNER_HEIGHT
-        corner1 = Cell(None, None, None, curr_x, curr_y, self.corner1Image, 0, True)
+        corner1 = Cell(None, None, None, None, curr_x, curr_y, self.corner1Image, 0, True)
         self.cells.append(corner1)
         
         #create bottom side
@@ -30,7 +30,7 @@ class Board:
         
         #create corner2
         curr_x = curr_x-CORNER_WIDTH
-        corner2 = Cell(None, None, None, curr_x, curr_y, self.corner2Image, -90, True)
+        corner2 = Cell(None, None, None, None, curr_x, curr_y, self.corner2Image, -90, True)
         self.cells.append(corner2)
         
         #create left side
@@ -38,7 +38,7 @@ class Board:
         
         #create corner3
         curr_y = curr_y-CORNER_HEIGHT        
-        corner3 = Cell(None, None, None, curr_x, curr_y, self.corner3Image, 180, True)
+        corner3 = Cell(None, None, None, None, curr_x, curr_y, self.corner3Image, 180, True)
         self.cells.append(corner3)
         
         #create top side
@@ -47,7 +47,7 @@ class Board:
         
         #create corner4
         curr_x = curr_x + CELL_WIDTH
-        corner4 = Cell(None, None, None, curr_x, curr_y, self.corner4Image, 90, True)
+        corner4 = Cell(None, None, None, None, curr_x, curr_y, self.corner4Image, 90, True)
         self.cells.append(corner4)
         
         #create right side
@@ -61,15 +61,15 @@ class Board:
             x, y = Board.computeNextCoord(x, y, CELLS_DEF[colors[0]]['side'])
             
             if(i == 2 or i == 6):
-                cell = Cell(None, None, None, x, y, eventImage, CELLS_DEF[colors[0]]['angle'])                
+                cell = Cell(None, None, None, None, x, y, eventImage, CELLS_DEF[colors[0]]['angle'])                
             elif(i == 4):
-                cell = Cell(None, None, None, x, y, centralImage, CELLS_DEF[colors[0]]['angle'])
+                cell = Cell(None, None, None, None, x, y, centralImage, CELLS_DEF[colors[0]]['angle'])
             elif (i < 4):
                 cellDef = CELLS_DEF[colors[0]]
-                cell = Cell(cellDef['color'], cellDef['value'], None, x, y, None, cellDef['angle'])                
+                cell = Cell(cellDef, cellDef['color'], cellDef['value'], None, x, y, None, cellDef['angle'])                
             else:
                 cellDef = CELLS_DEF[colors[1]]
-                cell = Cell(cellDef['color'], cellDef['value'], None, x, y, None, cellDef['angle'])
+                cell = Cell(cellDef, cellDef['color'], cellDef['value'], None, x, y, None, cellDef['angle'])
                 
             self.cells.append(cell)
 

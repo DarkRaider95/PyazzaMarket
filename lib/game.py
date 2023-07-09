@@ -23,6 +23,8 @@ class Game:
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
 
+        self.currentPlayer = 0
+
     def start(self):
         self.board.initialiaze_cells()
         self.board.draw(self.screen)
@@ -43,16 +45,29 @@ class Game:
                     if event.ui_element == self.gameUI.launchDice:
                         score = roll()
                         self.dice.updateDice(score,self.screen)
-                        self.players[0].move(score[0] + score[1])
-                        #self.players[0].move(1)
-                        #self.board.drawPlayerCar(self.screen, self.players[0], index, len(self.players))
-                        #self.board.draw(self.screen)
+                        #self.players[self.currentPlayer].move(score[0] + score[1])
+                        self.players[self.currentPlayer].move(1)
+                        if((self.players[self.currentPlayer].position % 5 == 0 or
+                           self.players[self.currentPlayer].position % 7 == 0 or 
+                           self.players[self.currentPlayer].position % 3 == 0) and (self.players[self.currentPlayer].position % 9 != 0 or 
+                                                                                    self.players[self.currentPlayer].position % 6 != 0)):
+                            self.gameUI.buyButton.disable()
+                        else:
+                            self.gameUI.buyButton.enable()                        
+                    elif event.ui_element == self.gameUI.buyButton:
+                        curr_pos = self.players[self.currentPlayer].position
+                        if(len(self.board.cells[curr_pos].stocks) > 0):
+                            stock = self.board.cells[curr_pos].stocks.pop()
+                            self.players[self.currentPlayer].stocks.append(stock)
+                    elif event.ui_element == self.gameUI.passButton:
+                        self.currentPlayer = (self.currentPlayer + 1) % len(self.players)                        
 
                 self.gameUI.manager.process_events(event)            
             
             self.board.draw(self.screen)
             for i, player in enumerate(self.players):
                 self.board.drawPlayerCar(self.screen, player, i, len(self.players))
+                print(len(player.stocks))
             
             time_delta = self.clock.tick(FPS) / 1000.0
             self.gameUI.manager.update(time_delta)            

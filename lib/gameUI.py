@@ -41,6 +41,8 @@ class GameUI:
                                 object_id = 'BUY',
                                 manager=self.manager)
         
+        self.buyButton.disable()
+        
         # Bottone "-" per diminuire il numero di giocatori
         self.showStocks = UIButton(relative_rect=pygame.Rect(ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 150, BUTTON_WIDTH, BUTTON_HEIGHT),
                                 text="Mostra Cedole",
