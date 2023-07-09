@@ -13,3 +13,16 @@ class Player:
     def move(self, step):
         self.old_position = self.position
         self.position = (self.position + step) % 40
+
+    def stockValue(self):
+        value = 0
+        for stock in self.stocks:
+            value += stock.stock_value
+
+        return value
+
+    def changeBalance(self, balance):
+        self.balance += balance
+    
+    def addStock(self, stocks):
+        self.stocks.append(stocks)

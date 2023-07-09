@@ -22,3 +22,24 @@ def update_stock_price(new_stock_price):
 
 def updated_penality(old_penality, old_stock_price, new_stock_price):
     return (old_penality // (old_stock_price * new_stock_price))
+
+def buyStock(cells, player):
+    curr_pos = player.position
+    stock_value = cells[curr_pos].stocks[0].stock_value
+    if(len(cells[curr_pos].stocks) > 0):
+        if player.balance >= stock_value:
+            stock = cells[curr_pos].stocks.pop()
+            player.changeBalance(-stock_value)
+            player.addStock(stock)
+    
+    return cells
+
+def enableBuyButton(cells, player, ui, board):
+    curr_pos = player.position
+    if(board.checkIfStockCell(player) or len(cells[curr_pos].stocks)  == 0):
+        ui.buyButton.disable()
+    else:
+        if player.balance >= cells[curr_pos].stocks[0].stock_value:
+            ui.buyButton.enable()
+        else:
+            ui.buyButton.disable()

@@ -125,3 +125,7 @@ class Board:
     def checkIfStockCell(self, player):
         cell = self.cells[player.position]
         return cell.cellImage is not None
+    
+    def getCellValue(self, position):
+        cell = self.cells[position]
+        return cell.stock_value

@@ -4,7 +4,7 @@ from .board import Board
 from .player import Player
 from .gameUI import GameUI
 from .dice import Dice
-from .gameLogic import roll
+from .gameLogic import roll, buyStock, enableBuyButton
 import pygame_gui
 
 class Game:
@@ -19,12 +19,12 @@ class Game:
         self.dice = Dice()
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
-        self.squareBalance = 2000 
-        
+        self.squareBalance = 2000
+
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
 
-        self.currentPlayer = 0
+        self.currentPlayer = 0 # Magari al posto dell'indice possiamo salvare direttamente il giocatare, così evitiamo di cercarlo all'interno dell'array di giocatori
 
     def start(self):
         self.board.initialiaze_cells()
@@ -47,19 +47,14 @@ class Game:
                     if event.ui_element == self.gameUI.launchDice:                        
                         score = roll()
                         self.dice.updateDice(score,self.screen)
-                        self.players[self.currentPlayer].move(score[0] + score[1])
-                        curr_pos = self.players[self.currentPlayer].position
-                        if(self.board.checkIfStockCell(self.players[self.currentPlayer]) or len(self.board.cells[curr_pos].stocks)  == 0):
-                            self.gameUI.buyButton.disable()
-                        else:
-                            self.gameUI.buyButton.enable()
+                        curr_player = self.players[self.currentPlayer]
+                        curr_player.move(score[0] + score[1])
+                        enableBuyButton(self.board.cells, curr_player, self.gameUI, self.board)
                         self.gameUI.launchDice.disable()
                         self.gameUI.passButton.enable()                        
                     elif event.ui_element == self.gameUI.buyButton:
-                        curr_pos = self.players[self.currentPlayer].position
-                        if(len(self.board.cells[curr_pos].stocks) > 0):
-                            stock = self.board.cells[curr_pos].stocks.pop()
-                            self.players[self.currentPlayer].stocks.append(stock)
+                        self.cells = buyStock(self.board.cells, curr_player)
+                        self.gameUI.updateLabel(curr_player)
                     elif event.ui_element == self.gameUI.passButton:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
                         self.gameUI.launchDice.enable()
