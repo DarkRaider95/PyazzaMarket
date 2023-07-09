@@ -55,6 +55,7 @@ class Game:
                     elif event.ui_element == self.gameUI.buyButton:
                         self.cells = buyStock(self.board.cells, curr_player)
                         self.gameUI.updateLabel(curr_player)
+                        self.gameUI.buyButton.disable()
                     elif event.ui_element == self.gameUI.passButton:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
                         self.gameUI.launchDice.enable()
