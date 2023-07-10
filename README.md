@@ -1,7 +1,7 @@
 To do list funzionalità:
 - ~~ pedaggi e incidenti ~~
     - ~~ fixare celle,bisogna crearne una per nome adesso sono stampate per colore tutte uguali ~~
-- passaggio via
+- ~~ passaggio via ~~
 - tabella con proprietà per giocatore
 - caselle speciali, angoli, dadi
 - quotazioni, senza asta

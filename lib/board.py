@@ -22,7 +22,7 @@ class Board:
         #create corner1
         curr_x = WIDTH - 10 - CORNER_WIDTH
         curr_y = HEIGHT - 10 - CORNER_HEIGHT
-        corner1 = Cell(None, curr_x, curr_y, None, self.corner1Image, 0, position, True)
+        corner1 = Cell(None, curr_x, curr_y, None, self.corner1Image, 0, position, None, True)
         self.cells.append(corner1)
         
         #create bottom side
@@ -30,7 +30,7 @@ class Board:
         
         #create corner2
         curr_x = curr_x-CORNER_WIDTH
-        corner2 = Cell(None, curr_x, curr_y, None, self.corner2Image, -90, position, True)
+        corner2 = Cell(None, curr_x, curr_y, None, self.corner2Image, -90, position, None, True)
         self.cells.append(corner2)
         
         #create left side
@@ -38,7 +38,7 @@ class Board:
         
         #create corner3
         curr_y = curr_y-CORNER_HEIGHT        
-        corner3 = Cell(None, curr_x, curr_y, None, self.corner3Image, 180, position, True)
+        corner3 = Cell(None, curr_x, curr_y, None, self.corner3Image, 180, position, None, True)
         self.cells.append(corner3)
         
         #create top side
@@ -47,7 +47,7 @@ class Board:
         
         #create corner4
         curr_x = curr_x + CELL_WIDTH
-        corner4 = Cell(None, curr_x, curr_y, None, self.corner4Image, 90, position, True)
+        corner4 = Cell(None, curr_x, curr_y, None, self.corner4Image, 90, position, None, True)
         self.cells.append(corner4)
         
         #create right side

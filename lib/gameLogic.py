@@ -1,5 +1,5 @@
 import random
-from .constants import CRASH_FEE
+from .constants import CRASH_FEE, TURN_FEE
 
 actual_stock_price = [200,280,360,440,500,600,700,800]
 
@@ -74,3 +74,8 @@ def checkCrash(players, player_number, ui): # since current_player is the one th
             player.changeBalance(CRASH_FEE)
             ui.updateLabel(current_player)
             ui.updateLabel(player)
+
+def checkTurn(player, ui):
+    if player.old_position > player.position:
+        player.changeBalance(TURN_FEE)
+        ui.updateLabel(player)
