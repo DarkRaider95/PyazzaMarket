@@ -4,7 +4,7 @@ from .board import Board
 from .player import Player
 from .gameUI import GameUI
 from .dice import Dice
-from .gameLogic import roll, buyStock, enableBuyButton
+from .gameLogic import roll, buyStock, enableBuyButton, checkForPenality
 import pygame_gui
 
 class Game:
@@ -50,6 +50,7 @@ class Game:
                         curr_player = self.players[self.currentPlayer]
                         curr_player.move(score[0] + score[1])
                         enableBuyButton(self.board.cells, curr_player, self.gameUI, self.board)
+                        checkForPenality(self.board.cells, self.players, self.currentPlayer)
                         self.gameUI.launchDice.disable()
                         self.gameUI.passButton.enable()                        
                     elif event.ui_element == self.gameUI.buyButton:
