@@ -22,7 +22,7 @@ class GameUI:
         actions_UI = UIPanel(panel_rect, manager=self.manager)
         #actionLabel = self.font.render(str('AZIONI'), True, BLACK)
         label_rect = pygame.Rect((ACTIONS_WIDTH // 2 - LABEL_WIDTH // 2, 10), (LABEL_WIDTH, LABEL_HEIGHT))
-        self.actionLabel = UILabel(label_rect, "AZIONI", manager=self.manager, container=actions_UI)
+        UILabel(label_rect, "AZIONI", manager=self.manager, container=actions_UI)
         #self.actions_UI.blit(actionLabel, (ACTIONS_WIDTH // 2 - actionLabel.get_width() // 2, 10))
         self.launchDice = UIButton(relative_rect=pygame.Rect(ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 50, BUTTON_WIDTH, BUTTON_HEIGHT),
                                 text="Lancia i dadi",
@@ -63,23 +63,62 @@ class GameUI:
 
     def draw_leaderboard(self, players, squareBalance):
         # DRAWING THE BOARD
+        position_x = LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2
+        label_dimension = (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT)
         panel_rect = pygame.Rect((30, 30), (LEADERBOARD_WIDTH, LEADERBOARD_HEIGHT)) # x, y, width, height
-        self.leaderboard = UIPanel(panel_rect, manager=self.manager)
+        leaderboard = UIPanel(panel_rect, manager=self.manager)
         # ADDING THE TITLE LABEL
-        title_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 10), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
-        UILabel(title_rect, "LEADERBOARD", manager=self.manager, container=self.leaderboard)
+        title_rect = pygame.Rect((position_x, 10), label_dimension)
+        UILabel(title_rect, "LEADERBOARD", manager=self.manager, container=leaderboard)
         # ADDING SQUARE BALANCE LABEL
-        balance_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 30), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
-        UILabel(balance_rect, "Riserva di piazza : " + str(squareBalance), manager=self.manager, container=self.leaderboard)
+        balance_rect = pygame.Rect((position_x, 30), label_dimension)
+        UILabel(balance_rect, "Riserva di piazza : " + str(squareBalance), manager=self.manager, container=leaderboard)
         # Head of players table
-        player_label_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 50), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
-        UILabel(player_label_rect,  "Giocatore: Scudi | Azioni ", manager=self.manager, container=self.leaderboard)
+        player_label_rect = pygame.Rect((position_x, 50), label_dimension)
+        UILabel(player_label_rect,  "Giocatore: Scudi | Azioni ", manager=self.manager, container=leaderboard)
         # ADDING THE PLAYERS LABELS
-        for i, player in enumerate(players):
-            player_label_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 50 + (20 * (i + 1))), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
-            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()), manager=self.manager, container=self.leaderboard)
+        for i, player in enumerate(players): # considerare di fare una lable unica e andare a capo per ogni riga
+            player_label_rect = pygame.Rect((position_x, 50 + (20 * (i + 1))), label_dimension)
+            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
             self.playerLabels.append({"name": player.playerName, "label": label})
-            
+    
+         
+    def draw_stockboard(self, players):
+        # DRAWING THE BOARD
+        lable_dimension = (150, LABEL_HEIGHT)
+        sorted_player = sorted(players, key=lambda x: len(x.stocks), reverse=True)
+        max_stock = max(len(sorted_player[0].stocks), 1)
+        num_columns = min(3, len(sorted_player))
+        for i in range(0,num_columns):
+            player = sorted_player[i]
+            position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * i)
+            # ADDING THE TITLE LABEL
+            title_rect = pygame.Rect((position_x, 20 + CELL_HEIGHT),(lable_dimension))
+            UILabel(title_rect, player.playerName, manager=self.manager)
+            if len(player.stocks) == 0:
+                player_label_rect = pygame.Rect((position_x, 40 + CELL_HEIGHT), lable_dimension)
+                UILabel(player_label_rect,  "No stock", manager=self.manager)
+            else:
+                for j, stock in enumerate(player.stocks): # considerare di fare una lable unica e andare a capo per ogni riga
+                    position_y = 40 + CELL_HEIGHT + (20 * j)
+                    player_label_rect = pygame.Rect((position_x, position_y), lable_dimension)
+                    UILabel(player_label_rect,  stock.name, manager=self.manager)
+        if len(sorted_player) > 3:
+            for i in range(3,len(sorted_player)):
+                player = sorted_player[i]
+                position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * (i - 3))
+                # ADDING THE TITLE LABEL
+                title_rect = pygame.Rect((position_x, 60 + CELL_HEIGHT + (max_stock * 20)),(lable_dimension))
+                UILabel(title_rect, player.playerName, manager=self.manager)
+                if len(player.stocks) == 0:
+                    player_label_rect = pygame.Rect((position_x, 80 + CELL_HEIGHT + (max_stock * 20)), lable_dimension)
+                    UILabel(player_label_rect,  "No stock", manager=self.manager)
+                else:
+                    for j, stock in enumerate(player.stocks): # considerare di fare una lable unica e andare a capo per ogni riga
+                        position_y = 80 + CELL_HEIGHT + (20 * j) + (max_stock * 20)
+                        player_label_rect = pygame.Rect((position_x, position_y), lable_dimension)
+                        UILabel(player_label_rect,  stock.name, manager=self.manager)
+
     def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
         for label in self.playerLabels:
             if label["name"] == player.playerName:

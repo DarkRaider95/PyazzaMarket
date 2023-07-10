@@ -32,6 +32,7 @@ class Game:
         self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
         self.gameUI.draw_leaderboard(self.players, self.squareBalance)
+        self.gameUI.draw_stockboard(self.players)
 
         for index, player in enumerate(self.players):
             self.board.drawPlayerCar(self.screen, player, index, len(self.players))
