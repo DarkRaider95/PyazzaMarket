@@ -13,7 +13,6 @@ class Stock:
     def __init__(self, cellDef, position, name):
         self.color = cellDef['color']
         self.stock_value = cellDef['value']
-        #self.value = cellDef['value']
         self.logo = None # cellDef['logo']
         self.font_stock_value = pygame.font.Font(None, 100)
         self.fees = pygame.font.Font(None, 32)

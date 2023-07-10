@@ -45,7 +45,7 @@ def enableBuyButton(cells, player, ui, board):
         else:
             ui.buyButton.disable()
 
-def checkForPenality(cells, players, player_number, ui): # testare per vedere se riconosce quando le celle sono uguali
+def checkForPenalty(cells, players, player_number, ui): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
     cell = cells[current_player.position]
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
@@ -58,7 +58,7 @@ def checkForPenality(cells, players, player_number, ui): # testare per vedere se
             for player in players:
                 for stock in player.stocks:
                     if cell.position == stock.position:
-                        penality = player.computePenality(stock)
+                        penality = player.computePenalty(stock)
                         current_player.changeBalance(-penality)
                         player.changeBalance(penality)
                         ui.updateLabel(current_player)

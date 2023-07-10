@@ -41,12 +41,11 @@ class Player:
 
         return False
 
-    def computePenality(self, stock):
+    def computePenalty(self, stock):
         sameColorCells = self.sameColorCount(stock.color)
-        if sameColorCells > 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
+        if sameColorCells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
             return stock.penalties[sameColorCells - 1]
         elif sameColorCells == 2: # we check if the player own two stocks of the same company
             if self.sameCompanyCount(stock):
                 return stock.penalties[1]
-        else: # otherwise he will pay the first panalty
-            return stock.penalties[0]
+        return stock.penalties[0] # this will return if the stock of the company is only one
