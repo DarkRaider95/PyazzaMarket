@@ -52,9 +52,10 @@ class Game:
                         #curr_player.move(10)
                         enableBuyButton(self.board.cells, curr_player, self.gameUI, self.board)
                         # we need to create a copy of the list in order to perform some edit of the list later
-                        checkForPenalty(self.board.cells, self.players.copy(), self.currentPlayer, self.gameUI)
-                        checkCrash(self.players.copy(), self.currentPlayer, self.gameUI)
-                        checkTurn(self.players[self.currentPlayer], self.gameUI)
+                        checkForPenalty(self.board.cells, self.players.copy(), self.currentPlayer)
+                        checkCrash(self.players.copy(), self.currentPlayer)
+                        checkTurn(self.players[self.currentPlayer])
+                        self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.launchDice.disable()
                         self.gameUI.passButton.enable()                        
                     elif event.ui_element == self.gameUI.buyButton:

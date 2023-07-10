@@ -16,7 +16,7 @@ class Cell:
         self.cellImage = cellImage
         self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         self.angle = angle
-        #self.position = position
+        self.position = position
         
 
     def initialize_stock(cellDef, position, name):
