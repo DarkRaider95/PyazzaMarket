@@ -4,7 +4,7 @@ To do list funzionalità:
 - ~~ passaggio via ~~
 - aggiungere situazione doppio dado
 - tabella con proprietà per giocatore
-- caselle speciali, angoli, dadi
+- ~~ caselle speciali, angoli, dadi ~~ 
 - quotazioni, senza asta
 - eventi
 - loghi
