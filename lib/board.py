@@ -57,20 +57,24 @@ class Board:
     def createSide(self, curr_x, curr_y, colors, eventImage, centralImage, position):        
         x = curr_x
         y = curr_y
+        # saving the names of the cells following the order of the cells
+        names = CELLS_DEF[colors[0]]['names'] + CELLS_DEF[colors[1]]['names']
+    
         for i in range(0, 9):
             x, y = Board.computeNextCoord(x, y, CELLS_DEF[colors[0]]['side'])
             position += 1
             
-            if(i == 2 or i == 6):
-                cell = Cell(None, x, y, None, eventImage, CELLS_DEF[colors[0]]['angle'], position)                
-            elif(i == 4):
-                cell = Cell(None, x, y, None, centralImage, CELLS_DEF[colors[0]]['angle'], position)
-            elif (i < 4):
+            if(i == 2 or i == 6): # check if it is an event cell
+                cell = Cell(None, x, y, None, eventImage, CELLS_DEF[colors[0]]['angle'], position, None)                
+            elif(i == 4): # check if it is a central cell, like free stop, quotation, chance
+                cell = Cell(None, x, y, None, centralImage, CELLS_DEF[colors[0]]['angle'], position, None)
+            elif (i < 4): # check if it is less than 4 that means that it is the first color
                 cellDef = CELLS_DEF[colors[0]]
-                cell = Cell(cellDef, x, y, None, None, cellDef['angle'], position)
-            else:
+                cell = Cell(cellDef, x, y, None, None, cellDef['angle'], position, names.pop(0))
+            else: # otherwise is the second color
+                # cell def defines the color, x and y are the position, than logo, image if it is a special one and position is the ordered number of the cell
                 cellDef = CELLS_DEF[colors[1]]
-                cell = Cell(cellDef, x, y, None, None, cellDef['angle'], position)
+                cell = Cell(cellDef, x, y, None, None, cellDef['angle'], position, names.pop(0)) 
                 
             self.cells.append(cell)
 

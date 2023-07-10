@@ -10,14 +10,16 @@ class Stock:
         "5 Cedole della stesso colore",
         "6 Cedole della stesso colore",
     ]
-    def __init__(self, color, stock_value, values, logo, position):
-        self.color = color
-        self.stock_value = stock_value
-        self.values = values
-        self.logo = logo
+    def __init__(self, cellDef, position, name):
+        self.color = cellDef['color']
+        self.stock_value = cellDef['value']
+        #self.value = cellDef['value']
+        self.logo = None # cellDef['logo']
         self.font_stock_value = pygame.font.Font(None, 100)
         self.fees = pygame.font.Font(None, 32)
         self.position = position
+        self.name = name
+        self.penalties = cellDef['penalty']
 
     def draw(self, screen):
         #Draw stock and spaces for logo and fees
@@ -38,11 +40,14 @@ class Stock:
         stock_price = self.font_stock_value.render(str(self.stock_value) + "  SCUDI", True, WHITE)
         screen.blit(stock_price, (WIDTH // 2 - stock_price.get_width() // 2, logo_y + LOGO_HEIGHT + 50))
 
-        for i in range(0,len(self.values)):
+        for i in range(0,len(self.value)):
             #write string value
             string_value = self.fees.render(Stock.string_values[i], True, BLACK)
             screen.blit(string_value, (price_x + 10, price_y + 30 * i + 1))
             #write fee value for that string
-            fee_price = self.fees.render(str(self.values[i]) + " SCUDI", True, BLACK)
+            fee_price = self.fees.render(str(self.value[i]) + " SCUDI", True, BLACK)
             screen.blit(fee_price, (price_x + PRICE_WIDTH - fee_price.get_width() - 10, price_y + 30 * i + 1))
+
+    def updatePenalties(self, new_penalties):
+        self.penalties = new_penalties
 

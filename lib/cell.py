@@ -3,25 +3,26 @@ from .constants import *
 from .stock import Stock
 
 class Cell:
-    
-    def __init__(self, cellDef, cell_x, cell_y, logo, cellImage, angle, position, isCorner = False):
+    # we should have name or position in both the cell and the stock in order to now where to put the stock in case the user will return it to the bank
+    def __init__(self, cellDef, cell_x, cell_y, logo, cellImage, angle, position, name, isCorner = False):
         if(cellDef is not None):
             self.color = cellDef['color']
             self.stock_value = cellDef['value']
             self.logo = logo
-            self.stocks = Cell.initialize_stock(cellDef, position)
+            self.stocks = Cell.initialize_stock(cellDef, position, name)
             self.font_stock_value = pygame.font.Font(None, 30)            
         self.cell_x = cell_x
         self.cell_y = cell_y
         self.cellImage = cellImage
         self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         self.angle = angle
+        self.position = position
         
 
-    def initialize_stock(cellDef, position):
+    def initialize_stock(cellDef, position, name):
         stocks = []
         for _ in range(0,2):
-            stocks.append(Stock(cellDef['color'], cellDef['value'], cellDef['penalty'], None, position))
+            stocks.append(Stock(cellDef, position, name))
 
         return stocks
 

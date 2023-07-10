@@ -44,17 +44,22 @@ def enableBuyButton(cells, player, ui, board):
         else:
             ui.buyButton.disable()
 
-def checkForPenality(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
+def checkForPenality(cells, players, player_number, ui): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
     cell = cells[current_player.position]
-    own_by_the_player = False
-    if cell in current_player.stocks:
-        own_by_the_player = True
-    if not own_by_the_player:
-        for player in players:
-            if player != current_player:
-                if cell in player.stocks:
-                    print("penality")
-                    penality = cell.penality
-                    current_player.changeBalance(-penality)
-                    player.changeBalance(penality)
+    if cell.cellImage == None: # first we check if it is a stock cell or not
+        own_by_the_player = False # then we check if the player own the stock
+        for stock in current_player.stocks:
+            if cell.position == stock.position:
+                own_by_the_player = True
+        if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
+            for player in players:
+                if player != current_player:
+                    for stock in player.stocks:
+                        if cell.position == stock.position:
+                            penality = player.computePenality(stock)
+                            current_player.changeBalance(-penality)
+                            player.changeBalance(penality)
+                            ui.updateLabel(current_player)
+                            ui.updateLabel(player)
+                            break # we break in order to pay only once the fee if the player have more than one card in the same cell

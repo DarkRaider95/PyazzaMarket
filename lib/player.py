@@ -1,4 +1,4 @@
-from .constants import INITIAL_BALANCE
+from .constants import INITIAL_BALANCE, CELLS_DEF
 from .car import Car
 
 class Player:
@@ -26,3 +26,27 @@ class Player:
     
     def addStock(self, stocks):
         self.stocks.append(stocks)
+
+    def sameColorCount(self, color):
+        count = 0
+        for stock in self.stocks:
+            if stock.color == color:
+                count += 1
+        return count
+
+    def sameCompanyCount(self, stock1): # we check if the player own two stocks of the same company
+        for stock2 in self.stocks:
+            if stock1.name == stock2.name:
+                return True
+
+        return False
+
+    def computePenality(self, stock):
+        sameColorCells = self.sameColorCount(stock.color)
+        if sameColorCells > 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
+            return stock.penalties[sameColorCells - 1]
+        elif sameColorCells == 2: # we check if the player own two stocks of the same company
+            if self.sameCompanyCount(stock):
+                return stock.penalties[1]
+        else: # otherwise he will pay the first panalty
+            return stock.penalties[0]

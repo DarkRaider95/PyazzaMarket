@@ -73,7 +73,8 @@ CELLS_DEF = {
         'color': ORANGE,
         'penalty': [60, 160, 160, 200, 260, 500],
         'side': 'BOT',
-        'angle': 0
+        'angle': 0,
+        'names': ['gled', 'friskies', 'frio']
     },
     'LIGHT_BLUE':{
         'logos': ['finish.png', 'dash.png', 'cuore.png'],
@@ -81,7 +82,8 @@ CELLS_DEF = {
         'color': LIGHT_BLUE,
         'penalty': [80,220,220,280,360,700],
         'side': 'BOT',
-        'angle': 0
+        'angle': 0,
+        'names': ['finish', 'dash', 'cuore']
     },
     'PINK':{
         'logos': ['zarotti.png', 'ponti.png', 'nostromo.png'],
@@ -89,7 +91,8 @@ CELLS_DEF = {
         'color': PINK,
         'penalty': [100, 280, 280, 360, 460, 900],
         'side': 'LEFT',
-        'angle': -90
+        'angle': -90,
+        'names': ['zarotti', 'ponti', 'nostromo']
     },
     'GREEN':{
         'logos': ['barilla.png', 'euvita.png', 'galbusera.png'],
@@ -97,7 +100,8 @@ CELLS_DEF = {
         'color': GREEN,
         'penalty': [120, 340, 340, 440, 560, 1000],
         'side': 'LEFT',
-        'angle': -90
+        'angle': -90,
+        'names': ['barilla', 'euvita', 'galbusera']
     },
     'RED':{
         'logos': ['lavazza.png', 'mangiaebevi.png', 'stella-artois.png'],
@@ -105,7 +109,8 @@ CELLS_DEF = {
         'color': RED,
         'penalty': [140, 380, 380, 500, 660, 1200],
         'side': 'TOP',
-        'angle': 180
+        'angle': 180,
+        'names': ['lavazza', 'mangiaebevi', 'stella-artois']
     },
     'BLUE':{
         'logos': ['san-benedetto.png', 'pepsi.png', 'schweppes.png'],
@@ -113,15 +118,17 @@ CELLS_DEF = {
         'color': BLUE,
         'penalty': [160, 460, 460, 600, 760, 1500],
         'side': 'TOP',
-        'angle': 180
+        'angle': 180,
+        'names': ['san-benedetto', 'pepsi', 'schweppes']
     },
     'YELLOW':{
-        'logos': ['ibis.png', 'friendies.png', 'yoplait.png'],
+        'logos': ['ibis.png', 'frendies.png', 'yoplait.png'],
         'value': 700,
         'color': YELLOW,
         'penalty': [180, 560, 560, 700, 880, 1760],
         'side': 'RIGHT',
-        'angle': 90
+        'angle': 90,
+        'names': ['ibis', 'frendies', 'yoplait']
     },
     'PURPLE':{
         'logos': ['cavicchioli.png', 'martini.png', 'galup.png'],
@@ -129,7 +136,8 @@ CELLS_DEF = {
         'color': PURPLE,
         'penalty': [200, 600, 600, 800, 1000, 2000],
         'side': 'RIGHT',
-        'angle': 90
+        'angle': 90,
+        'names': ['cavicchioli', 'martini', 'galup']
     }
 
 }

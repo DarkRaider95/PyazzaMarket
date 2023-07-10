@@ -48,9 +48,10 @@ class Game:
                         score = roll()
                         self.dice.updateDice(score,self.screen)
                         curr_player = self.players[self.currentPlayer]
-                        curr_player.move(score[0] + score[1])
+                        #curr_player.move(score[0] + score[1])
+                        curr_player.move(3)
                         enableBuyButton(self.board.cells, curr_player, self.gameUI, self.board)
-                        checkForPenality(self.board.cells, self.players, self.currentPlayer)
+                        checkForPenality(self.board.cells, self.players, self.currentPlayer, self.gameUI)
                         self.gameUI.launchDice.disable()
                         self.gameUI.passButton.enable()                        
                     elif event.ui_element == self.gameUI.buyButton:
