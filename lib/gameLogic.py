@@ -39,19 +39,18 @@ def checkForPenalty(cells, players, player_number): # testare per vedere se rico
     current_player = players[player_number]
     cell = cells[current_player.position]
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
-    if cell.cellImage == None: # first we check if it is a stock cell or not
-        own_by_the_player = False # then we check if the player own the stock
-        for stock in current_player.stocks:
-            if cell.position == stock.position:
-                own_by_the_player = True
-        if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
-            for player in players:
-                for stock in player.stocks:
-                    if cell.position == stock.position:
-                        penality = player.computePenalty(stock)
-                        current_player.changeBalance(-penality)
-                        player.changeBalance(penality)
-                        break # we break in order to pay only once the fee if the player have more than one card in the same cell
+    own_by_the_player = False # then we check if the player own the stock
+    for stock in current_player.stocks:
+        if cell.position == stock.position:
+            own_by_the_player = True
+    if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
+        for player in players:
+            for stock in player.stocks:
+                if cell.position == stock.position:
+                    penality = player.computePenalty(stock)
+                    current_player.changeBalance(-penality)
+                    player.changeBalance(penality)
+                    break # we break in order to pay only once the fee if the player have more than one card in the same cell
 
 def checkCrash(players, player_number): # since current_player is the one that have done the last move it will be the one that will pay for the crash
     current_player = players[player_number]
