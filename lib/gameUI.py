@@ -85,3 +85,7 @@ class GameUI:
             if label["name"] == player.playerName:
                 label["label"].set_text(player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()))
                 break
+
+    def updateAllPlayerLables(self, players):
+        for player in players:
+            self.updateLabel(player)

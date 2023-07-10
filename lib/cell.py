@@ -4,7 +4,7 @@ from .stock import Stock
 
 class Cell:
     # we should have name or position in both the cell and the stock in order to now where to put the stock in case the user will return it to the bank
-    def __init__(self, cellDef, cell_x, cell_y, logo, cellImage, angle, position, name, isCorner = False):
+    def __init__(self, cellDef, cellType, cell_x, cell_y, logo, cellImage, angle, position, name, isCorner = False):
         if(cellDef is not None):
             self.color = cellDef['color']
             self.stock_value = cellDef['value']
@@ -16,7 +16,8 @@ class Cell:
         self.cellImage = cellImage
         self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         self.angle = angle
-        #self.position = position
+        self.cellType = cellType
+        self.position = position
         
 
     def initialize_stock(cellDef, position, name):

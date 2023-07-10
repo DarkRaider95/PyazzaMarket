@@ -22,39 +22,39 @@ class Board:
         #create corner1
         curr_x = WIDTH - 10 - CORNER_WIDTH
         curr_y = HEIGHT - 10 - CORNER_HEIGHT
-        corner1 = Cell(None, curr_x, curr_y, None, self.corner1Image, 0, position, None, True)
+        corner1 = Cell(None, START_TYPE, curr_x, curr_y, None, self.corner1Image, 0, position, None, True)
         self.cells.append(corner1)
         
         #create bottom side
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["ORANGE","LIGHT_BLUE"], self.eventImage, self.fermataLibImage, position)
+        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["ORANGE","LIGHT_BLUE"], self.eventImage, self.fermataLibImage, FREE_STOP_TYPE, position)
         
         #create corner2
         curr_x = curr_x-CORNER_WIDTH
-        corner2 = Cell(None, curr_x, curr_y, None, self.corner2Image, -90, position, None, True)
+        corner2 = Cell(None, STOCKS_PRIZE_TYPE, curr_x, curr_y, None, self.corner2Image, -90, position, None, True)
         self.cells.append(corner2)
         
         #create left side
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["PINK","GREEN"], self.eventImage, self.quotationImage, position)
+        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["PINK","GREEN"], self.eventImage, self.quotationImage, QUOTATION_TYPE, position)
         
         #create corner3
         curr_y = curr_y-CORNER_HEIGHT        
-        corner3 = Cell(None, curr_x, curr_y, None, self.corner3Image, 180, position, None, True)
+        corner3 = Cell(None, CHOOSE_STOCK_TYPE, curr_x, curr_y, None, self.corner3Image, 180, position, None, True)
         self.cells.append(corner3)
         
         #create top side
         curr_x = curr_x + CELL_WIDTH
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["RED","BLUE"], self.eventImage, self.chanceImage, position)
+        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["RED","BLUE"], self.eventImage, self.chanceImage, CHANCE_TYPE, position)
         
         #create corner4
         curr_x = curr_x + CELL_WIDTH
-        corner4 = Cell(None, curr_x, curr_y, None, self.corner4Image, 90, position, None, True)
+        corner4 = Cell(None, SIX_HUNDRED_TYPE, curr_x, curr_y, None, self.corner4Image, 90, position, None, True)
         self.cells.append(corner4)
         
         #create right side
         curr_y = curr_y+CELL_WIDTH
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["YELLOW","PURPLE"], self.eventImage, self.quotationImage, position)
+        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["YELLOW","PURPLE"], self.eventImage, self.quotationImage, QUOTATION_TYPE, position)
     
-    def createSide(self, curr_x, curr_y, colors, eventImage, centralImage, position):        
+    def createSide(self, curr_x, curr_y, colors, eventImage, centralImage, centralType, position):        
         x = curr_x
         y = curr_y
         # saving the names of the cells following the order of the cells
@@ -65,16 +65,16 @@ class Board:
             position += 1
             
             if(i == 2 or i == 6): # check if it is an event cell
-                cell = Cell(None, x, y, None, eventImage, CELLS_DEF[colors[0]]['angle'], position, None)                
+                cell = Cell(None, EVENTS_TYPE, x, y, None, eventImage, CELLS_DEF[colors[0]]['angle'], position, None)                
             elif(i == 4): # check if it is a central cell, like free stop, quotation, chance
-                cell = Cell(None, x, y, None, centralImage, CELLS_DEF[colors[0]]['angle'], position, None)
+                cell = Cell(None, centralType, x, y, None, centralImage, CELLS_DEF[colors[0]]['angle'], position, None)
             elif (i < 4): # check if it is less than 4 that means that it is the first color
                 cellDef = CELLS_DEF[colors[0]]
-                cell = Cell(cellDef, x, y, None, None, cellDef['angle'], position, names.pop(0))
+                cell = Cell(cellDef, STOCKS_TYPE, x, y, None, None, cellDef['angle'], position, names.pop(0))
             else: # otherwise is the second color
                 # cell def defines the color, x and y are the position, than logo, image if it is a special one and position is the ordered number of the cell
                 cellDef = CELLS_DEF[colors[1]]
-                cell = Cell(cellDef, x, y, None, None, cellDef['angle'], position, names.pop(0)) 
+                cell = Cell(cellDef, STOCKS_TYPE, x, y, None, None, cellDef['angle'], position, names.pop(0)) 
                 
             self.cells.append(cell)
 

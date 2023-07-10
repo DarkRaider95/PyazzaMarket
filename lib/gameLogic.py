@@ -1,5 +1,5 @@
 import random
-from .constants import CRASH_FEE, TURN_FEE
+from .constants import *
 
 actual_stock_price = [200,280,360,440,500,600,700,800]
 
@@ -35,17 +35,7 @@ def buyStock(cells, player):
     
     return cells
 
-def enableBuyButton(cells, player, ui, board):
-    curr_pos = player.position
-    if(board.checkIfStockCell(player) or len(cells[curr_pos].stocks)  == 0):
-        ui.buyButton.disable()
-    else:
-        if player.balance >= cells[curr_pos].stocks[0].stock_value:
-            ui.buyButton.enable()
-        else:
-            ui.buyButton.disable()
-
-def checkForPenalty(cells, players, player_number, ui): # testare per vedere se riconosce quando le celle sono uguali
+def checkForPenalty(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
     cell = cells[current_player.position]
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
@@ -61,24 +51,45 @@ def checkForPenalty(cells, players, player_number, ui): # testare per vedere se 
                         penality = player.computePenalty(stock)
                         current_player.changeBalance(-penality)
                         player.changeBalance(penality)
-                        ui.updateLabel(current_player)
-                        ui.updateLabel(player)
                         break # we break in order to pay only once the fee if the player have more than one card in the same cell
 
-def checkCrash(players, player_number, ui): # since current_player is the one that have done the last move it will be the one that will pay for the crash
+def checkCrash(players, player_number): # since current_player is the one that have done the last move it will be the one that will pay for the crash
     current_player = players[player_number]
     players.pop(player_number)
     for player in players:
         if player.position == current_player.position:
             current_player.changeBalance(-CRASH_FEE)
             player.changeBalance(CRASH_FEE)
-            ui.updateLabel(current_player)
-            ui.updateLabel(player)
 
-def checkTurn(player, ui):
-    if player.position == 0:
-        player.changeBalance(TURN_FEE * 2)
-        ui.updateLabel(player)
-    elif player.old_position > player.position:
+def checkTurn(player):
+    if player.old_position > player.position:
         player.changeBalance(TURN_FEE)
-        ui.updateLabel(player)
+
+def eventsLogic(player):
+    pass
+
+def stockPrizeLogic(player):
+    player.changeBalance(len(player.stocks) * 100)
+
+def quotationLogic(player):
+    pass
+
+def chanceLogic(player, squareBalance):
+    score = roll()
+    if (score[0] + score[1]) > 3:
+        amount = squareBalance//3
+        player.changeBalance(amount)        
+    else:
+        amount = -squareBalance//2
+        player.changeBalance(amount)
+
+    return score, amount
+
+def sixHundredLogic(player):
+    player.changeBalance(600)
+
+def startLogic(player):
+    player.changeBalance(TURN_FEE * 2)
+
+def chooseStockLogic(player):
+    pass
