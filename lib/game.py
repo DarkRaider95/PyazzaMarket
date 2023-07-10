@@ -4,7 +4,7 @@ from .board import Board
 from .player import Player
 from .gameUI import GameUI
 from .dice import Dice
-from .gameLogic import roll, buyStock, enableBuyButton, checkForPenality
+from .gameLogic import roll, buyStock, enableBuyButton, checkForPenality, checkCrash
 import pygame_gui
 
 class Game:
@@ -51,7 +51,9 @@ class Game:
                         #curr_player.move(score[0] + score[1])
                         curr_player.move(3)
                         enableBuyButton(self.board.cells, curr_player, self.gameUI, self.board)
-                        checkForPenality(self.board.cells, self.players, self.currentPlayer, self.gameUI)
+                        # we need to create a copy of the list in order to perform some edit of the list later
+                        checkForPenality(self.board.cells, self.players.copy(), self.currentPlayer, self.gameUI)
+                        checkCrash(self.players.copy(), self.currentPlayer, self.gameUI)
                         self.gameUI.launchDice.disable()
                         self.gameUI.passButton.enable()                        
                     elif event.ui_element == self.gameUI.buyButton:

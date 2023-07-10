@@ -1,4 +1,5 @@
 import random
+from .constants import CRASH_FEE
 
 actual_stock_price = [200,280,360,440,500,600,700,800]
 
@@ -47,6 +48,7 @@ def enableBuyButton(cells, player, ui, board):
 def checkForPenality(cells, players, player_number, ui): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
     cell = cells[current_player.position]
+    players.pop(player_number) # we drop the current player in order to not check him self in the for loops
     if cell.cellImage == None: # first we check if it is a stock cell or not
         own_by_the_player = False # then we check if the player own the stock
         for stock in current_player.stocks:
@@ -54,12 +56,21 @@ def checkForPenality(cells, players, player_number, ui): # testare per vedere se
                 own_by_the_player = True
         if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
             for player in players:
-                if player != current_player:
-                    for stock in player.stocks:
-                        if cell.position == stock.position:
-                            penality = player.computePenality(stock)
-                            current_player.changeBalance(-penality)
-                            player.changeBalance(penality)
-                            ui.updateLabel(current_player)
-                            ui.updateLabel(player)
-                            break # we break in order to pay only once the fee if the player have more than one card in the same cell
+                for stock in player.stocks:
+                    if cell.position == stock.position:
+                        penality = player.computePenality(stock)
+                        current_player.changeBalance(-penality)
+                        player.changeBalance(penality)
+                        ui.updateLabel(current_player)
+                        ui.updateLabel(player)
+                        break # we break in order to pay only once the fee if the player have more than one card in the same cell
+
+def checkCrash(players, player_number, ui): # since current_player is the one that have done the last move it will be the one that will pay for the crash
+    current_player = players[player_number]
+    players.pop(player_number)
+    for player in players:
+        if player.position == current_player.position:
+            current_player.changeBalance(-CRASH_FEE)
+            player.changeBalance(CRASH_FEE)
+            ui.updateLabel(current_player)
+            ui.updateLabel(player)

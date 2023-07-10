@@ -24,6 +24,7 @@ PURPLE = (128, 0, 128)
 FPS = 60
 
 INITIAL_BALANCE = 3000
+CRASH_FEE = 100
 
 #Board dimensions
 CELL_HEIGHT = 150
