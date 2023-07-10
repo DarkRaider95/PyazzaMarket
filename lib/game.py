@@ -49,7 +49,7 @@ class Game:
                         self.dice.updateDice(score,self.screen)
                         curr_player = self.players[self.currentPlayer]
                         curr_player.move(score[0] + score[1])
-                        #curr_player.move(3)
+                        #curr_player.move(10)
                         enableBuyButton(self.board.cells, curr_player, self.gameUI, self.board)
                         # we need to create a copy of the list in order to perform some edit of the list later
                         checkForPenality(self.board.cells, self.players.copy(), self.currentPlayer, self.gameUI)

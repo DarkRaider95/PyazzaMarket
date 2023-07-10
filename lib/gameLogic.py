@@ -76,6 +76,9 @@ def checkCrash(players, player_number, ui): # since current_player is the one th
             ui.updateLabel(player)
 
 def checkTurn(player, ui):
-    if player.old_position > player.position:
+    if player.position == 0:
+        player.changeBalance(TURN_FEE * 2)
+        ui.updateLabel(player)
+    elif player.old_position > player.position:
         player.changeBalance(TURN_FEE)
         ui.updateLabel(player)
