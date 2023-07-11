@@ -109,7 +109,7 @@ class Game:
 
     def turn(self):
         disablePassButton = False
-        score = (1, 4)# roll()
+        score = roll()
         self.dice.updateDice(score,self.screen)
         curr_player = self.players[self.currentPlayer]
         curr_player.move(score[0] + score[1])
