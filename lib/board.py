@@ -145,5 +145,15 @@ class Board:
 
         return stocks
     
+    def getPurchasableStocks(self, balance):
+        stocks = []
+        for cell in self.cells:
+            if(cell.stocks is not None and 
+               len(cell.stocks) > 0 and 
+               cell.stocks[0].stock_value <= balance):
+                stocks.append(cell.stocks[0])
+
+        return stocks
+    
     def removeStock(self, stock):
         self.cells[stock.position].stocks.pop()

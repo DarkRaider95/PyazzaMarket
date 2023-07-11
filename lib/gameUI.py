@@ -67,7 +67,7 @@ class GameUI:
         UILabel(title_rect, "LEADERBOARD", manager=self.manager, container=self.leaderboard)
         # ADDING SQUARE BALANCE LABEL
         balance_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 30), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
-        UILabel(balance_rect, "Riserva di piazza : " + str(squareBalance), manager=self.manager, container=self.leaderboard)
+        self.squareBalanceLabel = UILabel(balance_rect, "Riserva di piazza : " + str(squareBalance), manager=self.manager, container=self.leaderboard)
         # Head of players table
         player_label_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 50), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
         UILabel(player_label_rect,  "Giocatore: Scudi | Azioni ", manager=self.manager, container=self.leaderboard)
@@ -76,7 +76,10 @@ class GameUI:
             player_label_rect = pygame.Rect((LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2, 50 + (20 * (i + 1))), (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT))
             label = UILabel(player_label_rect,  player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()), manager=self.manager, container=self.leaderboard)
             self.playerLabels.append({"name": player.playerName, "label": label})
-            
+    
+    def updateSquareBalanceLabel(self, squareBalance):
+        self.squareBalanceLabel.set_text("Riserva di piazza : " + str(squareBalance))
+
     def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
         for label in self.playerLabels:
             if label["name"] == player.playerName:

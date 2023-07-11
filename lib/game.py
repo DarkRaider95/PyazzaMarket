@@ -114,6 +114,9 @@ class Game:
         curr_player = self.players[self.currentPlayer]
         curr_player.move(score[0] + score[1])
         cell = self.board.cells[curr_player.position]
+        #check turn and crash before any other events or effect of the cells
+        checkTurn(curr_player)
+        checkCrash(self.players.copy(), self.currentPlayer)
         #case cell with stock
         if(cell.cellType == STOCKS_TYPE):
             #curr_player.move(10)
@@ -123,9 +126,7 @@ class Game:
         #case special cell
         else:
             disablePassButton = self.specialCellLogic(cell, curr_player)
-
-        checkCrash(self.players.copy(), self.currentPlayer)
-        checkTurn(curr_player)
+        
         self.gameUI.updateAllPlayerLables(self.players)
         self.gameUI.launchDice.disable()
 
@@ -163,14 +164,15 @@ class Game:
         elif cell.cellType == SIX_HUNDRED_TYPE:
             sixHundredLogic(player)
         elif cell.cellType == FREE_STOP_TYPE:
-            stocks = self.board.getAvailbleStocks()
+            stocks = self.board.getPurchasableStocks(player.balance)
             self.gameUI.disableActions()
             self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
             disablePassButton = True
         elif cell.cellType == CHANCE_TYPE:
             score, amount = chanceLogic(player, self.squareBalance)
             self.squareBalance += amount
-            self.dice.updateDice(score, self.screen)            
+            self.dice.updateDice(score, self.screen)
+            self.gameUI.updateSquareBalanceLabel(self.squareBalance)
 
         return disablePassButton
         
