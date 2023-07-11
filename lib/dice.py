@@ -1,5 +1,5 @@
 import pygame
-from .constants import DICE_1, DICE_2, DICE_3, DICE_4, DICE_5, DICE_6, DICE_WIDTH, DICE_HEIGHT, CELL_WIDTH, CELL_HEIGHT, WIDTH, HEIGHT, CORNER_WIDTH, CORNER_HEIGHT
+from .constants import DICE_1, DICE_2, DICE_3, DICE_4, DICE_5, DICE_6, DICE_WIDTH, DICE_HEIGHT, DICE_SURFACE_X, DICE_SURFACE_Y
 
 # CARICARE LE IMMAGINI DEI DADI IN RAM
 
@@ -10,8 +10,8 @@ class Dice:
         self.image_dice_1 = pygame.transform.scale(self.image_dice_1, (DICE_WIDTH, DICE_HEIGHT))
         self.image_dice_2 = pygame.image.load(DICE_1)
         self.image_dice_2 = pygame.transform.scale(self.image_dice_2, (DICE_WIDTH, DICE_HEIGHT))
-        self.surface_x = WIDTH - 5 - CORNER_WIDTH - (CELL_WIDTH * 9)
-        self.surface_y = 20 + CELL_HEIGHT
+        self.surface_x = DICE_SURFACE_X
+        self.surface_y = DICE_SURFACE_Y
         self.score_dice_1 = 1
         self.score_dice_2 = 1
         self.surface = pygame.Surface((DICE_WIDTH * 2, DICE_HEIGHT))

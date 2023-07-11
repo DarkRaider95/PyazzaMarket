@@ -32,6 +32,7 @@ class Game:
         self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
         self.gameUI.draw_leaderboard(self.players, self.squareBalance)
+        self.gameUI.draw_stockboard(self.players)
 
         for index, player in enumerate(self.players):
             self.board.drawPlayerCar(self.screen, player, index, len(self.players))
@@ -72,6 +73,7 @@ class Game:
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
+                        self.gameUI.passButton.enable()
                     elif event.ui_element == self.gameUI.chooseBut:
                         curr_player = self.players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
