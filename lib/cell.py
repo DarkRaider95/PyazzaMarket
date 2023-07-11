@@ -5,12 +5,13 @@ from .stock import Stock
 class Cell:
     # we should have name or position in both the cell and the stock in order to now where to put the stock in case the user will return it to the bank
     def __init__(self, cellDef, cellType, cell_x, cell_y, logo, cellImage, angle, position, name, isCorner = False):
+        self.stocks = None
         if(cellDef is not None):
             self.color = cellDef['color']
             self.stock_value = cellDef['value']
             self.logo = logo
             self.stocks = Cell.initialize_stock(cellDef, position, name)
-            self.font_stock_value = pygame.font.Font(None, 30)            
+            self.font_stock_value = pygame.font.Font(None, 30)        
         self.cell_x = cell_x
         self.cell_y = cell_y
         self.cellImage = cellImage

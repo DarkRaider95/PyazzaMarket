@@ -14,6 +14,9 @@ class GameUI:
         self.manager = UIManager((WIDTH, HEIGHT)) # Create something similar to pygame.display.set_mode((WIDTH, HEIGHT))
         self.buyButton = None
         self.playerLabels = []
+        self.closeStock = None
+        self.chooseMoveBut = None
+        self.chooseBut = None
         #self.actions_UI = pygame.Surface((ACTIONS_WIDTH, ACTIONS_HEIGHT))
         #self.actions_rect = pygame.Rect(30, HEIGHT - 30 - ACTIONS_HEIGHT, ACTIONS_WIDTH, ACTIONS_HEIGHT)#pygame.Surface((ACTIONS_WIDTH, ACTIONS_HEIGHT))
 
@@ -53,13 +56,6 @@ class GameUI:
         
         self.passButton.disable()
         self.showStocks.disable()
-
-        #self.actions_UI.add(self.launchDice)
-        #self.actions_UI.add(self.buyButton)
-        #self.actions_UI.add(self.showStocks)
-        #self.actions_UI.add(self.passButton)
-        #pygame.draw.rect(self.screen, WHITE, self.actions_rect)
-        #self.screen.blit(self.actions_UI, (30, HEIGHT - 30 - ACTIONS_HEIGHT))
         
 
     def draw_leaderboard(self, players, squareBalance):
@@ -91,10 +87,44 @@ class GameUI:
         for player in players:
             self.updateLabel(player)
 
-    def showStocksUi(self, stocks):
+    def showStocksUi(self, stocks, title):
+        self.stocks = stocks
+        self.showedStock = 0
+        self.drawStockUi(title, True)
+
+    def showChooseStock(self, stocks, title):
+        self.stocks = stocks
+        self.showedStock = 0
+        self.drawStockUi(title, False)
+        chooseRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+
+        self.chooseBut = UIButton(relative_rect=chooseRect,
+                                text="Scegli",
+                                container=self.stocksUi,
+                                object_id = 'CHOOSE_STOCK',
+                                manager=self.manager)
+        
+    def showMoveToStock(self, stocks, title):
+        self.stocks = stocks
+        self.showedStock = 0
+        self.drawStockUi(title, False)
+        chooseRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+
+        self.chooseMoveBut = UIButton(relative_rect=chooseRect,
+                                text="Scegli",
+                                container=self.stocksUi,
+                                object_id = 'CHOOSE_AND_MOVE',
+                                manager=self.manager)
+
+    def getShowedStock(self):
+        return self.stocks[self.showedStock]
+
+    def drawStockUi(self, title, close):
         panel_rect = pygame.Rect((WIDTH // 2 - STOCK_UI_WIDTH // 2, 20), (STOCK_UI_WIDTH, STOCK_UI_HEIGHT))
         self.stocksUi = UIPanel(panel_rect, starting_height= 2, manager=self.manager)
-        #self.stocksUi = UIPanel(panel_rect, manager=self.manager)
+        
+        title_rect = pygame.Rect((STOCK_UI_WIDTH // 2 - STOCK_UI_TITLE_WIDTH // 2, 10), (STOCK_UI_TITLE_WIDTH, STOCK_UI_TITLE_HEIGHT))
+        UILabel(title_rect, title, manager=self.manager, container=self.stocksUi)
 
         nextRect = pygame.Rect((STOCK_UI_WIDTH - 30 - STOCK_UI_BUT_WIDTH, STOCK_UI_HEIGHT // 2 - STOCK_UI_BUT_HEIGHT // 2), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
         prevRect = pygame.Rect((30, STOCK_UI_HEIGHT // 2 - STOCK_UI_BUT_HEIGHT // 2), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
@@ -111,38 +141,30 @@ class GameUI:
                                 container=self.stocksUi,
                                 object_id = 'PREV_STOCK',
                                 manager=self.manager)
+        if(close):
+            self.closeStock = UIButton(relative_rect=closeRect,
+                                    text="X",
+                                    container=self.stocksUi,
+                                    object_id = 'CLOSE_STOCK_UI',
+                                    manager=self.manager)
         
-        self.closeStock = UIButton(relative_rect=closeRect,
-                                text="X",
-                                container=self.stocksUi,
-                                object_id = 'CLOSE_STOCK_UI',
-                                manager=self.manager)
+        stockImageRect = pygame.Rect((STOCK_UI_WIDTH // 2 - STOCK_WIDTH // 2, 60), (STOCK_WIDTH, STOCK_HEIGHT))        
         
-        self.stockImageRect = pygame.Rect((STOCK_UI_WIDTH // 2 - STOCK_WIDTH // 2, 10), (STOCK_WIDTH, STOCK_HEIGHT))        
-        self.stocksUi.focus()
-        self.stocks = stocks
-        self.showedStock = 0
         currStock =self.stocks[self.showedStock]
         currStock.draw(self.screen)
-        surface = pygame.Surface((STOCK_WIDTH, STOCK_HEIGHT))
-        surface.fill(WHITE)
-        self.stockImage = UIImage(self.stockImageRect, currStock.surface, container=self.stocksUi, manager=self.manager)
+        self.stockImage = UIImage(stockImageRect, currStock.surface, container=self.stocksUi, manager=self.manager)
         
     def showNextStock(self):
         self.showedStock = (self.showedStock + 1) % len(self.stocks)
         currStock =self.stocks[self.showedStock]
-        self.stockImage.kill()
         currStock.draw(self.screen)
-        self.stockImage = UIImage(self.stockImageRect, currStock.surface, container=self.stocksUi, manager=self.manager)
-        #self.stocks[self.showedStock].draw(self.screen)        
+        self.stockImage.set_image(currStock.surface)    
     
     def showPreviousStock(self):
         self.showedStock = (self.showedStock - 1) % len(self.stocks)
         currStock =self.stocks[self.showedStock]
-        self.stockImage.kill()
         currStock.draw(self.screen)
-        self.stockImage = UIImage(self.stockImageRect, currStock.surface, container=self.stocksUi, manager=self.manager)
-        #self.stocks[self.showedStock].draw(self.screen) 
+        self.stockImage.set_image(currStock.surface)
     
     def closeStockUi(self):
         self.stocksUi.kill()
@@ -152,3 +174,9 @@ class GameUI:
             self.showStocks.enable()
         else:
             self.showStocks.disable()
+
+    def disableActions(self):
+        self.launchDice.disable()
+        self.buyButton.disable()
+        self.passButton.disable()
+        self.showStocks.disable()

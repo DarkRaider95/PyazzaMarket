@@ -14,6 +14,10 @@ class Player:
         self.old_position = self.position
         self.position = (self.position + step) % 40
 
+    def setPosition(self, position):
+        self.old_position = self.position
+        self.position = position
+
     def stockValue(self):
         value = 0
         for stock in self.stocks:
