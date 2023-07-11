@@ -17,6 +17,7 @@ class GameUI:
         self.closeStock = None
         self.chooseMoveBut = None
         self.chooseBut = None
+        self.stockboardLabels = []
         #self.actions_UI = pygame.Surface((ACTIONS_WIDTH, ACTIONS_HEIGHT))
         #self.actions_rect = pygame.Rect(30, HEIGHT - 30 - ACTIONS_HEIGHT, ACTIONS_WIDTH, ACTIONS_HEIGHT)#pygame.Surface((ACTIONS_WIDTH, ACTIONS_HEIGHT))
 
@@ -101,15 +102,25 @@ class GameUI:
                 position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * (i - 3))
             # ADDING THE TITLE LABEL
             title_rect = pygame.Rect((position_x, offset + CELL_HEIGHT + (max_stock * 20)),(label_dimension))
-            UILabel(title_rect, player.playerName, manager=self.manager)
+            nameLabel = UILabel(title_rect, player.playerName, manager=self.manager)
+            self.stockboardLabels.append(nameLabel)
             if len(player.stocks) == 0:
                 player_label_rect = pygame.Rect((position_x, offset + 20 + CELL_HEIGHT + (max_stock * 20)), label_dimension)
-                UILabel(player_label_rect,  "No stock", manager=self.manager)
+                noStockLabel = UILabel(player_label_rect,  "No stock", manager=self.manager)
+                self.stockboardLabels.append(noStockLabel)
             else:
                 for j, stock in enumerate(player.stocks): # considerare di fare una lable unica e andare a capo per ogni riga
                     position_y = offset + 20 + CELL_HEIGHT + (20 * j) + (max_stock * 20)
                     player_label_rect = pygame.Rect((position_x, position_y), label_dimension)
-                    UILabel(player_label_rect,  stock.name, manager=self.manager)
+                    stockNameLabel = UILabel(player_label_rect,  stock.name, manager=self.manager)
+                    self.stockboardLabels.append(stockNameLabel)
+        
+    def updateStockboard(self, players):
+        for label in self.stockboardLabels:
+            label.kill()
+        self.screen.fill(BLACK)
+        self.stockboardLabels = []
+        self.draw_stockboard(players)
 
     def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
         for label in self.playerLabels:
