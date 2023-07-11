@@ -85,39 +85,32 @@ class GameUI:
          
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
-        lable_dimension = (150, LABEL_HEIGHT)
+        label_dimension = (150, LABEL_HEIGHT)
         sorted_player = sorted(players, key=lambda x: len(x.stocks), reverse=True)
         max_stock = max(len(sorted_player[0].stocks), 1)
         num_columns = min(3, len(sorted_player))
-        for i in range(0,num_columns):
+        self.drawRowStockboard(0,num_columns,sorted_player, 20, 0, label_dimension, True)
+        if len(sorted_player) > 3:
+            self.drawRowStockboard(3, len(sorted_player), sorted_player, 60, max_stock, label_dimension, False)
+
+    def drawRowStockboard(self, start_range, end_range, sorted_player, offset, max_stock, label_dimension, first_row):
+        for i in range(start_range, end_range):
             player = sorted_player[i]
-            position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * i)
+            if first_row:
+                position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * i)
+            else:
+                position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * (i - 3))
             # ADDING THE TITLE LABEL
-            title_rect = pygame.Rect((position_x, 20 + CELL_HEIGHT),(lable_dimension))
+            title_rect = pygame.Rect((position_x, offset + CELL_HEIGHT + (max_stock * 20)),(label_dimension))
             UILabel(title_rect, player.playerName, manager=self.manager)
             if len(player.stocks) == 0:
-                player_label_rect = pygame.Rect((position_x, 40 + CELL_HEIGHT), lable_dimension)
+                player_label_rect = pygame.Rect((position_x, offset + 20 + CELL_HEIGHT + (max_stock * 20)), label_dimension)
                 UILabel(player_label_rect,  "No stock", manager=self.manager)
             else:
                 for j, stock in enumerate(player.stocks): # considerare di fare una lable unica e andare a capo per ogni riga
-                    position_y = 40 + CELL_HEIGHT + (20 * j)
-                    player_label_rect = pygame.Rect((position_x, position_y), lable_dimension)
+                    position_y = offset + 20 + CELL_HEIGHT + (20 * j) + (max_stock * 20)
+                    player_label_rect = pygame.Rect((position_x, position_y), label_dimension)
                     UILabel(player_label_rect,  stock.name, manager=self.manager)
-        if len(sorted_player) > 3:
-            for i in range(3,len(sorted_player)):
-                player = sorted_player[i]
-                position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * (i - 3))
-                # ADDING THE TITLE LABEL
-                title_rect = pygame.Rect((position_x, 60 + CELL_HEIGHT + (max_stock * 20)),(lable_dimension))
-                UILabel(title_rect, player.playerName, manager=self.manager)
-                if len(player.stocks) == 0:
-                    player_label_rect = pygame.Rect((position_x, 80 + CELL_HEIGHT + (max_stock * 20)), lable_dimension)
-                    UILabel(player_label_rect,  "No stock", manager=self.manager)
-                else:
-                    for j, stock in enumerate(player.stocks): # considerare di fare una lable unica e andare a capo per ogni riga
-                        position_y = 80 + CELL_HEIGHT + (20 * j) + (max_stock * 20)
-                        player_label_rect = pygame.Rect((position_x, position_y), lable_dimension)
-                        UILabel(player_label_rect,  stock.name, manager=self.manager)
 
     def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
         for label in self.playerLabels:
