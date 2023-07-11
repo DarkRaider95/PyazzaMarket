@@ -51,10 +51,27 @@ class Game:
                         self.cells = buyStock(self.board.cells, curr_player)
                         self.gameUI.updateLabel(curr_player)
                         self.gameUI.buyButton.disable()
+                        self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
                         self.gameUI.launchDice.enable()
                         self.gameUI.passButton.disable()
+                        self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
+                    elif event.ui_element == self.gameUI.showStocks:
+                        curr_player = self.players[self.currentPlayer]
+                        self.gameUI.showStocksUi(curr_player.stocks)
+                    elif event.ui_element == self.gameUI.nextStock:
+                        curr_player = self.players[self.currentPlayer]
+                        self.gameUI.showNextStock()
+                    elif event.ui_element == self.gameUI.previousStock:
+                        curr_player = self.players[self.currentPlayer]
+                        self.gameUI.showPreviousStock()
+                    elif event.ui_element == self.gameUI.closeStock:
+                        curr_player = self.players[self.currentPlayer]
+                        self.gameUI.closeStockUi()
+                        self.screen.fill(BLACK)
+                        #self.board.draw(self.screen)
+                        self.dice.drawDices(self.screen)
 
                 self.gameUI.manager.process_events(event)            
             
