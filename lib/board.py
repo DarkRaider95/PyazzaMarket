@@ -133,3 +133,17 @@ class Board:
     def getCellValue(self, position):
         cell = self.cells[position]
         return cell.stock_value
+    
+    def getCell(self, position):
+        return self.cells[position]
+    
+    def getAvailbleStocks(self):
+        stocks = []
+        for cell in self.cells:
+            if(cell.stocks is not None and len(cell.stocks) > 0):
+                stocks.append(cell.stocks[0])
+
+        return stocks
+    
+    def removeStock(self, stock):
+        self.cells[stock.position].stocks.pop()
