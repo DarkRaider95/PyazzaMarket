@@ -124,14 +124,13 @@ class GameUI:
                         latest_stock_position = stock.position
                         self.stockboardLabels.append(stockNameLabel)
 
-    def updateStockboard(self, players):
-        for player in players:
-            if player.stockUpdatedAt > self.latestStockUpdate:
-                for label in self.stockboardLabels:
-                    label.kill()
-                self.screen.fill(BLACK)
-                self.stockboardLabels = []
-                self.draw_stockboard(players)
+    def updateStockboard(self, players, last_stock_update):
+        if last_stock_update > self.latestStockUpdate:
+            for label in self.stockboardLabels:
+                label.kill()
+            self.screen.fill(BLACK)
+            self.stockboardLabels = []
+            self.draw_stockboard(players)
 
     def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
         for label in self.playerLabels:

@@ -6,6 +6,7 @@ from .gameUI import GameUI
 from .dice import Dice
 from .gameLogic import *
 import pygame_gui
+import time
 
 class Game:
     def __init__(self, width, height, clock, players):
@@ -21,6 +22,7 @@ class Game:
         self.players = []
         self.squareBalance = 2000
 
+        Player.last_stock_update = time.time()
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
 
@@ -101,7 +103,7 @@ class Game:
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
-            self.gameUI.updateStockboard(self.players)
+            self.gameUI.updateStockboard(self.players, Player.last_stock_update)
             self.board.draw(self.screen)
             for i, player in enumerate(self.players):
                 self.board.drawPlayerCar(self.screen, player, i, len(self.players))

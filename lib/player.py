@@ -2,6 +2,8 @@ from .constants import INITIAL_BALANCE, CELLS_DEF
 from .car import Car
 import time
 class Player:
+    last_stock_update = None
+
     def __init__(self, playerName, car):
         self.playerName = playerName
         self.balance = INITIAL_BALANCE
@@ -9,7 +11,6 @@ class Player:
         self.__stocks = []
         self.car = Car(car)
         self.old_position = 0
-        self.stockUpdatedAt = time.time()
 
     def move(self, step):
         self.old_position = self.position
@@ -32,7 +33,7 @@ class Player:
     def addStock(self, stocks):
         self.__stocks.append(stocks)
         self.__stocks = sorted(self.__stocks, key=lambda x: x.position)
-        self.stockUpdatedAt = time.time()
+        Player.last_stock_update = time.time()
 
     def sameColorCount(self, color):
         count = 0

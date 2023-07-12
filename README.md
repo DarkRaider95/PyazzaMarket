@@ -3,9 +3,9 @@ To do list funzionalità:
     - ~~ fixare celle,bisogna crearne una per nome adesso sono stampate per colore tutte uguali ~~
 - ~~ passaggio via ~~
 - aggiungere situazione doppio dado
-- tabella con proprietà per giocatore
-    - aggiunge x1 o x2 in base al numero di stock
-    - vedere se si può aggiornare la label al posto di rifare e nel caso che le stock siano le stesse non aggiornare
+- ~~ tabella con proprietà per giocatore ~~
+    - ~~ aggiunge x1 o x2 in base al numero di stock ~~
+    - ~~ nel caso che le stock siano le stesse non aggiornare ~~
 - ~~ caselle speciali, angoli, dadi ~~ 
 - quotazioni, senza asta
 - eventi
