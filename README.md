@@ -2,7 +2,7 @@ To do list funzionalità:
 - ~~ pedaggi e incidenti ~~
     - ~~ fixare celle,bisogna crearne una per nome adesso sono stampate per colore tutte uguali ~~
 - ~~ passaggio via ~~
-- aggiungere situazione doppio dado
+- ~~ aggiungere situazione doppio dado ~~
 - ~~ tabella con proprietà per giocatore ~~
     - ~~ aggiunge x1 o x2 in base al numero di stock ~~
     - ~~ nel caso che le stock siano le stesse non aggiornare ~~

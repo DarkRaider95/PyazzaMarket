@@ -61,6 +61,7 @@ class Game:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
                         self.gameUI.launchDice.enable()
                         self.gameUI.passButton.disable()
+                        self.gameUI.buyButton.disable()
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.players[self.currentPlayer]
@@ -118,8 +119,7 @@ class Game:
         score = roll()
         self.dice.updateDice(score,self.screen)
         curr_player = self.players[self.currentPlayer]
-        #curr_player.move(score[0] + score[1])
-        curr_player.move(5)
+        curr_player.move(score[0] + score[1])
         cell = self.board.cells[curr_player.position]
         #check turn and crash before any other events or effect of the cells
         checkTurn(curr_player)
