@@ -2,6 +2,7 @@ import pygame
 from pygame_gui import UIManager
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIImage
 from .constants import *
+import time
 
 # Inizializzazione della finestra di gioco
 pygame.display.set_caption("Menu di Gioco")
@@ -18,8 +19,7 @@ class GameUI:
         self.chooseMoveBut = None
         self.chooseBut = None
         self.stockboardLabels = []
-        #self.actions_UI = pygame.Surface((ACTIONS_WIDTH, ACTIONS_HEIGHT))
-        #self.actions_rect = pygame.Rect(30, HEIGHT - 30 - ACTIONS_HEIGHT, ACTIONS_WIDTH, ACTIONS_HEIGHT)#pygame.Surface((ACTIONS_WIDTH, ACTIONS_HEIGHT))
+        self.latestStockUpdate = None
 
     def draw_actions_ui(self):
         panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
@@ -92,6 +92,8 @@ class GameUI:
         self.drawRowStockboard(0,num_columns,sorted_player, 20, 0, label_dimension, True)
         if len(sorted_player) > 3:
             self.drawRowStockboard(3, len(sorted_player), sorted_player, 60, max_stock, label_dimension, False)
+        self.latestStockUpdate = time.time()
+        # since we update the lastestStockUpdate we will not update twice the stockboard if someone sold a stock to another player
 
     def drawRowStockboard(self, start_range, end_range, sorted_player, offset, max_stock, label_dimension, first_row):
         for i in range(start_range, end_range):
@@ -116,11 +118,13 @@ class GameUI:
                     self.stockboardLabels.append(stockNameLabel)
         
     def updateStockboard(self, players):
-        for label in self.stockboardLabels:
-            label.kill()
-        self.screen.fill(BLACK)
-        self.stockboardLabels = []
-        self.draw_stockboard(players)
+        for player in players:
+            if player.stockUpdatedAt > self.latestStockUpdate:
+                for label in self.stockboardLabels:
+                    label.kill()
+                self.screen.fill(BLACK)
+                self.stockboardLabels = []
+                self.draw_stockboard(players)
 
     def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
         for label in self.playerLabels:
