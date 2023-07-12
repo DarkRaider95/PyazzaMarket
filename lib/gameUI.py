@@ -78,7 +78,7 @@ class GameUI:
         for i, player in enumerate(players): # considerare di fare una lable unica e andare a capo per ogni riga
             player_label_rect = pygame.Rect((position_x, 50 + (20 * (i + 1))), label_dimension)
             label = UILabel(player_label_rect,  player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
-            self.playerLabels.append({"name": player.playerName, "label": label})
+            self.playerLabels.append(label)
     
     def updateSquareBalanceLabel(self, squareBalance):
         self.squareBalanceLabel.set_text("Riserva di piazza : " + str(squareBalance))
@@ -86,12 +86,12 @@ class GameUI:
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
         label_dimension = (150, LABEL_HEIGHT)
-        sorted_player = sorted(players, key=lambda x: len(x.getStocks()), reverse=True)
-        max_stock = max(len(sorted_player[0].getStocks()), 1)
-        num_columns = min(3, len(sorted_player))
-        self.drawRowStockboard(0,num_columns,sorted_player, 20, 0, label_dimension, True)
-        if len(sorted_player) > 3:
-            self.drawRowStockboard(3, len(sorted_player), sorted_player, 60, max_stock, label_dimension, False)
+        sorted_players = sorted(players, key=lambda x: len(x.getStocks()), reverse=True)
+        max_stock = max(len(sorted_players[0].getStocks()), 1)
+        num_columns = min(3, len(sorted_players))
+        self.drawRowStockboard(0,num_columns,sorted_players, 20, 0, label_dimension, True)
+        if len(sorted_players) > 3:
+            self.drawRowStockboard(3, len(sorted_players), sorted_players, 60, max_stock, label_dimension, False)
         self.latestStockUpdate = time.time()
         # since we update the lastestStockUpdate we will not update twice the stockboard if someone sold a stock to another player
 
@@ -132,15 +132,10 @@ class GameUI:
             self.stockboardLabels = []
             self.draw_stockboard(players)
 
-    def updateLabel(self, player): # Maybe is better to update all the players each time since they are few
-        for label in self.playerLabels:
-            if label["name"] == player.playerName:
-                label["label"].set_text(player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()))
-                break
-        
     def updateAllPlayerLables(self, players):
-        for player in players:
-            self.updateLabel(player)
+        sorted_players = sorted(players, key=lambda x: x.balance + x.stockValue(), reverse=True)
+        for i, player in enumerate(sorted_players):
+            self.playerLabels[i].set_text(player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()))
 
     def showStocksUi(self, stocks, title):
         self.stocks = stocks

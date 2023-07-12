@@ -11,14 +11,14 @@ To do list funzionalità:
 - eventi
 - loghi
 - mostra cedole
-    - fermata libera
+    - ~~ fermata libera ~~
     - asta
 - bancarotta
     - vendita, dopo asta
 - macchine
     - due nuove macchine
     - messaggio in caso di doppia selezione della stessa macchina
-- ordinare le label quando mostrate di modo da far vedere chi è in testa
+- ~~ ordinare le label quando mostrate di modo da far vedere chi è in testa ~~
 
 To do list codice:
 - fare getters and setters

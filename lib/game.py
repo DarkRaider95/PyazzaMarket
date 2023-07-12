@@ -54,7 +54,7 @@ class Game:
                         #questo non so serve salvarlselo
                         #self.cells = buyStock(self.board.cells, curr_player)
                         buyStock(self.board.cells, curr_player)
-                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.buyButton.disable()
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
@@ -86,7 +86,7 @@ class Game:
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
-                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.passButton.enable()
                         self.gameUI.showStocks.enable()
                     elif event.ui_element == self.gameUI.chooseMoveBut:
