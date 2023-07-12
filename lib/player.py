@@ -31,6 +31,7 @@ class Player:
     
     def addStock(self, stocks):
         self.__stocks.append(stocks)
+        self.__stocks = sorted(self.__stocks, key=lambda x: x.position)
         self.stockUpdatedAt = time.time()
 
     def sameColorCount(self, color):
