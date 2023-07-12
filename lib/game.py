@@ -62,6 +62,7 @@ class Game:
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.players[self.currentPlayer]
+                        self.gameUI.disableActions()
                         self.gameUI.showStocksUi(curr_player.stocks, 'Le cedole di '+curr_player.playerName)
                     elif event.ui_element == self.gameUI.nextStock:
                         curr_player = self.players[self.currentPlayer]
@@ -73,7 +74,7 @@ class Game:
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
-                        self.gameUI.passButton.enable()
+                        self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseBut:
                         curr_player = self.players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()

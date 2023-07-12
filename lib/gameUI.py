@@ -20,6 +20,8 @@ class GameUI:
         self.chooseBut = None
         self.stockboardLabels = []
         self.latestStockUpdate = None
+        self.actionsEnabled = []
+        self.actions = []
 
     def draw_actions_ui(self):
         panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
@@ -57,6 +59,8 @@ class GameUI:
         
         self.passButton.disable()
         self.showStocks.disable()
+
+        self.actions = [self.launchDice, self.buyButton, self.showStocks, self.passButton]
         
 
     def draw_leaderboard(self, players, squareBalance):
@@ -225,7 +229,17 @@ class GameUI:
             self.showStocks.disable()
 
     def disableActions(self):
+        for action in self.actions:
+            if action.is_enabled:
+                self.actionsEnabled.append(action)            
         self.launchDice.disable()
         self.buyButton.disable()
         self.passButton.disable()
         self.showStocks.disable()
+
+    def renableActions(self):
+
+        for action in self.actionsEnabled:
+            action.enable()
+
+        self.actionsEnabled.clear()
