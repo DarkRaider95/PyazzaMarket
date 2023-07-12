@@ -118,7 +118,8 @@ class Game:
         score = roll()
         self.dice.updateDice(score,self.screen)
         curr_player = self.players[self.currentPlayer]
-        curr_player.move(score[0] + score[1])
+        #curr_player.move(score[0] + score[1])
+        curr_player.move(5)
         cell = self.board.cells[curr_player.position]
         #check turn and crash before any other events or effect of the cells
         checkTurn(curr_player)
@@ -131,6 +132,7 @@ class Game:
             checkForPenalty(self.board.cells, self.players.copy(), self.currentPlayer)            
         #case special cell
         else:
+            self.gameUI.buyButton.disable()
             disablePassButton = self.specialCellLogic(cell, curr_player)
         
         self.gameUI.updateAllPlayerLables(self.players)
@@ -140,6 +142,10 @@ class Game:
             self.gameUI.passButton.disable()
         else:
             self.gameUI.passButton.enable()
+
+        if is_double(score):
+            self.gameUI.passButton.disable()
+            self.gameUI.launchDice.enable()
 
     def enableBuyButton(self, cell, player):
     
