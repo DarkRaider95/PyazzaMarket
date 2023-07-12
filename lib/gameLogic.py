@@ -40,12 +40,12 @@ def checkForPenalty(cells, players, player_number): # testare per vedere se rico
     cell = cells[current_player.position]
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
     own_by_the_player = False # then we check if the player own the stock
-    for stock in current_player.stocks:
+    for stock in current_player.getStocks():
         if cell.position == stock.position:
             own_by_the_player = True
     if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
         for player in players:
-            for stock in player.stocks:
+            for stock in player.getStocks():
                 if cell.position == stock.position:
                     penality = player.computePenalty(stock)
                     current_player.changeBalance(-penality)
@@ -68,7 +68,7 @@ def eventsLogic(player):
     pass
 
 def stockPrizeLogic(player):
-    player.changeBalance(len(player.stocks) * 100)
+    player.changeBalance(len(player.getStocks()) * 100)
 
 def quotationLogic(player):
     pass

@@ -86,8 +86,8 @@ class GameUI:
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
         label_dimension = (150, LABEL_HEIGHT)
-        sorted_player = sorted(players, key=lambda x: len(x.stocks), reverse=True)
-        max_stock = max(len(sorted_player[0].stocks), 1)
+        sorted_player = sorted(players, key=lambda x: len(x.getStocks()), reverse=True)
+        max_stock = max(len(sorted_player[0].getStocks()), 1)
         num_columns = min(3, len(sorted_player))
         self.drawRowStockboard(0,num_columns,sorted_player, 20, 0, label_dimension, True)
         if len(sorted_player) > 3:
@@ -106,12 +106,12 @@ class GameUI:
             title_rect = pygame.Rect((position_x, offset + CELL_HEIGHT + (max_stock * 20)),(label_dimension))
             nameLabel = UILabel(title_rect, player.playerName, manager=self.manager)
             self.stockboardLabels.append(nameLabel)
-            if len(player.stocks) == 0:
+            if len(player.getStocks()) == 0:
                 player_label_rect = pygame.Rect((position_x, offset + 20 + CELL_HEIGHT + (max_stock * 20)), label_dimension)
                 noStockLabel = UILabel(player_label_rect,  "No stock", manager=self.manager)
                 self.stockboardLabels.append(noStockLabel)
             else:
-                for j, stock in enumerate(player.stocks): # considerare di fare una lable unica e andare a capo per ogni riga
+                for j, stock in enumerate(player.getStocks()): # considerare di fare una lable unica e andare a capo per ogni riga
                     position_y = offset + 20 + CELL_HEIGHT + (20 * j) + (max_stock * 20)
                     player_label_rect = pygame.Rect((position_x, position_y), label_dimension)
                     stockNameLabel = UILabel(player_label_rect,  stock.name, manager=self.manager)
@@ -219,7 +219,7 @@ class GameUI:
         self.stocksUi.kill()
 
     def enableShowStockButton(self, player):
-        if len(player.stocks) > 0:
+        if len(player.getStocks()) > 0:
             self.showStocks.enable()
         else:
             self.showStocks.disable()

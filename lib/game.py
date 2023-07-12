@@ -62,7 +62,7 @@ class Game:
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.players[self.currentPlayer]
-                        self.gameUI.showStocksUi(curr_player.stocks, 'Le cedole di '+curr_player.playerName)
+                        self.gameUI.showStocksUi(curr_player.getStocks(), 'Le cedole di '+curr_player.playerName)
                     elif event.ui_element == self.gameUI.nextStock:
                         curr_player = self.players[self.currentPlayer]
                         self.gameUI.showNextStock()

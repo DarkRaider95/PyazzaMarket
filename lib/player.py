@@ -6,7 +6,7 @@ class Player:
         self.playerName = playerName
         self.balance = INITIAL_BALANCE
         self.position = 0
-        self.stocks = []
+        self.__stocks = []
         self.car = Car(car)
         self.old_position = 0
         self.stockUpdatedAt = time.time()
@@ -21,7 +21,7 @@ class Player:
 
     def stockValue(self):
         value = 0
-        for stock in self.stocks:
+        for stock in self.__stocks:
             value += stock.stock_value
 
         return value
@@ -30,18 +30,18 @@ class Player:
         self.balance += balance
     
     def addStock(self, stocks):
-        self.stocks.append(stocks)
+        self.__stocks.append(stocks)
         self.stockUpdatedAt = time.time()
 
     def sameColorCount(self, color):
         count = 0
-        for stock in self.stocks:
+        for stock in self.__stocks:
             if stock.color == color:
                 count += 1
         return count
 
     def sameCompanyCount(self, stock1): # we check if the player own two stocks of the same company
-        for stock2 in self.stocks:
+        for stock2 in self.__stocks:
             if stock1.name == stock2.name:
                 return True
 
@@ -55,3 +55,6 @@ class Player:
             if self.sameCompanyCount(stock):
                 return stock.penalties[1]
         return stock.penalties[0] # this will return if the stock of the company is only one
+    
+    def getStocks(self):
+        return self.__stocks.copy()
