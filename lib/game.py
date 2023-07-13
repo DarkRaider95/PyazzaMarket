@@ -33,7 +33,7 @@ class Game:
         self.board.draw(self.screen)
         self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
-        self.gameUI.draw_leaderboard(self.players, self.squareBalance)
+        self.gameUI.draw_leaderboard(self.players, self.squareBalance, self.players[self.currentPlayer])
         self.gameUI.draw_stockboard(self.players)
 
         for index, player in enumerate(self.players):

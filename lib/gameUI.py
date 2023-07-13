@@ -20,6 +20,7 @@ class GameUI:
         self.chooseBut = None
         self.stockboardLabels = []
         self.latestStockUpdate = None
+        self.turnName = None
 
     def draw_actions_ui(self):
         panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
@@ -59,7 +60,7 @@ class GameUI:
         self.showStocks.disable()
         
 
-    def draw_leaderboard(self, players, squareBalance):
+    def draw_leaderboard(self, players, squareBalance, currentPlayer):
         # DRAWING THE BOARD
         position_x = LEADERBOARD_WIDTH // 2 - LEADERBOARD_LABEL_WIDTH // 2
         label_dimension = (LEADERBOARD_LABEL_WIDTH, LABEL_HEIGHT)
@@ -68,20 +69,26 @@ class GameUI:
         # ADDING THE TITLE LABEL
         title_rect = pygame.Rect((position_x, 10), label_dimension)
         UILabel(title_rect, "LEADERBOARD", manager=self.manager, container=leaderboard)
+        # ADDING WHO IS THE TURN
+        turn_rect = pygame.Rect((position_x, 30), label_dimension)
+        self.turnName = UILabel(turn_rect, "Turno di " + currentPlayer.playerName, manager=self.manager, container=leaderboard)
         # ADDING SQUARE BALANCE LABEL
-        balance_rect = pygame.Rect((position_x, 30), label_dimension)
+        balance_rect = pygame.Rect((position_x, 50), label_dimension)
         self.squareBalanceLabel = UILabel(balance_rect, "Riserva di piazza : " + str(squareBalance), manager=self.manager, container=leaderboard)
         # Head of players table
-        player_label_rect = pygame.Rect((position_x, 50), label_dimension)
+        player_label_rect = pygame.Rect((position_x, 70), label_dimension)
         UILabel(player_label_rect,  "Giocatore: Scudi | Azioni ", manager=self.manager, container=leaderboard)
         # ADDING THE PLAYERS LABELS
         for i, player in enumerate(players): # considerare di fare una lable unica e andare a capo per ogni riga
-            player_label_rect = pygame.Rect((position_x, 50 + (20 * (i + 1))), label_dimension)
+            player_label_rect = pygame.Rect((position_x, 70 + (20 * (i + 1))), label_dimension)
             label = UILabel(player_label_rect,  player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
             self.playerLabels.append(label)
     
     def updateSquareBalanceLabel(self, squareBalance):
         self.squareBalanceLabel.set_text("Riserva di piazza : " + str(squareBalance))
+
+    def updateTurnLabel(self, currentPlayer):
+        self.turnName.set_text("Turno di " + currentPlayer.playerName)
          
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
