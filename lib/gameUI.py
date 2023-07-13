@@ -20,12 +20,9 @@ class GameUI:
         self.chooseBut = None
         self.stockboardLabels = []
         self.latestStockUpdate = None
-<<<<<<< HEAD
         self.turnName = None
-=======
         self.actionsEnabled = []
         self.actions = []
->>>>>>> events
 
     def draw_actions_ui(self):
         panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
