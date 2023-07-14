@@ -157,3 +157,10 @@ class Board:
     
     def removeStock(self, stock):
         self.cells[stock.position].stocks.pop()
+
+    def getStockIfAvailable(self, stockPos):
+        for cell in self.cells:
+            if(cell.stocks is not None and len(cell.stocks) > 0 and stockPos == cell.position):
+                return cell.stocks.pop()
+            
+        return None

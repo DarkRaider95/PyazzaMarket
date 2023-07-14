@@ -40,12 +40,12 @@ def checkForPenalty(cells, players, player_number): # testare per vedere se rico
     cell = cells[current_player.position]
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
     own_by_the_player = False # then we check if the player own the stock
-    for stock in current_player.stocks:
+    for stock in current_player.getStocks():
         if cell.position == stock.position:
             own_by_the_player = True
     if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
         for player in players:
-            for stock in player.stocks:
+            for stock in player.getStocks():
                 if cell.position == stock.position:
                     penality = player.computePenalty(stock)
                     current_player.changeBalance(-penality)
@@ -64,11 +64,8 @@ def checkTurn(player):
     if player.old_position > player.position:
         player.changeBalance(TURN_FEE)
 
-def eventsLogic(player):
-    pass
-
 def stockPrizeLogic(player):
-    player.changeBalance(len(player.stocks) * 100)
+    player.changeBalance(len(player.getStocks()) * 100)
 
 def quotationLogic(player):
     pass
@@ -90,5 +87,51 @@ def sixHundredLogic(player):
 def startLogic(player):
     player.changeBalance(TURN_FEE * 2)
 
-def chooseStockLogic(player):
-    pass
+def everyOneFifty(players):
+    for player in players:
+        player.changeBalance(50)
+
+def whoOwnsStock(players, stockPos):
+    for player in players:
+        for stock in player.getStocks():
+            if stockPos == stock.position:
+                return player
+            
+def getMoneyFromOthers(players, player_number, amount): # since current_player is the one that have done the last move it will be the one that will pay for the crash
+    current_player = players[player_number]
+    players.pop(player_number)
+    
+    for player in players:
+        player.changeBalance(-amount)
+    
+    current_player.changeBalance(len(players) * amount)
+
+def checkStartPass(player, destination):
+    if player.position <= 39 and destination > 0:
+        return True
+    else:
+        return False
+    
+def computePassAmount(players, player_number, passAmount, destination):
+    current_player = players[player_number]
+    players.pop(player_number)
+
+    totPassAmount = 0
+
+    for player in players:
+        if (            
+            (
+                current_player.position < player.position and 
+                destination > current_player.position and 
+                destination > player.position
+            ) 
+            or 
+            (
+                current_player.position < player.position and 
+                destination < current_player.position and 
+                destination < player.position
+            )
+        ):
+            totPassAmount += passAmount
+
+    return totPassAmount

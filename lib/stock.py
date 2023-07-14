@@ -12,6 +12,7 @@ class Stock:
     ]
     def __init__(self, cellDef, position, name):
         self.color = cellDef['color']
+        self.__original_value = cellDef['value']
         self.stock_value = cellDef['value']
         self.logo = None # cellDef['logo']
         self.font_stock_value = pygame.font.Font(None, 100)
@@ -48,3 +49,5 @@ class Stock:
     def updatePenalties(self, new_penalties):
         self.penalties = new_penalties
 
+    def getOriginalValue(self):
+        return self.__original_value

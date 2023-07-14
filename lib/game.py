@@ -7,6 +7,7 @@ from .dice import Dice
 from .event import Event
 from .gameLogic import *
 import pygame_gui
+from collections import deque
 
 class Game:
     def __init__(self, width, height, clock, players):
@@ -21,7 +22,9 @@ class Game:
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
         self.squareBalance = 2000
-        self.events = Event.initialize_events()
+        #creating events
+        events = Event.initialize_events()
+        self.events = deque(events)
 
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
@@ -47,7 +50,8 @@ class Game:
                     self.running = False
 
                 elif event.type == pygame_gui.UI_BUTTON_PRESSED:
-                    if event.ui_element == self.gameUI.launchDice:                        
+                    if event.ui_element == self.gameUI.launchDice:
+                        self.skipTurn()
                         self.turn()
                     elif event.ui_element == self.gameUI.buyButton:
                         curr_player = self.players[self.currentPlayer]
@@ -65,7 +69,7 @@ class Game:
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.players[self.currentPlayer]
                         self.gameUI.disableActions()
-                        self.gameUI.showStocksUi(curr_player.stocks, 'Le cedole di '+curr_player.playerName)
+                        self.gameUI.showStocksUi(curr_player.getStocks(), 'Le cedole di '+curr_player.playerName)
                     elif event.ui_element == self.gameUI.nextStock:
                         curr_player = self.players[self.currentPlayer]
                         self.gameUI.showNextStock()
@@ -114,6 +118,13 @@ class Game:
             self.gameUI.manager.draw_ui(self.screen)
             pygame.display.update()
 
+    def skipTurn(self):
+        curr_player = self.players[self.currentPlayer]
+        while curr_player.getSkipTurn():
+            curr_player.skipTurn(False)
+            self.currentPlayer += 1
+            curr_player = self.players[self.currentPlayer]
+
     def turn(self):
         disablePassButton = False
         score = roll()
@@ -158,7 +169,7 @@ class Game:
         if cell.cellType == START_TYPE:
             startLogic(player)        
         elif cell.cellType == EVENTS_TYPE:
-            eventsLogic(player)
+            self.eventsLogic(player)
         elif cell.cellType == STOCKS_PRIZE_TYPE:
             stockPrizeLogic(player)
         elif cell.cellType == QUOTATION_TYPE:
@@ -183,3 +194,87 @@ class Game:
 
         return disablePassButton
         
+    def eventsLogic(self, player):
+        event = self.events[0]
+        
+        if event.type == COLOR_EVENT:
+            pass
+        elif event.type == BUY_ANTHING_EVENT:
+            stocks = self.board.getAvailbleStocks()            
+            for p in self.players:
+                if p != player:
+                    stocks.extend(player.getStocks())
+            self.gameUI.disableActions()
+            self.gameUI.showBuyAnythingStock(stocks, 'Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)')            
+        elif event.type == STOP_1:
+            player.skipTurn(True)
+        elif event.type == FREE_PENALTY:
+            player.freePenalty(True)
+        elif event.type == FREE_PENALTY_MARTINI:
+            player.freeMartini(True)
+        elif event.type == EVERYONE_FIFTY_EVENT:
+            everyOneFifty(self.players)
+        elif event.type == PREVIOUS_PLAYER_GALUP:
+            previousPlayer = self.players[self.currentPlayer-1]
+            previousPlayer.setPosition(39)
+            playerOwnStock = whoOwnsStock(self.players, 39)
+            stock = playerOwnStock.getStockByPos(39)
+            amount = playerOwnStock.computePenalty(stock)
+            previousPlayer.changeBalance(amount)
+        elif event.type == NEXT_PLAYER_PAY:
+            nextPlayer = self.players[self.currentPlayer+1]
+            nextPlayer.changeBalance(-200)
+        elif event.type == GIFT_EVENT:
+            effectData = event.effect.data    
+            stock = self.board.getStockIfAvailable(effectData['stockIndex'])
+            if stock is not None:
+                player.addStock(stock)
+            else:                
+                player.changeBalance(effectData['amount'])
+        elif event.type == GET_EVENT:
+            effectData = event.effect.data
+            
+            if 'from' in effectData.keys():
+                fromWho = effectData['from']
+                if fromWho == 'others':
+                    getMoneyFromOthers(self.players.copy(), self.currentPlayer, effectData['amount'])
+            else:
+                player.changeBalance(effectData['amount'])
+        elif event.type == GO_EVENT:
+            self.goEventLogic(player, event)
+        elif event.type == PAY_EVENT:
+            pass
+        elif event.type == OWN_EVENT:
+            pass
+        elif event.type == BUY_EVENT:
+            pass
+        self.events.rotate(-1)
+
+
+    def goEventLogic(self, player, event):
+        effectData = event.effect.data
+
+        if effectData['startCheck']:
+            passStart = checkStartPass(player, effectData['destination'])
+            if passStart:
+                player.changeBalance(300)
+
+        if effectData['pass'] is not None:
+            passAmount = computePassAmount(self.players, player.position, effectData['pass'])
+            player.changeBalance(passAmount)
+
+        if effectData['someone']:#implement interface to choose someone
+            pass
+
+        if effectData['buy']:
+            stock = self.board.getStockIfAvailable(effectData['destination'])
+            if stock is not None:
+                player.addStock(stock)
+                player.changeBalance(-stock.getOriginalValue())
+            else:
+                pass #implement gui to start negotiation with owner
+
+        if effectData['get'] is not None:
+            player.changeBalance(effectData['get'])
+
+        player.setPosition(effectData['destination'])
