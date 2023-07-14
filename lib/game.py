@@ -4,6 +4,7 @@ from .board import Board
 from .player import Player
 from .gameUI import GameUI
 from .dice import Dice
+from .event import Event
 from .gameLogic import *
 import pygame_gui
 
@@ -20,6 +21,7 @@ class Game:
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
         self.squareBalance = 2000
+        self.events = Event.initialize_events()
 
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
