@@ -12,6 +12,9 @@ To do list funzionalità:
     - ~~ calcolo penalità ~~
     - ~~ calcolo differenza da dare ai giocatori ~~
 - eventi
+    - eventi colorati
+    - grafica per scegliere accompagnatore
+    - grafica per avviare trattative
 - loghi
 - mostra cedole
     - ~~ fermata libera ~~
