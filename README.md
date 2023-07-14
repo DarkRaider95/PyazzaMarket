@@ -2,23 +2,29 @@ To do list funzionalità:
 - ~~ pedaggi e incidenti ~~
     - ~~ fixare celle,bisogna crearne una per nome adesso sono stampate per colore tutte uguali ~~
 - ~~ passaggio via ~~
-- aggiungere situazione doppio dado
-- tabella con proprietà per giocatore
-    - aggiunge x1 o x2 in base al numero di stock
-    - vedere se si può aggiornare la label al posto di rifare e nel caso che le stock siano le stesse non aggiornare
+- ~~ aggiungere situazione doppio dado ~~
+- ~~ tabella con proprietà per giocatore ~~
+    - ~~ aggiunge x1 o x2 in base al numero di stock ~~
+    - ~~ nel caso che le stock siano le stesse non aggiornare ~~
 - ~~ caselle speciali, angoli, dadi ~~ 
-- quotazioni, senza asta
+- ~~ mostra turno ~~
+- ~~ quotazioni, senza asta ~~
+    - ~~ calcolo penalità ~~
+    - ~~ calcolo differenza da dare ai giocatori ~~
 - eventi
 - loghi
 - mostra cedole
-    - fermata libera
+    - ~~ fermata libera ~~
     - asta
 - bancarotta
     - vendita, dopo asta
 - macchine
     - due nuove macchine
     - messaggio in caso di doppia selezione della stessa macchina
-- ordinare le label quando mostrate di modo da far vedere chi è in testa
+- ~~ ordinare le label quando mostrate di modo da far vedere chi è in testa ~~
+- aggiungere tasto salva, per salvare stato partita
+- gestire default piazza
+- controllare cella lancio dadi per perdere o vincere sulla piazza
 
 To do list codice:
 - fare getters and setters

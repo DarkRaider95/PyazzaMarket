@@ -21,12 +21,9 @@ def update_stock_price(new_stock_price):
     for i in new_stock_price:
         actual_stock_price[i] = new_stock_price[i]
 
-def updated_penality(old_penality, old_stock_price, new_stock_price):
-    return (old_penality // (old_stock_price * new_stock_price))
-
 def buyStock(cells, player):
     curr_pos = player.position
-    stock_value = cells[curr_pos].stocks[0].stock_value
+    stock_value = cells[curr_pos].stocks[0].getStockValue()
     if(len(cells[curr_pos].stocks) > 0):
         if player.balance >= stock_value:
             stock = cells[curr_pos].stocks.pop()
@@ -65,8 +62,20 @@ def checkTurn(player):
 def stockPrizeLogic(player):
     player.changeBalance(len(player.getStocks()) * 100)
 
-def quotationLogic(player):
-    pass
+def quotationLogic(players, board, quotation, game):
+    newQuotation = quotation[0]
+    for player in players:
+        for stock in player.getStocks():
+            difference = stock.updateValue(newQuotation[stock.getIndex()])
+            player.changeBalance(difference)
+            game.increaseSquareBalance(difference)
+    for cell in board.getCells():
+        if cell.getStocks() is not None:                                                                          
+            cell.updateCellValue(newQuotation[cell.getIndex()])
+            for stock in cell.getStocks():
+                _ = stock.updateValue(newQuotation[stock.getIndex()])
+
+    quotation.rotate(-1)
 
 def chanceLogic(player, squareBalance):
     score = roll()

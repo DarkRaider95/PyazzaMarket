@@ -132,7 +132,7 @@ class Board:
     
     def getCellValue(self, position):
         cell = self.cells[position]
-        return cell.stock_value
+        return cell.getCellValue()
     
     def getCell(self, position):
         return self.cells[position]
@@ -150,7 +150,7 @@ class Board:
         for cell in self.cells:
             if(cell.stocks is not None and 
                len(cell.stocks) > 0 and 
-               cell.stocks[0].stock_value <= balance):
+               cell.stocks[0].getStockValue() <= balance):
                 stocks.append(cell.stocks[0])
 
         return stocks
@@ -164,3 +164,5 @@ class Board:
                 return cell.stocks.pop()
             
         return None
+    def getCells(self):
+        return self.cells

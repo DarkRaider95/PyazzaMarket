@@ -104,7 +104,8 @@ CELLS_DEF = {
         'penalty': [60, 160, 160, 200, 260, 500],
         'side': 'BOT',
         'angle': 0,
-        'names': ['gled', 'friskies', 'frio']
+        'names': ['gled', 'friskies', 'frio'],
+        'index': 0
     },
     'LIGHT_BLUE':{
         'logos': ['finish.png', 'dash.png', 'cuore.png'],
@@ -113,7 +114,8 @@ CELLS_DEF = {
         'penalty': [80,220,220,280,360,700],
         'side': 'BOT',
         'angle': 0,
-        'names': ['finish', 'dash', 'cuore']
+        'names': ['finish', 'dash', 'cuore'],
+        'index': 1
     },
     'PINK':{
         'logos': ['zarotti.png', 'ponti.png', 'nostromo.png'],
@@ -122,7 +124,8 @@ CELLS_DEF = {
         'penalty': [100, 280, 280, 360, 460, 900],
         'side': 'LEFT',
         'angle': -90,
-        'names': ['zarotti', 'ponti', 'nostromo']
+        'names': ['zarotti', 'ponti', 'nostromo'],
+        'index': 2
     },
     'GREEN':{
         'logos': ['barilla.png', 'euvita.png', 'galbusera.png'],
@@ -131,7 +134,8 @@ CELLS_DEF = {
         'penalty': [120, 340, 340, 440, 560, 1000],
         'side': 'LEFT',
         'angle': -90,
-        'names': ['barilla', 'euvita', 'galbusera']
+        'names': ['barilla', 'euvita', 'galbusera'],
+        'index': 3
     },
     'RED':{
         'logos': ['lavazza.png', 'mangiaebevi.png', 'stella-artois.png'],
@@ -140,7 +144,8 @@ CELLS_DEF = {
         'penalty': [140, 380, 380, 500, 660, 1200],
         'side': 'TOP',
         'angle': 180,
-        'names': ['lavazza', 'mangiaebevi', 'stella-artois']
+        'names': ['lavazza', 'mangiaebevi', 'stella-artois'],
+        'index': 4
     },
     'BLUE':{
         'logos': ['san-benedetto.png', 'pepsi.png', 'schweppes.png'],
@@ -149,7 +154,8 @@ CELLS_DEF = {
         'penalty': [160, 460, 460, 600, 760, 1500],
         'side': 'TOP',
         'angle': 180,
-        'names': ['san-benedetto', 'pepsi', 'schweppes']
+        'names': ['san-benedetto', 'pepsi', 'schweppes'],
+        'index': 5
     },
     'YELLOW':{
         'logos': ['ibis.png', 'frendies.png', 'yoplait.png'],
@@ -158,7 +164,8 @@ CELLS_DEF = {
         'penalty': [180, 560, 560, 700, 880, 1760],
         'side': 'RIGHT',
         'angle': 90,
-        'names': ['ibis', 'frendies', 'yoplait']
+        'names': ['ibis', 'frendies', 'yoplait'],
+        'index': 6
     },
     'PURPLE':{
         'logos': ['cavicchioli.png', 'martini.png', 'galup.png'],
@@ -167,12 +174,14 @@ CELLS_DEF = {
         'penalty': [200, 600, 600, 800, 1000, 2000],
         'side': 'RIGHT',
         'angle': 90,
-        'names': ['cavicchioli', 'martini', 'galup']
+        'names': ['cavicchioli', 'martini', 'galup'],
+        'index': 7
     }
 
 }
 
-QUOTATION = ((220,280,410,490,500,300,700,900),
+# QUOTATION FOR ORANGE, LIGHT_BLUE, PINK, GREEN, RED, BLUE, YELLOW, PURPLE
+QUOTATION = [(220,280,410,490,500,300,700,900),
              (180,280,380,340,500,600,700,800),
              (600,280,360,240,500,600,200,600),
              (200,380,360,390,500,600,1100,1000),
@@ -183,7 +192,7 @@ QUOTATION = ((220,280,410,490,500,300,700,900),
              (200,260,360,490,500,600,700,900),
              (200,280,310,140,700,600,700,800),
              (200,230,460,340,500,650,700,800),
-             (200,580,360,540,500,550,700,800))
+             (200,580,360,540,500,550,700,800)]
 
 #UI dimesions
 ACTIONS_WIDTH = 400
@@ -195,7 +204,7 @@ LABEL_HEIGHT = 30
 BUTTON_WIDTH = 150
 BUTTON_HEIGHT = 30
 LEADERBOARD_WIDTH = 400
-LEADERBOARD_HEIGHT = 210
+LEADERBOARD_HEIGHT = 230
 LEADERBOARD_LABEL_WIDTH = 250
 STOCK_UI_WIDTH = 1000
 STOCK_UI_HEIGHT = 900

@@ -2,6 +2,8 @@ from .constants import INITIAL_BALANCE, CELLS_DEF
 from .car import Car
 import time
 class Player:
+    last_stock_update = None
+
     def __init__(self, playerName, car):
         self.playerName = playerName
         self.balance = INITIAL_BALANCE
@@ -25,7 +27,7 @@ class Player:
     def stockValue(self):
         value = 0
         for stock in self.__stocks:
-            value += stock.stock_value
+            value += stock.getStockValue()
 
         return value
 
@@ -34,7 +36,8 @@ class Player:
     
     def addStock(self, stocks):
         self.__stocks.append(stocks)
-        self.stockUpdatedAt = time.time()
+        self.__stocks = sorted(self.__stocks, key=lambda x: x.position)
+        Player.last_stock_update = time.time()
 
     def sameColorCount(self, color):
         count = 0
@@ -53,11 +56,11 @@ class Player:
     def computePenalty(self, stock):
         sameColorCells = self.sameColorCount(stock.color)
         if sameColorCells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
-            return stock.penalties[sameColorCells - 1]
+            return stock.getPenalty()[sameColorCells - 1]
         elif sameColorCells == 2: # we check if the player own two stocks of the same company
             if self.sameCompanyCount(stock):
-                return stock.penalties[1]
-        return stock.penalties[0] # this will return if the stock of the company is only one
+                return stock.getPenalty()[1]
+        return stock.getPenalty()[0] # this will return if the stock of the company is only one
     
     def getStockByPos(self, stockPos):
         for stock in self.__stocks:

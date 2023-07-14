@@ -1,5 +1,5 @@
 import pygame
-from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE
+from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
 from .board import Board
 from .player import Player
 from .gameUI import GameUI
@@ -8,6 +8,8 @@ from .event import Event
 from .gameLogic import *
 import pygame_gui
 from collections import deque
+import time
+import random
 
 class Game:
     def __init__(self, width, height, clock, players):
@@ -21,11 +23,15 @@ class Game:
         self.dice = Dice()
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
-        self.squareBalance = 2000
         #creating events
         events = Event.initialize_events()
         self.events = deque(events)
+        random.shuffle(self.events)
+        self.__squareBalance = 2000
+        random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
+        self.newQuotation = deque(QUOTATION) # this function create a ring list that work using rotate()
 
+        Player.last_stock_update = time.time()
         for player in players:
             self.players.append(Player(player["name"], player["color"]))
 
@@ -36,7 +42,7 @@ class Game:
         self.board.draw(self.screen)
         self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
-        self.gameUI.draw_leaderboard(self.players, self.squareBalance)
+        self.gameUI.draw_leaderboard(self.players, self.__squareBalance, self.players[self.currentPlayer])
         self.gameUI.draw_stockboard(self.players)
 
         for index, player in enumerate(self.players):
@@ -56,13 +62,16 @@ class Game:
                     elif event.ui_element == self.gameUI.buyButton:
                         curr_player = self.players[self.currentPlayer]
                         buyStock(self.board.cells, curr_player)
-                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.updateAllPlayerLables(self.players)
+                        self.dice.drawDices(self.screen)
                         self.gameUI.buyButton.disable()
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
+                        self.gameUI.updateTurnLabel(self.players[self.currentPlayer])
                         self.gameUI.launchDice.enable()
                         self.gameUI.passButton.disable()
+                        self.gameUI.buyButton.disable()
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.players[self.currentPlayer]
@@ -83,14 +92,13 @@ class Game:
                         curr_player = self.players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
                         curr_player.addStock(chosenStock)
-                        curr_player.changeBalance(-chosenStock.stock_value)
+                        curr_player.changeBalance(-chosenStock.getStockValue())
                         self.board.removeStock(chosenStock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
-                        self.gameUI.updateLabel(curr_player)
-                        self.gameUI.passButton.enable()
-                        self.gameUI.showStocks.enable()
+                        self.gameUI.updateAllPlayerLables(self.players)
+                        self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseMoveBut:
                         curr_player = self.players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
@@ -108,18 +116,18 @@ class Game:
                         self.gameUI.closeEventUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
-                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.buyAnyBut:
                         chosenStock = self.gameUI.getShowedStock()
                         curr_player = self.players[self.currentPlayer]
                         transferStock(self.board, curr_player, chosenStock)
-                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.renableActions()
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
-            self.gameUI.updateStockboard(self.players)
+            self.gameUI.updateStockboard(self.players, Player.last_stock_update)
             self.board.draw(self.screen)
             for i, player in enumerate(self.players):
                 self.board.drawPlayerCar(self.screen, player, i, len(self.players))
@@ -166,49 +174,54 @@ class Game:
 #            self.gameUI.passButton.disable()
 #        else:
 #           self.gameUI.passButton.enable()
+            #disablePassButton = self.specialCellLogic(cell, curr_player)
+
+        if is_double(score):
+            self.gameUI.passButton.disable()
+            self.gameUI.launchDice.enable()
 
     def enableBuyButton(self, cell, player):
     
         if(cell.cellType != STOCKS_TYPE or len(cell.stocks)  == 0):
             self.gameUI.buyButton.disable()
         else:
-            if player.balance >= cell.stocks[0].stock_value:
+            if player.balance >= cell.stocks[0].getStockValue():
                 self.gameUI.buyButton.enable()
             else:
                 self.gameUI.buyButton.disable()
 
     def specialCellLogic(self, cell, player):
-        disablePassButton = False
+        #disablePassButton = False
 
         if cell.cellType == START_TYPE:
             startLogic(player)        
         elif cell.cellType == EVENTS_TYPE:
             self.gameUI.disableActions()
             self.gameUI.showEventUi(self.events[0])
-            disablePassButton = True  
+            #disablePassButton = True  
         elif cell.cellType == STOCKS_PRIZE_TYPE:
             stockPrizeLogic(player)
         elif cell.cellType == QUOTATION_TYPE:
-            quotationLogic(player)
+            quotationLogic(self.players, self.board, self.newQuotation, self)
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.getAvailbleStocks()
             self.gameUI.disableActions()
             self.gameUI.showMoveToStock(stocks, 'Scegli su quale cedola vuoi spostarti')
-            disablePassButton = True
+            #disablePassButton = True
         elif cell.cellType == SIX_HUNDRED_TYPE:
             sixHundredLogic(player)
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.board.getPurchasableStocks(player.balance)
             self.gameUI.disableActions()
             self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
-            disablePassButton = True
+            #disablePassButton = True
         elif cell.cellType == CHANCE_TYPE:
-            score, amount = chanceLogic(player, self.squareBalance)
-            self.squareBalance += amount
+            score, amount = chanceLogic(player, self.__squareBalance)
+            self.__squareBalance += amount
             self.dice.updateDice(score, self.screen)
-            self.gameUI.updateSquareBalanceLabel(self.squareBalance)
+            self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
 
-        return disablePassButton
+        #return disablePassButton
         
     def eventsLogic(self, player):
         event = self.events[0]
@@ -323,3 +336,7 @@ class Game:
             player.changeBalance(effectData['get'])
 
         player.setPosition(effectData['destination'])
+
+    def increaseSquareBalance(self, new_balance):
+        self.__squareBalance += new_balance
+        self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
