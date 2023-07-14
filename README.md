@@ -15,6 +15,7 @@ To do list funzionalità:
 - loghi
 - mostra cedole
     - ~~ fermata libera ~~
+    - in showStockUi devo controllare se ci sono 0 cedole da mostrare per qualsiasi ragione essa sia e mostrare che non ci sono cedole
     - asta
 - bancarotta
     - vendita, dopo asta

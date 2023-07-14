@@ -150,6 +150,11 @@ class Game:
         self.gameUI.passButton.enable()
         score = roll()
         self.dice.updateDice(score,self.screen)
+        #is double
+        if is_double(score):
+            self.gameUI.passButton.disable()
+            self.gameUI.launchDice.enable()
+
         curr_player = self.players[self.currentPlayer]
         curr_player.move(score[0] + score[1])
         cell = self.board.cells[curr_player.position]
@@ -175,10 +180,6 @@ class Game:
 #        else:
 #           self.gameUI.passButton.enable()
             #disablePassButton = self.specialCellLogic(cell, curr_player)
-
-        if is_double(score):
-            self.gameUI.passButton.disable()
-            self.gameUI.launchDice.enable()
 
     def enableBuyButton(self, cell, player):
     

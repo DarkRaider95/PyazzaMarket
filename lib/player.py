@@ -68,6 +68,15 @@ class Player:
                 return stock
             
         return None
+    
+    def removeStock(self, chosenStock):
+        stockToRemoveIndex = None
+        
+        for i, stock in enumerate(self.__stocks):
+            if stock.position == chosenStock.position:
+                stockToRemoveIndex = i
+
+        self.__stocks.pop(stockToRemoveIndex)
 
     def getStocks(self):
         return self.__stocks.copy()
