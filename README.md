@@ -24,6 +24,7 @@ To do list funzionalità:
 - ~~ ordinare le label quando mostrate di modo da far vedere chi è in testa ~~
 - aggiungere tasto salva, per salvare stato partita
 - gestire default piazza
+- controllare cella lancio dadi per perdere o vincere sulla piazza
 
 To do list codice:
 - fare getters and setters
