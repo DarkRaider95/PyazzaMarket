@@ -56,8 +56,7 @@ class Game:
                     self.running = False
 
                 elif event.type == pygame_gui.UI_BUTTON_PRESSED:
-                    if event.ui_element == self.gameUI.launchDice:
-                        self.skipTurn()
+                    if event.ui_element == self.gameUI.launchDice:                        
                         self.turn()
                     elif event.ui_element == self.gameUI.buyButton:
                         curr_player = self.players[self.currentPlayer]
@@ -68,6 +67,7 @@ class Game:
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
+                        self.skipTurn()
                         self.gameUI.updateTurnLabel(self.players[self.currentPlayer])
                         self.gameUI.launchDice.enable()
                         self.gameUI.passButton.disable()
@@ -141,7 +141,7 @@ class Game:
         curr_player = self.players[self.currentPlayer]
         while curr_player.getSkipTurn():
             curr_player.skipTurn(False)
-            self.currentPlayer += 1
+            self.currentPlayer =  (self.currentPlayer+1) % len(self.players)
             curr_player = self.players[self.currentPlayer]
 
     def turn(self):
