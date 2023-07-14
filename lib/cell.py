@@ -8,10 +8,12 @@ class Cell:
         self.stocks = None
         if(cellDef is not None):
             self.color = cellDef['color']
-            self.stock_value = cellDef['value']
+            self.__original_value = cellDef['value']
+            self.__new_value = self.__original_value
             self.logo = logo
             self.stocks = Cell.initialize_stock(cellDef, position, name)
-            self.font_stock_value = pygame.font.Font(None, 30)        
+            self.font_stock_value = pygame.font.Font(None, 30)
+            self.__stockIndex = cellDef['index']     
         self.cell_x = cell_x
         self.cell_y = cell_y
         self.cellImage = cellImage
@@ -50,7 +52,7 @@ class Cell:
         pygame.draw.rect(self.surface, self.color, colorrect)
 
         #Draw stock price
-        stock_price = self.font_stock_value.render("  "+ str(self.stock_value) + "\nSCUDI", True, BLACK)
+        stock_price = self.font_stock_value.render("  "+ str(self.__new_value) + "\nSCUDI", True, BLACK)
         price_x = (CELL_WIDTH - (CELL_WIDTH // 2)) - (stock_price.get_width() // 2)
         price_y = cell_color_y - stock_price.get_height() - 10
         self.surface.blit(stock_price, (price_x, price_y))
@@ -77,3 +79,15 @@ class Cell:
             screen.blit(surfaceRotated, (self.cell_x, self.cell_y))
         else:
             screen.blit(self.surface, (self.cell_x, self.cell_y))
+        
+    def getCellValue(self):
+        return self.__new_value
+    
+    def getStocks(self):
+        return self.stocks
+    
+    def updateCellValue(self, value):
+        self.__new_value = value
+
+    def getIndex(self):
+        return self.__stockIndex

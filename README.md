@@ -7,8 +7,10 @@ To do list funzionalità:
     - ~~ aggiunge x1 o x2 in base al numero di stock ~~
     - ~~ nel caso che le stock siano le stesse non aggiornare ~~
 - ~~ caselle speciali, angoli, dadi ~~ 
-- mostra turno
-- quotazioni, senza asta
+- ~~ mostra turno ~~
+- ~~ quotazioni, senza asta ~~
+    - ~~ calcolo penalità ~~
+    - ~~ calcolo differenza da dare ai giocatori ~~
 - eventi
 - loghi
 - mostra cedole
@@ -21,6 +23,7 @@ To do list funzionalità:
     - messaggio in caso di doppia selezione della stessa macchina
 - ~~ ordinare le label quando mostrate di modo da far vedere chi è in testa ~~
 - aggiungere tasto salva, per salvare stato partita
+- gestire default piazza
 
 To do list codice:
 - fare getters and setters

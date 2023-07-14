@@ -1,5 +1,5 @@
 import pygame
-from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE
+from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
 from .board import Board
 from .player import Player
 from .gameUI import GameUI
@@ -7,6 +7,8 @@ from .dice import Dice
 from .gameLogic import *
 import pygame_gui
 import time
+import random
+import collections
 
 class Game:
     def __init__(self, width, height, clock, players):
@@ -20,7 +22,9 @@ class Game:
         self.dice = Dice()
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
-        self.squareBalance = 2000
+        self.__squareBalance = 2000
+        random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
+        self.newQuotation = collections.deque(QUOTATION) # this function create a ring list that work using rotate()
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -33,7 +37,7 @@ class Game:
         self.board.draw(self.screen)
         self.dice.drawDices(self.screen)
         self.gameUI.draw_actions_ui()
-        self.gameUI.draw_leaderboard(self.players, self.squareBalance, self.players[self.currentPlayer])
+        self.gameUI.draw_leaderboard(self.players, self.__squareBalance, self.players[self.currentPlayer])
         self.gameUI.draw_stockboard(self.players)
 
         for index, player in enumerate(self.players):
@@ -59,6 +63,7 @@ class Game:
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
                         self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
+                        self.gameUI.updateTurnLabel(self.players[self.currentPlayer])
                         self.gameUI.launchDice.enable()
                         self.gameUI.passButton.disable()
                         self.gameUI.buyButton.disable()
@@ -66,7 +71,7 @@ class Game:
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.players[self.currentPlayer]
                         self.gameUI.disableActions()
-                        self.gameUI.showStocksUi(curr_player.stocks, 'Le cedole di '+curr_player.playerName)
+                        self.gameUI.showStocksUi(curr_player.getStocks(), 'Le cedole di '+curr_player.playerName)
                     elif event.ui_element == self.gameUI.nextStock:
                         curr_player = self.players[self.currentPlayer]
                         self.gameUI.showNextStock()
@@ -82,14 +87,13 @@ class Game:
                         curr_player = self.players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
                         curr_player.addStock(chosenStock)
-                        curr_player.changeBalance(-chosenStock.stock_value)
+                        curr_player.changeBalance(-chosenStock.getStockValue())
                         self.board.removeStock(chosenStock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
                         self.gameUI.updateAllPlayerLables(self.players)
-                        self.gameUI.passButton.enable()
-                        self.gameUI.showStocks.enable()
+                        self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseMoveBut:
                         curr_player = self.players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
@@ -99,8 +103,7 @@ class Game:
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.dice.drawDices(self.screen)
-                        self.gameUI.passButton.enable()
-                        self.gameUI.showStocks.enable()
+                        self.gameUI.renableActions()
 
                 self.gameUI.manager.process_events(event)            
             
@@ -116,7 +119,7 @@ class Game:
             pygame.display.update()
 
     def turn(self):
-        disablePassButton = False
+        #disablePassButton = False
         score = roll()
         self.dice.updateDice(score,self.screen)
         curr_player = self.players[self.currentPlayer]
@@ -134,15 +137,19 @@ class Game:
         #case special cell
         else:
             self.gameUI.buyButton.disable()
-            disablePassButton = self.specialCellLogic(cell, curr_player)
+            #disablePassButton = self.specialCellLogic(cell, curr_player)
+            self.specialCellLogic(cell, curr_player)
         
         self.gameUI.updateAllPlayerLables(self.players)
         self.gameUI.launchDice.disable()
 
+        """
         if disablePassButton:
             self.gameUI.passButton.disable()
         else:
-            self.gameUI.passButton.enable()
+            self.gameUI.passButton.enable() """
+
+        self.gameUI.passButton.enable()
 
         if is_double(score):
             self.gameUI.passButton.disable()
@@ -153,13 +160,13 @@ class Game:
         if(cell.cellType != STOCKS_TYPE or len(cell.stocks)  == 0):
             self.gameUI.buyButton.disable()
         else:
-            if player.balance >= cell.stocks[0].stock_value:
+            if player.balance >= cell.stocks[0].getStockValue():
                 self.gameUI.buyButton.enable()
             else:
                 self.gameUI.buyButton.disable()
 
     def specialCellLogic(self, cell, player):
-        disablePassButton = False
+        #disablePassButton = False
 
         if cell.cellType == START_TYPE:
             startLogic(player)        
@@ -168,7 +175,7 @@ class Game:
         elif cell.cellType == STOCKS_PRIZE_TYPE:
             stockPrizeLogic(player)
         elif cell.cellType == QUOTATION_TYPE:
-            quotationLogic(player)
+            quotationLogic(self.players, self.board, self.newQuotation, self)
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.getAvailbleStocks()
             self.gameUI.disableActions()
@@ -182,10 +189,13 @@ class Game:
             self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
             disablePassButton = True
         elif cell.cellType == CHANCE_TYPE:
-            score, amount = chanceLogic(player, self.squareBalance)
-            self.squareBalance += amount
+            score, amount = chanceLogic(player, self.__squareBalance)
+            self.__squareBalance += amount
             self.dice.updateDice(score, self.screen)
-            self.gameUI.updateSquareBalanceLabel(self.squareBalance)
+            self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
 
-        return disablePassButton
-        
+        #return disablePassButton
+
+    def increaseSquareBalance(self, new_balance):
+        self.__squareBalance += new_balance
+        self.gameUI.updateSquareBalanceLabel(self.__squareBalance)

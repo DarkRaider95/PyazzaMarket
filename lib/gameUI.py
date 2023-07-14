@@ -212,19 +212,19 @@ class GameUI:
         stockImageRect = pygame.Rect((STOCK_UI_WIDTH // 2 - STOCK_WIDTH // 2, 60), (STOCK_WIDTH, STOCK_HEIGHT))        
         
         currStock =self.stocks[self.showedStock]
-        currStock.draw(self.screen)
+        currStock.draw()
         self.stockImage = UIImage(stockImageRect, currStock.surface, container=self.stocksUi, manager=self.manager)
         
     def showNextStock(self):
         self.showedStock = (self.showedStock + 1) % len(self.stocks)
         currStock =self.stocks[self.showedStock]
-        currStock.draw(self.screen)
+        currStock.draw()
         self.stockImage.set_image(currStock.surface)    
     
     def showPreviousStock(self):
         self.showedStock = (self.showedStock - 1) % len(self.stocks)
         currStock =self.stocks[self.showedStock]
-        currStock.draw(self.screen)
+        currStock.draw()
         self.stockImage.set_image(currStock.surface)
     
     def closeStockUi(self):
