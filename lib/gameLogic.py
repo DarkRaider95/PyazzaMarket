@@ -32,8 +32,6 @@ def buyStock(cells, player):
             stock = cells[curr_pos].stocks.pop()
             player.changeBalance(-stock_value)
             player.addStock(stock)
-    
-    return cells
 
 def checkForPenalty(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
@@ -108,6 +106,17 @@ def whoOwnsStockByName(players, stockName):
                 owners.append(player)
     
     return owners
+
+def transferStock(board, current_player, chosenStock):
+
+    if chosenStock.owner is not None:
+        chosenStock.owner.removeStock(chosenStock)    
+    else:
+        board.removeStock(chosenStock)
+        
+    chosenStock.owner = current_player
+    current_player.addStock(chosenStock)
+
             
 def getMoneyFromOthers(players, player_number, amount):
     current_player = players[player_number]
@@ -124,8 +133,7 @@ def checkStartPass(player, destination):
     else:
         return False
     
-def computePassAmount(players, player_number, passAmount, destination):
-    current_player = players[player_number]
+def computePassAmount(players, curr_player_pos, player_number, passAmount, destination):
     players.pop(player_number)
 
     totPassAmount = 0
@@ -133,15 +141,16 @@ def computePassAmount(players, player_number, passAmount, destination):
     for player in players:
         if (            
             (
-                current_player.position < player.position and 
-                destination > current_player.position and 
+                curr_player_pos < player.position and
                 destination > player.position
             ) 
             or 
             (
-                current_player.position < player.position and 
-                destination < current_player.position and 
-                destination < player.position
+                destination < curr_player_pos and 
+                (
+                    curr_player_pos < player.position or
+                    player.position < destination
+                )
             )
         ):
             totPassAmount += passAmount

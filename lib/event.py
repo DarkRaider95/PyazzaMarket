@@ -7,7 +7,11 @@ class Event:
         self.image = image
         self.evenType = eventType
         self.effectData = effectData
+        self.surface = pygame.Surface((EVENT_WIDTH, EVENT_HEIGHT))
     
+    def draw(self):
+        self.surface.blit(self.image, (0, 0))
+
     def initialize_events():
         events = []
         # Get the list of all files in the events directory
@@ -17,7 +21,7 @@ class Event:
         for fileName in files:
             filePath = EVENTS_DIR+fileName
             image = pygame.image.load(filePath)
-            image = pygame.transform.scale(image, (DICE_WIDTH, DICE_HEIGHT))
+            image = pygame.transform.scale(image, (EVENT_WIDTH, EVENT_HEIGHT))
             eventType, effectData = Event.parse_name(fileName)
             events.append(Event(image, eventType, effectData))
 

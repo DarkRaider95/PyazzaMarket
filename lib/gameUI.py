@@ -21,6 +21,9 @@ class GameUI:
         self.stockboardLabels = []
         self.latestStockUpdate = None
         self.buyAnyBut = None
+        self.eventBut = None
+        self.nextStock = None
+        self.previousStock = None
         self.actionsEnabled = []
         self.actions = []
 
@@ -43,7 +46,7 @@ class GameUI:
                                 object_id = 'BUY',
                                 manager=self.manager)
         
-        self.buyButton.disable()
+        
         
         self.showStocks = UIButton(relative_rect=pygame.Rect(ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 150, BUTTON_WIDTH, BUTTON_HEIGHT),
                                 text="Mostra Cedole",
@@ -58,6 +61,7 @@ class GameUI:
                                 object_id = 'PASS',
                                 manager=self.manager)
         
+        self.buyButton.disable()
         self.passButton.disable()
         self.showStocks.disable()
 
@@ -91,8 +95,8 @@ class GameUI:
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
         label_dimension = (150, LABEL_HEIGHT)
-        sorted_player = sorted(players, key=lambda x: len(x.stocks), reverse=True)
-        max_stock = max(len(sorted_player[0].stocks), 1)
+        sorted_player = sorted(players, key=lambda x: len(x.getStocks()), reverse=True)
+        max_stock = max(len(sorted_player[0].getStocks()), 1)
         num_columns = min(3, len(sorted_player))
         self.drawRowStockboard(0,num_columns,sorted_player, 20, 0, label_dimension, True)
         if len(sorted_player) > 3:
@@ -217,19 +221,19 @@ class GameUI:
         stockImageRect = pygame.Rect((STOCK_UI_WIDTH // 2 - STOCK_WIDTH // 2, 60), (STOCK_WIDTH, STOCK_HEIGHT))        
         
         currStock =self.stocks[self.showedStock]
-        currStock.draw(self.screen)
+        currStock.draw()
         self.stockImage = UIImage(stockImageRect, currStock.surface, container=self.stocksUi, manager=self.manager)
         
     def showNextStock(self):
         self.showedStock = (self.showedStock + 1) % len(self.stocks)
         currStock =self.stocks[self.showedStock]
-        currStock.draw(self.screen)
+        currStock.draw()
         self.stockImage.set_image(currStock.surface)    
     
     def showPreviousStock(self):
         self.showedStock = (self.showedStock - 1) % len(self.stocks)
         currStock =self.stocks[self.showedStock]
-        currStock.draw(self.screen)
+        currStock.draw()
         self.stockImage.set_image(currStock.surface)
     
     def closeStockUi(self):
@@ -256,3 +260,31 @@ class GameUI:
             action.enable()
 
         self.actionsEnabled.clear()
+
+    def showEventUi(self, event):
+        self.showedEvent = event        
+        self.drawEventUi()
+
+    def drawEventUi(self):
+        panel_rect = pygame.Rect((WIDTH // 2 - EVENT_UI_WIDTH // 2, 20), (EVENT_UI_WIDTH, EVENT_UI_HEIGHT))
+        self.eventUi = UIPanel(panel_rect, starting_height= 2, manager=self.manager)
+        
+        title_rect = pygame.Rect((EVENT_UI_WIDTH // 2 - EVENT_UI_TITLE_WIDTH // 2, 10), (EVENT_UI_TITLE_WIDTH, EVENT_UI_TITLE_HEIGHT))
+        UILabel(title_rect, 'EVENTI', manager=self.manager, container=self.eventUi)
+
+        eventRect = pygame.Rect((EVENT_UI_WIDTH - 30 - EVENT_UI_BUT_WIDTH, EVENT_UI_HEIGHT // 2 - EVENT_UI_BUT_HEIGHT // 2), (EVENT_UI_BUT_WIDTH, EVENT_UI_BUT_WIDTH))
+        
+
+        self.eventBut = UIButton(relative_rect=eventRect,
+                                text="OK",
+                                container=self.eventUi,
+                                object_id = 'EVENT_OK',
+                                manager=self.manager)
+        
+        eventImageRect = pygame.Rect((EVENT_UI_WIDTH // 2 - EVENT_WIDTH // 2, 60), (EVENT_WIDTH, EVENT_HEIGHT))        
+        
+        self.showedEvent.draw()
+        self.eventImage = UIImage(eventImageRect, self.showedEvent.surface, container=self.eventUi, manager=self.manager)
+
+    def closeEventUi(self):
+        self.eventUi.kill()

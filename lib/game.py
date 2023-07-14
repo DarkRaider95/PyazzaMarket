@@ -55,8 +55,6 @@ class Game:
                         self.turn()
                     elif event.ui_element == self.gameUI.buyButton:
                         curr_player = self.players[self.currentPlayer]
-                        #questo non so serve salvarlselo
-                        #self.cells = buyStock(self.board.cells, curr_player)
                         buyStock(self.board.cells, curr_player)
                         self.gameUI.updateLabel(curr_player)
                         self.gameUI.buyButton.disable()
@@ -104,7 +102,20 @@ class Game:
                         self.dice.drawDices(self.screen)
                         self.gameUI.passButton.enable()
                         self.gameUI.showStocks.enable()
-
+                    elif event.ui_element == self.gameUI.eventBut:
+                        curr_player = self.players[self.currentPlayer]
+                        self.eventsLogic(curr_player)
+                        self.gameUI.closeEventUi()
+                        self.screen.fill(BLACK)
+                        self.dice.drawDices(self.screen)
+                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.renableActions()
+                    elif event.ui_element == self.gameUI.buyAnyBut:
+                        chosenStock = self.gameUI.getShowedStock()
+                        curr_player = self.players[self.currentPlayer]
+                        transferStock(self.board, curr_player, chosenStock)
+                        self.gameUI.updateLabel(curr_player)
+                        self.gameUI.renableActions()
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
@@ -126,7 +137,9 @@ class Game:
             curr_player = self.players[self.currentPlayer]
 
     def turn(self):
-        disablePassButton = False
+        #disablePassButton = False
+        self.gameUI.launchDice.disable()
+        self.gameUI.passButton.enable()
         score = roll()
         self.dice.updateDice(score,self.screen)
         curr_player = self.players[self.currentPlayer]
@@ -143,15 +156,16 @@ class Game:
             checkForPenalty(self.board.cells, self.players.copy(), self.currentPlayer)            
         #case special cell
         else:
-            disablePassButton = self.specialCellLogic(cell, curr_player)
-        
-        self.gameUI.updateAllPlayerLables(self.players)
-        self.gameUI.launchDice.disable()
+            #disablePassButton = self.specialCellLogic(cell, curr_player)
+            self.specialCellLogic(cell, curr_player)
 
-        if disablePassButton:
-            self.gameUI.passButton.disable()
-        else:
-            self.gameUI.passButton.enable()
+        self.gameUI.updateAllPlayerLables(self.players)
+        
+        #self.gameUI.passButton.enable()
+#        if disablePassButton:
+#            self.gameUI.passButton.disable()
+#        else:
+#           self.gameUI.passButton.enable()
 
     def enableBuyButton(self, cell, player):
     
@@ -169,7 +183,9 @@ class Game:
         if cell.cellType == START_TYPE:
             startLogic(player)        
         elif cell.cellType == EVENTS_TYPE:
-            self.eventsLogic(player)
+            self.gameUI.disableActions()
+            self.gameUI.showEventUi(self.events[0])
+            disablePassButton = True  
         elif cell.cellType == STOCKS_PRIZE_TYPE:
             stockPrizeLogic(player)
         elif cell.cellType == QUOTATION_TYPE:
@@ -197,41 +213,43 @@ class Game:
     def eventsLogic(self, player):
         event = self.events[0]
         
-        if event.type == COLOR_EVENT:
+        if event.evenType == COLOR_EVENT:
             pass
-        elif event.type == BUY_ANTHING_EVENT:
+        elif event.evenType == BUY_ANTHING_EVENT:
             stocks = self.board.getAvailbleStocks()            
             for p in self.players:
                 if p != player:
                     stocks.extend(player.getStocks())
             self.gameUI.disableActions()
             self.gameUI.showBuyAnythingStock(stocks, 'Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)')            
-        elif event.type == STOP_1:
+        elif event.evenType == STOP_1:
             player.skipTurn(True)
-        elif event.type == FREE_PENALTY:
+        elif event.evenType == FREE_PENALTY:
             player.freePenalty(True)
-        elif event.type == FREE_PENALTY_MARTINI:
+        elif event.evenType == FREE_PENALTY_MARTINI:
             player.freeMartini(True)
-        elif event.type == EVERYONE_FIFTY_EVENT:
+        elif event.evenType == EVERYONE_FIFTY_EVENT:
             everyOneFifty(self.players)
-        elif event.type == PREVIOUS_PLAYER_GALUP:
-            previousPlayer = self.players[self.currentPlayer-1]
+        elif event.evenType == PREVIOUS_PLAYER_GALUP:
+            previousPlayerIndex = (self.currentPlayer-1) % len(self.players)
+            previousPlayer = self.players[previousPlayerIndex]
             previousPlayer.setPosition(39)
             playerOwnStock = whoOwnsStock(self.players, 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
             stock = playerOwnStock.getStockByPos(39)
             amount = playerOwnStock.computePenalty(stock)
             previousPlayer.changeBalance(amount)
-        elif event.type == NEXT_PLAYER_PAY:
-            nextPlayer = self.players[self.currentPlayer+1]
+        elif event.evenType == NEXT_PLAYER_PAY:
+            nextPlayerIndex = (self.currentPlayer+1) % len(self.players)
+            nextPlayer = self.players[nextPlayerIndex]
             nextPlayer.changeBalance(-200)
-        elif event.type == GIFT_EVENT:
+        elif event.evenType == GIFT_EVENT:
             effectData = event.effectData   
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
                 player.addStock(stock)
             else:                
                 player.changeBalance(effectData['amount'])
-        elif event.type == GET_EVENT:
+        elif event.evenType == GET_EVENT:
             effectData = event.effectData
             
             if 'from' in effectData.keys():
@@ -240,9 +258,9 @@ class Game:
                     getMoneyFromOthers(self.players.copy(), self.currentPlayer, effectData['amount'])
             else:
                 player.changeBalance(effectData['amount'])
-        elif event.type == GO_EVENT:
+        elif event.evenType == GO_EVENT:
             self.goEventLogic(player, event)
-        elif event.type == PAY_EVENT:
+        elif event.evenType == PAY_EVENT:
             effectData = event.effectData
 
             if 'to' in effectData.keys():
@@ -251,7 +269,7 @@ class Game:
                     payMoneyToOthers(self.players.copy(), self.currentPlayer, effectData['amount'])
             else:
                 player.changeBalance(-effectData['amount'])
-        elif event.type == OWN_EVENT:
+        elif event.evenType == OWN_EVENT:
             effectData = event.effectData
             
             owners = whoOwnsStockByName(self.players, effectData['stockName'])
@@ -260,15 +278,16 @@ class Game:
                 for owner in owners:
                     update_owner_balance(owner, effectData['stockName'], effectData['getAmount'], effectData['each'])
 
-            if 'othersPayValue' in effectData.keys():
+            if effectData['othersPayValue'] is not None:
                 update_others_balance(self.players.copy(), owners, effectData['othersPayValue'])
 
-        elif event.type == BUY_EVENT:
+        elif event.evenType == BUY_EVENT:
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
                 player.addStock(stock)
                 player.changeBalance(-stock.getOriginalValue())
             else:
+                print('BUY CASE START NEGOTIATION')
                 pass # avviare trattativa con proprietario
         
         #rotate the events list
@@ -284,10 +303,11 @@ class Game:
                 player.changeBalance(300)
 
         if effectData['pass'] is not None:
-            passAmount = computePassAmount(self.players, player.position, effectData['pass'])
+            passAmount = computePassAmount(self.players.copy(), player.position, self.currentPlayer, effectData['pass'], effectData['destination'])
             player.changeBalance(passAmount)
 
         if effectData['someone']:#implement interface to choose someone
+            print('GOTO SOMEONE CASE')
             pass
 
         if effectData['buy']:
@@ -296,6 +316,7 @@ class Game:
                 player.addStock(stock)
                 player.changeBalance(-stock.getOriginalValue())
             else:
+                print('GOTO BUY CASE START NEGOTIATION')
                 pass #implement gui to start negotiation with owner
 
         if effectData['get'] is not None:

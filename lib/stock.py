@@ -21,8 +21,9 @@ class Stock:
         self.name = name
         self.penalties = cellDef['penalty']
         self.surface = pygame.Surface((STOCK_WIDTH, STOCK_HEIGHT))
+        self.owner = None        
 
-    def draw(self, screen):
+    def draw(self):
         #Draw stock and spaces for logo and fees
         logo_x = STOCK_WIDTH // 2 - LOGO_WIDTH // 2
         logo_y = 50 
