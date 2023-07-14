@@ -92,12 +92,24 @@ def everyOneFifty(players):
         player.changeBalance(50)
 
 def whoOwnsStock(players, stockPos):
+    owners = []
     for player in players:
         for stock in player.getStocks():
             if stockPos == stock.position:
-                return player
+                owners.append(player)
+    
+    return owners
+
+def whoOwnsStockByName(players, stockName):
+    owners = []
+    for player in players:
+        for stock in player.getStocks():
+            if stockName == stock.name:
+                owners.append(player)
+    
+    return owners
             
-def getMoneyFromOthers(players, player_number, amount): # since current_player is the one that have done the last move it will be the one that will pay for the crash
+def getMoneyFromOthers(players, player_number, amount):
     current_player = players[player_number]
     players.pop(player_number)
     
@@ -135,3 +147,27 @@ def computePassAmount(players, player_number, passAmount, destination):
             totPassAmount += passAmount
 
     return totPassAmount
+
+def payMoneyToOthers(players, player_number, amount):
+    current_player = players[player_number]
+    players.pop(player_number)
+    
+    for player in players:
+        player.changeBalance(+amount)
+    
+    current_player.changeBalance(len(players) * (-amount))
+
+#this method is executed when an event with own some stock occurs
+def update_owner_balance(owner, stockName, amount, each):
+    for stock in owner.getStocks():
+        if stock.name == stockName:
+            owner.changeBalance(amount)
+            if each == False:
+                break
+
+#this method is executed when an event with own some stock occurs
+#there is an event where the ones that aren't owners pay some money
+def update_others_balance(players, owners, amount):
+    for player in players:
+        if player not in owners:
+            player.changeBalance(-amount)

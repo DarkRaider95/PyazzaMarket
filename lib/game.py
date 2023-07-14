@@ -217,7 +217,7 @@ class Game:
         elif event.type == PREVIOUS_PLAYER_GALUP:
             previousPlayer = self.players[self.currentPlayer-1]
             previousPlayer.setPosition(39)
-            playerOwnStock = whoOwnsStock(self.players, 39)
+            playerOwnStock = whoOwnsStock(self.players, 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
             stock = playerOwnStock.getStockByPos(39)
             amount = playerOwnStock.computePenalty(stock)
             previousPlayer.changeBalance(amount)
@@ -225,14 +225,14 @@ class Game:
             nextPlayer = self.players[self.currentPlayer+1]
             nextPlayer.changeBalance(-200)
         elif event.type == GIFT_EVENT:
-            effectData = event.effect.data    
+            effectData = event.effectData   
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
                 player.addStock(stock)
             else:                
                 player.changeBalance(effectData['amount'])
         elif event.type == GET_EVENT:
-            effectData = event.effect.data
+            effectData = event.effectData
             
             if 'from' in effectData.keys():
                 fromWho = effectData['from']
@@ -243,16 +243,40 @@ class Game:
         elif event.type == GO_EVENT:
             self.goEventLogic(player, event)
         elif event.type == PAY_EVENT:
-            pass
+            effectData = event.effectData
+
+            if 'to' in effectData.keys():
+                toWho = effectData['to']
+                if toWho == 'others':
+                    payMoneyToOthers(self.players.copy(), self.currentPlayer, effectData['amount'])
+            else:
+                player.changeBalance(-effectData['amount'])
         elif event.type == OWN_EVENT:
-            pass
+            effectData = event.effectData
+            
+            owners = whoOwnsStockByName(self.players, effectData['stockName'])
+            
+            if len(owners) > 0:
+                for owner in owners:
+                    update_owner_balance(owner, effectData['stockName'], effectData['getAmount'], effectData['each'])
+
+            if 'othersPayValue' in effectData.keys():
+                update_others_balance(self.players.copy(), owners, effectData['othersPayValue'])
+
         elif event.type == BUY_EVENT:
-            pass
+            stock = self.board.getStockIfAvailable(effectData['stockIndex'])
+            if stock is not None:
+                player.addStock(stock)
+                player.changeBalance(-stock.getOriginalValue())
+            else:
+                pass # avviare trattativa con proprietario
+        
+        #rotate the events list
         self.events.rotate(-1)
 
 
     def goEventLogic(self, player, event):
-        effectData = event.effect.data
+        effectData = event.effectData
 
         if effectData['startCheck']:
             passStart = checkStartPass(player, effectData['destination'])
