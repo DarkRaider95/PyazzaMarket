@@ -44,7 +44,7 @@ class Event:
             eventType = FREE_PENALTY                                    
         elif eventName == 'free_penalty_martini':
             eventType = FREE_PENALTY_MARTINI
-        elif eventName == 'every_50_per_point':
+        elif eventName == 'every_50_per_point': # add dice lunch
             eventType = EVERYONE_FIFTY_EVENT
         elif eventName == 'player-1_go_39_get_penalty':
             eventType = PREVIOUS_PLAYER_GALUP

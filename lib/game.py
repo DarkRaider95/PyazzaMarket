@@ -62,7 +62,6 @@ class Game:
                         curr_player = self.players[self.currentPlayer]
                         buyStock(self.board.cells, curr_player)
                         self.gameUI.updateAllPlayerLables(self.players)
-                        self.dice.drawDices(self.screen)
                         self.gameUI.buyButton.disable()
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
@@ -127,7 +126,7 @@ class Game:
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
-            self.gameUI.updateStockboard(self.players, Player.last_stock_update)
+            self.gameUI.updateStockboard(self.players, Player.last_stock_update, self.dice)
             self.board.draw(self.screen)
             for i, player in enumerate(self.players):
                 self.board.drawPlayerCar(self.screen, player, i, len(self.players))

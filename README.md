@@ -29,6 +29,7 @@ To do list funzionalità:
 - aggiungere tasto salva, per salvare stato partita
 - gestire default piazza
 - controllare cella lancio dadi per perdere o vincere sulla piazza
+. fare la ui per incidenti, tiri doppi, penalità ecc
 
 To do list codice:
 - fare getters and setters

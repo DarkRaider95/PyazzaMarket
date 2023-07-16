@@ -140,11 +140,12 @@ class GameUI:
                         latest_stock_position = stock.position
                         self.stockboardLabels.append(stockNameLabel)
 
-    def updateStockboard(self, players, last_stock_update):
+    def updateStockboard(self, players, last_stock_update, dice):
         if last_stock_update > self.latestStockUpdate:
             for label in self.stockboardLabels:
                 label.kill()
             self.screen.fill(BLACK)
+            dice.drawDices(self.screen)
             self.stockboardLabels = []
             self.draw_stockboard(players)
 
