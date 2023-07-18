@@ -30,6 +30,8 @@ To do list funzionalità:
 - gestire default piazza
 - controllare cella lancio dadi per perdere o vincere sulla piazza
 . fare la ui per incidenti, tiri doppi, penalità ecc
+- interfaccia per tiro dadi per celle speciali, inizio partita ecc
+    - tiro dadi a inizio partita
 
 To do list codice:
 - fare getters and setters
