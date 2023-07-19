@@ -70,3 +70,6 @@ class Stock:
 
     def getPenalty(self):
         return self.__new_penalties.copy() # we pass a copy so that the original list is not modified
+    
+    def get_name(self):
+        return self.name
