@@ -50,10 +50,13 @@ def checkForPenalty(cells, players, player_number): # testare per vedere se rico
 def checkCrash(players, player_number): # since current_player is the one that have done the last move it will be the one that will pay for the crash
     current_player = players[player_number]
     players.pop(player_number)
+    crash = 0
     for player in players:
         if player.position == current_player.position:
             current_player.changeBalance(-CRASH_FEE)
             player.changeBalance(CRASH_FEE)
+            crash = 1
+    return crash
 
 def checkTurn(player):
     if player.old_position > player.position:

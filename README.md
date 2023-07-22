@@ -29,7 +29,8 @@ To do list funzionalità:
 - aggiungere tasto salva, per salvare stato partita
 - gestire default piazza
 - controllare cella lancio dadi per perdere o vincere sulla piazza
-. fare la ui per incidenti, tiri doppi, penalità ecc
+- ~~ fare la ui per incidenti, tiri doppi, penalità ecc ~~
+    - ~~ bloccare altri tasti fino a quando non si fa kill o fare kill nel caso si usi un altro bottone ~~
 - interfaccia per tiro dadi per celle speciali, inizio partita ecc
     - tiro dadi a inizio partita
 

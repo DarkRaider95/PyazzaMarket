@@ -123,6 +123,8 @@ class Game:
                         transferStock(self.board, curr_player, chosenStock)
                         self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.renableActions()
+                    elif event.ui_element == self.gameUI.closeAlertBut:
+                        self.gameUI.closeAlert(self.players, self.dice)
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
@@ -144,6 +146,7 @@ class Game:
             curr_player = self.players[self.currentPlayer]
 
     def turn(self):
+        tiroDoppio = False
         #disablePassButton = False
         self.gameUI.launchDice.disable()
         self.gameUI.passButton.enable()
@@ -153,13 +156,21 @@ class Game:
         if is_double(score):
             self.gameUI.passButton.disable()
             self.gameUI.launchDice.enable()
+            tiroDoppio = True
 
         curr_player = self.players[self.currentPlayer]
         curr_player.move(score[0] + score[1])
+        #curr_player.move(4)
         cell = self.board.cells[curr_player.position]
         #check turn and crash before any other events or effect of the cells
         checkTurn(curr_player)
-        checkCrash(self.players.copy(), self.currentPlayer)
+        crash = checkCrash(self.players.copy(), self.currentPlayer)
+        if tiroDoppio and crash:
+            self.gameUI.drawAlert("Doppio e incidente!")
+        elif tiroDoppio:
+            self.gameUI.drawAlert("Tiro doppio!")
+        elif crash:
+            self.gameUI.drawAlert("Incidente!")
         #case cell with stock
         if(cell.cellType == STOCKS_TYPE):
             #curr_player.move(10)
