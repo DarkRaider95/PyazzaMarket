@@ -71,7 +71,7 @@ def quotationLogic(players, board, quotation, game):
         for stock in player.getStocks():
             difference = stock.updateValue(newQuotation[stock.getIndex()])
             player.changeBalance(difference)
-            game.increaseSquareBalance(difference)
+            game.setSquareBalance(difference)
     for cell in board.getCells():
         if cell.getStocks() is not None:                                                                          
             cell.updateCellValue(newQuotation[cell.getIndex()])

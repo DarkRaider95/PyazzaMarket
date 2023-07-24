@@ -228,7 +228,10 @@ class Game:
             #disablePassButton = True
         elif cell.cellType == CHANCE_TYPE:
             score, amount = chanceLogic(player, self.__squareBalance)
-            self.__squareBalance += amount
+            if amount < 0:
+                self.__squareBalance += 0
+            else:
+                self.__squareBalance += amount
             self.dice.updateDice(score, self.screen)
             self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
 
@@ -348,6 +351,8 @@ class Game:
 
         player.setPosition(effectData['destination'])
 
-    def increaseSquareBalance(self, new_balance):
+    def setSquareBalance(self, new_balance):
         self.__squareBalance += new_balance
+        if self.__squareBalance < 0:
+            self.__squareBalance == 0
         self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
