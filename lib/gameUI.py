@@ -27,6 +27,7 @@ class GameUI:
         self.turnName = None
         self.actionsEnabled = []
         self.actions = []
+        self.disableActionCount = 0 # if you have two events that call disable action you have to make sure that you call for both renable action before to enable again the bottons
 
     def draw_actions_ui(self):
         panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
@@ -141,6 +142,7 @@ class GameUI:
                         self.stockboardLabels.append(stockNameLabel)
 
     def updateStockboard(self, players, last_stock_update, dice):
+        # add a class variable for and update of the stock board as a or on the if cicle
         if last_stock_update > self.latestStockUpdate:
             for label in self.stockboardLabels:
                 label.kill()
@@ -262,13 +264,15 @@ class GameUI:
         self.buyButton.disable()
         self.passButton.disable()
         self.showStocks.disable()
+        self.disableActionCount += 1
 
     def renableActions(self):
+        self.disableActionCount += -1
+        if self.disableActionCount == 0:
+            for action in self.actionsEnabled:
+                action.enable()
 
-        for action in self.actionsEnabled:
-            action.enable()
-
-        self.actionsEnabled.clear()
+            self.actionsEnabled.clear()
 
     def showEventUi(self, event):
         self.showedEvent = event        
@@ -297,3 +301,23 @@ class GameUI:
 
     def closeEventUi(self):
         self.eventUi.kill()
+
+    def drawAlert(self, message):
+        surface = pygame.Rect(((WIDTH - ALERT_WIDTH) // 2, (HEIGHT - ALERT_HEIGHT) // 2), (ALERT_WIDTH, ALERT_HEIGHT))
+        self.alertUi = UIPanel(surface, starting_height=2, manager=self.manager)
+
+        message_rect = pygame.Rect(((ALERT_WIDTH - ALERT_MESSAGE_WIDTH) // 2, (ALERT_HEIGHT - ALERT_MESSAGE_HEIGHT - 20) // 2), (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT))
+        UILabel(message_rect, message, manager=self.manager, container=self.alertUi)
+
+        close_rect = pygame.Rect(((ALERT_WIDTH - ALERT_BUT_WIDTH) // 2, ALERT_HEIGHT - ALERT_BUT_HEIGHT - 10), (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT))
+        self.closeAlertBut = UIButton(relative_rect=close_rect, text="chiudi", container=self.alertUi, object_id="CLOSE_ALERT", manager=self.manager)
+
+        self.disableActions()
+
+    def closeAlert(self, players, dice):
+        # since screen.fill(BLACK) is already on updateStockboard and 
+        # dice.draw also we directly call that function
+        self.alertUi.kill()
+        self.updateStockboard(players, time.time(), dice)
+        self.renableActions()
+        
