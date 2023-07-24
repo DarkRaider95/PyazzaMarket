@@ -31,6 +31,9 @@ class Player:
 
         return value
 
+    def getName(self):
+        return self.playerName
+
     def changeBalance(self, balance):
         self.balance += balance
     
