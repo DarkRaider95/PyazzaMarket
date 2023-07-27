@@ -27,12 +27,14 @@ To do list funzionalità:
     - messaggio in caso di doppia selezione della stessa macchina
 - ~~ ordinare le label quando mostrate di modo da far vedere chi è in testa ~~
 - aggiungere tasto salva, per salvare stato partita
-- gestire default piazza
+- ~~ gestire default piazza ~~
 - controllare cella lancio dadi per perdere o vincere sulla piazza
 - ~~ fare la ui per incidenti, tiri doppi, penalità ecc ~~
     - ~~ bloccare altri tasti fino a quando non si fa kill o fare kill nel caso si usi un altro bottone ~~
 - interfaccia per tiro dadi per celle speciali, inizio partita ecc
     - tiro dadi a inizio partita
+        - gestire tiro pari
+- aggiungere lunghezza massima nome giocatore
 
 To do list codice:
 - fare getters and setters

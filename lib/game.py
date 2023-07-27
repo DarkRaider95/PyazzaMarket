@@ -3,7 +3,6 @@ from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CH
 from .board import Board
 from .player import Player
 from .gameUI import GameUI
-from .dice import Dice
 from .event import Event
 from .gameLogic import *
 import pygame_gui
@@ -20,7 +19,6 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('PyazzaMarket')
         self.board = Board()
-        self.dice = Dice()
         self.gameUI = GameUI(self.screen, self.clock)
         self.players = []
         #creating events
@@ -30,6 +28,10 @@ class Game:
         self.__squareBalance = 2000
         random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
         self.newQuotation = deque(QUOTATION) # this function create a ring list that work using rotate()
+        self.establishPlayersOrder = True # we use this variable to understand when we have launched the game for the first time
+        self.highestScore = 0 # we save the score for deciding which is the play with the highest score that will start first
+        self.firstPlayerIndex = 0 # we save the index of the player that will start first
+        self.firstPlayerStarted = True # we check if the all the players have throw the dices for decide who will start first
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -40,10 +42,13 @@ class Game:
     def start(self):
         self.board.initialiaze_cells()
         self.board.draw(self.screen)
-        self.dice.drawDices(self.screen)
+        self.gameUI.drawDices()
         self.gameUI.draw_actions_ui()
         self.gameUI.draw_leaderboard(self.players, self.__squareBalance, self.players[self.currentPlayer])
         self.gameUI.draw_stockboard(self.players)
+
+        self.gameUI.drawDiceOverlay(self.players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
+        # we will handle the next players in the while loop
 
         for index, player in enumerate(self.players):
             self.board.drawPlayerCar(self.screen, player, index, len(self.players))
@@ -85,7 +90,7 @@ class Game:
                     elif event.ui_element == self.gameUI.closeStock:                        
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
-                        self.dice.drawDices(self.screen)
+                        self.gameUI.drawDices()
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseBut:
                         curr_player = self.players[self.currentPlayer]
@@ -95,7 +100,7 @@ class Game:
                         self.board.removeStock(chosenStock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
-                        self.dice.drawDices(self.screen)
+                        self.gameUI.drawDices()
                         self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseMoveBut:
@@ -106,7 +111,7 @@ class Game:
                         self.enableBuyButton(curr_cell, curr_player)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
-                        self.dice.drawDices(self.screen)
+                        self.gameUI.drawDices()
                         self.gameUI.passButton.enable()
                         self.gameUI.showStocks.enable()
                     elif event.ui_element == self.gameUI.eventBut:
@@ -114,7 +119,7 @@ class Game:
                         self.eventsLogic(curr_player)
                         self.gameUI.closeEventUi()
                         self.screen.fill(BLACK)
-                        self.dice.drawDices(self.screen)
+                        self.gameUI.drawDices()
                         self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.buyAnyBut:
@@ -124,11 +129,36 @@ class Game:
                         self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.closeAlertBut:
-                        self.gameUI.closeAlert(self.players, self.dice)
+                        self.gameUI.closeAlert(self.players, self.gameUI)
+                    elif event.ui_element == self.gameUI.closeDiceOverlayBut:
+                        if self.establishPlayersOrder:
+                            self.gameUI.closeDiceOverlay(self.players, self.gameUI)
+                            self.currentPlayer =  (self.currentPlayer+1) % len(self.players)
+                            self.gameUI.drawDiceOverlay(self.players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
+                        elif self.firstPlayerStarted:
+                            # this will be fired only after all the players have throw the dices
+                            self.gameUI.closeDiceOverlay(self.players, self.gameUI)
+                            self.currentPlayer = self.firstPlayerIndex
+                            self.gameUI.updateTurnLabel(self.players[self.currentPlayer])
+                            self.firstPlayerStarted = False
+                        else:
+                            self.gameUI.closeDiceOverlay(self.players, self.gameUI)
+                    elif event.ui_element == self.gameUI.launchOverlayDiceBut:
+                        score = roll()
+                        self.gameUI.updateDiceOverlay(score)
+                        if self.establishPlayersOrder:
+                            diceSum = score[0] + score[1]
+                            if self.highestScore < diceSum:
+                                self.firstPlayerIndex = self.currentPlayer
+                                self.highestScore = diceSum
+                            if self.currentPlayer == len(self.players) - 1:
+                                self.establishPlayersOrder = False
+                    else:
+                        print("Evento non gestito")
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
-            self.gameUI.updateStockboard(self.players, Player.last_stock_update, self.dice)
+            self.gameUI.updateStockboard(self.players, Player.last_stock_update, self.gameUI)
             self.board.draw(self.screen)
             for i, player in enumerate(self.players):
                 self.board.drawPlayerCar(self.screen, player, i, len(self.players))
@@ -151,7 +181,7 @@ class Game:
         self.gameUI.launchDice.disable()
         self.gameUI.passButton.enable()
         score = roll()
-        self.dice.updateDice(score,self.screen)
+        self.gameUI.updateDice(score)
         #is double
         if is_double(score):
             self.gameUI.passButton.disable()
@@ -232,7 +262,7 @@ class Game:
                 self.__squareBalance += 0
             else:
                 self.__squareBalance += amount
-            self.dice.updateDice(score, self.screen)
+            self.gameUI.updateDice(score)
             self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
 
         #return disablePassButton

@@ -28,6 +28,13 @@ class GameUI:
         self.actionsEnabled = []
         self.actions = []
         self.disableActionCount = 0 # if you have two events that call disable action you have to make sure that you call for both renable action before to enable again the bottons
+        self.closeAlertBut = None
+        self.image_dice_1 = pygame.image.load(DICE_1)
+        self.image_dice_1 = pygame.transform.scale(self.image_dice_1, (DICE_WIDTH, DICE_HEIGHT))
+        self.image_dice_2 = pygame.image.load(DICE_1)
+        self.image_dice_2 = pygame.transform.scale(self.image_dice_2, (DICE_WIDTH, DICE_HEIGHT))
+        self.launchOverlayDiceBut = None
+        self.twoDices = True # this is used when we update the dice overlay image to know if the overlay have one or two dices
 
     def draw_actions_ui(self):
         panel_rect = pygame.Rect((30, HEIGHT - 30 - ACTIONS_HEIGHT), (ACTIONS_WIDTH, ACTIONS_HEIGHT))
@@ -48,15 +55,12 @@ class GameUI:
                                 object_id = 'BUY',
                                 manager=self.manager)
         
-        
-        
         self.showStocks = UIButton(relative_rect=pygame.Rect(ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 150, BUTTON_WIDTH, BUTTON_HEIGHT),
                                 text="Mostra Cedole",
                                 container=actions_UI,
                                 object_id = 'SHOW_STOCKS',
                                 manager=self.manager)
         
-
         self.passButton = UIButton(relative_rect=pygame.Rect(ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 200, BUTTON_WIDTH, BUTTON_HEIGHT),
                                 text="Passa il turno",
                                 container=actions_UI,
@@ -147,7 +151,7 @@ class GameUI:
             for label in self.stockboardLabels:
                 label.kill()
             self.screen.fill(BLACK)
-            dice.drawDices(self.screen)
+            dice.drawDices()
             self.stockboardLabels = []
             self.draw_stockboard(players)
 
@@ -320,4 +324,72 @@ class GameUI:
         self.alertUi.kill()
         self.updateStockboard(players, time.time(), dice)
         self.renableActions()
-        
+
+    def drawDiceOverlay(self, message, title, twoDices = True):
+        surface = pygame.Rect(((WIDTH - DICE_OVERLAY_WIDTH) // 2, (HEIGHT - DICE_OVERLAY_HEIGHT) // 2), (DICE_OVERLAY_WIDTH, DICE_OVERLAY_HEIGHT))
+        self.diceOverlay = UIPanel(surface, starting_height=2, manager=self.manager)
+
+        title_rect = pygame.Rect(((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 10), (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT))
+        UILabel(title_rect, title, manager=self.manager, container=self.diceOverlay)
+
+        message_rect = pygame.Rect(((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 30), (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT))
+        UILabel(message_rect, message, manager=self.manager, container=self.diceOverlay)
+
+        if twoDices:
+            imgRect = pygame.Rect((DICE_OVERLAY_WIDTH // 2 - DICE_WIDTH, 65), (DICE_WIDTH * 2, DICE_HEIGHT))
+            diceSurface = self.createDiceSurface(twoDices)
+            self.diceOverlayImg = UIImage(imgRect, diceSurface, manager=self.manager, container=self.diceOverlay)
+        else:
+            imgRect = pygame.Rect(((DICE_OVERLAY_WIDTH - DICE_WIDTH) // 2, 65), (DICE_WIDTH, DICE_HEIGHT))
+            diceSurface = self.createDiceSurface(twoDices)
+            self.diceOverlayImg = UIImage(imgRect, diceSurface, manager=self.manager, container=self.diceOverlay)
+    
+        close_rect = pygame.Rect((DICE_OVERLAY_WIDTH - ALERT_BUT_WIDTH - 20, DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10), (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT))
+        self.closeDiceOverlayBut = UIButton(relative_rect=close_rect, text="Chiudi", container=self.diceOverlay, object_id="CLOSE_DICE_OVERLAY", manager=self.manager)
+        self.closeDiceOverlayBut.disable()
+
+        self.disableActions()
+
+        throw_rect = pygame.Rect((20, DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10), (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT))
+        self.launchOverlayDiceBut = UIButton(relative_rect=throw_rect, text="Lancia", container=self.diceOverlay, object_id="CLOSE_DICE_OVERLAY", manager=self.manager)
+
+        self.twoDices = twoDices
+
+    def createDiceSurface(self, twoDices = True):
+        if twoDices:
+            diceSurface = pygame.Surface((DICE_WIDTH * 2, DICE_HEIGHT))
+            diceSurface.blit(self.image_dice_1, (0, 0))
+            diceSurface.blit(self.image_dice_2, (0 + DICE_WIDTH, 0))
+        else:
+            diceSurface = pygame.Surface((DICE_WIDTH, DICE_HEIGHT))
+            diceSurface.blit(self.image_dice_1, (0, 0))
+        return diceSurface
+
+    def updateDiceOverlay(self, score):
+        self.updateDice(score)
+        self.diceOverlayImg.set_image(self.createDiceSurface(self.twoDices))
+        self.launchOverlayDiceBut.disable()
+        self.closeDiceOverlayBut.enable()
+
+    def closeDiceOverlay(self, players, dice):
+        # since screen.fill(BLACK) is already on updateStockboard and 
+        # dice.draw also we directly call that function
+        self.diceOverlay.kill()
+        self.updateStockboard(players, time.time(), dice)
+        self.renableActions()
+
+    def drawDices(self):
+        surface = self.createDiceSurface()
+        self.screen.blit(surface, (DICE_SURFACE_X, DICE_SURFACE_Y))
+
+    def updateDice(self, score): # score is a tuple from roll in gameLogic
+        scoreToImage = [{"score": 1, "image": DICE_1},{"score": 2, "image": DICE_2},{"score": 3, "image": DICE_3},{"score": 4, "image": DICE_4},{"score": 5, "image": DICE_5},{"score": 6, "image": DICE_6}]
+        for scoreImage in scoreToImage:
+            if(scoreImage["score"] == score[0]):
+                self.image_dice_1 = pygame.image.load(scoreImage["image"])
+                self.image_dice_1 = pygame.transform.scale(self.image_dice_1, (DICE_WIDTH, DICE_HEIGHT))
+            if(scoreImage["score"] == score[1]):
+                self.image_dice_2 = pygame.image.load(scoreImage["image"])
+                self.image_dice_2 = pygame.transform.scale(self.image_dice_2, (DICE_WIDTH, DICE_HEIGHT))
+            
+        self.drawDices()
