@@ -5,16 +5,15 @@ from .stock import Stock
 class Cell:
     # we should have name or position in both the cell and the stock in order to now where to put the stock in case the user will return it to the bank
     def __init__(self, cellDef, cellType, cell_x, cell_y, logo, cellImage, position, name, isCorner = False, angle = 0, enableGraphics = True):
-        self.stocks = None
+        self.__stocks = None
         if(cellDef is not None):
             self.color = cellDef['color']
             self.__original_value = cellDef['value']
             self.__new_value = self.__original_value
             self.logo = logo
-            self.stocks = []
+            self.__stocks = []
             for _ in range(0,2):
-                self.stocks.append(Stock(cellDef, position, name, enableGraphics))
-            self.font_stock_value = pygame.font.Font(None, 30)
+                self.__stocks.append(Stock(cellDef, position, name, enableGraphics))
             self.__stockIndex = cellDef['index']
             self.angle = cellDef['angle']
         else:
@@ -25,6 +24,7 @@ class Cell:
         self.cellType = cellType
         self.position = position
         if enableGraphics:
+            self.font_stock_value = pygame.font.Font(None, 30)
             self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         
     def draw(self, screen):
@@ -80,10 +80,13 @@ class Cell:
         return self.__new_value
     
     def getStocks(self):
-        return self.stocks
+        return self.__stocks.copy()
     
     def updateCellValue(self, value):
         self.__new_value = value
 
     def getIndex(self):
         return self.__stockIndex
+    
+    def sellStock(self):
+        return self.__stocks.pop()

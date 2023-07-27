@@ -11,12 +11,21 @@ def is_double(dice):
 
 def buyStock(cells, player):
     curr_pos = player.position
-    stock_value = cells[curr_pos].stocks[0].getStockValue()
-    if(len(cells[curr_pos].stocks) > 0):
+    stock_value = cells[curr_pos].getStocks()[0].getStockValue()
+    if(len(cells[curr_pos].getStocks()) > 0):
         if player.balance >= stock_value:
-            stock = cells[curr_pos].stocks.pop()
+            stock = cells[curr_pos].sellStock()
             player.changeBalance(-stock_value)
             player.addStock(stock)
+
+def checkIfCanBuyStock(cell, player):
+        if(cell.cellType != STOCKS_TYPE or len(cell.getStocks())  == 0):
+            return False
+        else:
+            if player.balance >= cell.getStocks()[0].getStockValue():
+                return True
+            else:
+                return False
 
 def checkForPenalty(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]

@@ -231,14 +231,10 @@ class Game:
             #disablePassButton = self.specialCellLogic(cell, curr_player)
 
     def enableBuyButton(self, cell, player):
-    
-        if(cell.cellType != STOCKS_TYPE or len(cell.stocks)  == 0):
-            self.gameUI.buyButton.disable()
+        if checkIfCanBuyStock(cell, player):
+            self.gameUI.buyButton.enable()
         else:
-            if player.balance >= cell.stocks[0].getStockValue():
-                self.gameUI.buyButton.enable()
-            else:
-                self.gameUI.buyButton.disable()
+            self.gameUI.buyButton.disable()
 
     def specialCellLogic(self, cell, player):
         #disablePassButton = False
