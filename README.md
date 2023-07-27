@@ -35,6 +35,7 @@ To do list funzionalità:
     - tiro dadi a inizio partita
         - gestire tiro pari
 - aggiungere lunghezza massima nome giocatore
+- add requirements.txt
 
 To do list codice:
 - fare getters and setters
@@ -48,3 +49,8 @@ To do extra:
 - funzionalità di rete
 - eseguibili
 - ai
+
+Per eseguire i test basta chiamare "pytest", per vedere la copertura "pytest --cov" e per fare un repor "coverage html"
+
+Refactor dopo test:
+- cancellare initialize_cells in board e metterlo nel init

@@ -4,33 +4,29 @@ from .stock import Stock
 
 class Cell:
     # we should have name or position in both the cell and the stock in order to now where to put the stock in case the user will return it to the bank
-    def __init__(self, cellDef, cellType, cell_x, cell_y, logo, cellImage, angle, position, name, isCorner = False):
+    def __init__(self, cellDef, cellType, cell_x, cell_y, logo, cellImage, position, name, isCorner = False, angle = 0, enableGraphics = True):
         self.stocks = None
         if(cellDef is not None):
             self.color = cellDef['color']
             self.__original_value = cellDef['value']
             self.__new_value = self.__original_value
             self.logo = logo
-            self.stocks = Cell.initialize_stock(cellDef, position, name)
+            self.stocks = []
+            for _ in range(0,2):
+                self.stocks.append(Stock(cellDef, position, name, enableGraphics))
             self.font_stock_value = pygame.font.Font(None, 30)
-            self.__stockIndex = cellDef['index']     
+            self.__stockIndex = cellDef['index']
+            self.angle = cellDef['angle']
+        else:
+            self.angle = angle
         self.cell_x = cell_x
         self.cell_y = cell_y
         self.cellImage = cellImage
-        self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
-        self.angle = angle
         self.cellType = cellType
         self.position = position
+        if enableGraphics:
+            self.surface = pygame.Surface((CORNER_WIDTH, CORNER_HEIGHT)) if isCorner else pygame.Surface((CELL_WIDTH, CELL_HEIGHT))
         
-
-    def initialize_stock(cellDef, position, name):
-        stocks = []
-        for _ in range(0,2):
-            stocks.append(Stock(cellDef, position, name))
-
-        return stocks
-
-
     def draw(self, screen):
         #if it's not a corner draw a cell
         if(self.cellImage is None):

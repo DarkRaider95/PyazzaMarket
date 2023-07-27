@@ -40,7 +40,6 @@ class Game:
         self.currentPlayer = 0 # Magari al posto dell'indice possiamo salvare direttamente il giocatare, così evitiamo di cercarlo all'interno dell'array di giocatori
 
     def start(self):
-        self.board.initialiaze_cells()
         self.board.draw(self.screen)
         self.gameUI.drawDices()
         self.gameUI.draw_actions_ui()
@@ -65,7 +64,7 @@ class Game:
                         self.turn()
                     elif event.ui_element == self.gameUI.buyButton:
                         curr_player = self.players[self.currentPlayer]
-                        buyStock(self.board.cells, curr_player)
+                        buyStock(self.board.getCells(), curr_player)
                         self.gameUI.updateAllPlayerLables(self.players)
                         self.gameUI.buyButton.disable()
                         self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
@@ -144,15 +143,25 @@ class Game:
                         else:
                             self.gameUI.closeDiceOverlay(self.players, self.gameUI)
                     elif event.ui_element == self.gameUI.launchOverlayDiceBut:
-                        score = roll()
-                        self.gameUI.updateDiceOverlay(score)
                         if self.establishPlayersOrder:
+                            score = roll()
+                            self.gameUI.updateDiceOverlay(score)
                             diceSum = score[0] + score[1]
                             if self.highestScore < diceSum:
                                 self.firstPlayerIndex = self.currentPlayer
                                 self.highestScore = diceSum
                             if self.currentPlayer == len(self.players) - 1:
                                 self.establishPlayersOrder = False
+                        else:
+                            # in case you are in chance cell
+                            score, amount = chanceLogic(player, self.__squareBalance)
+                            self.gameUI.updateDiceOverlay(score)
+                            if amount < 0:
+                                self.__squareBalance += 0
+                            else:
+                                self.__squareBalance += amount
+                            self.gameUI.updateDice(score)
+                            self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
                     else:
                         print("Evento non gestito")
                 self.gameUI.manager.process_events(event)            
@@ -191,7 +200,7 @@ class Game:
         curr_player = self.players[self.currentPlayer]
         curr_player.move(score[0] + score[1])
         #curr_player.move(4)
-        cell = self.board.cells[curr_player.position]
+        cell = self.board.getCells()[curr_player.position]
         #check turn and crash before any other events or effect of the cells
         checkTurn(curr_player)
         crash = checkCrash(self.players.copy(), self.currentPlayer)
@@ -206,7 +215,7 @@ class Game:
             #curr_player.move(10)
             self.enableBuyButton(cell, curr_player)
             # we need to create a copy of the list in order to perform some edit of the list later
-            checkForPenalty(self.board.cells, self.players.copy(), self.currentPlayer)            
+            checkForPenalty(self.board.getCells(), self.players.copy(), self.currentPlayer)            
         #case special cell
         else:
             #disablePassButton = self.specialCellLogic(cell, curr_player)
@@ -257,13 +266,7 @@ class Game:
             self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
             #disablePassButton = True
         elif cell.cellType == CHANCE_TYPE:
-            score, amount = chanceLogic(player, self.__squareBalance)
-            if amount < 0:
-                self.__squareBalance += 0
-            else:
-                self.__squareBalance += amount
-            self.gameUI.updateDice(score)
-            self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
+            self.gameUI.drawDiceOverlay(self.players[self.currentPlayer].playerName + ' tira dadi', 'Riserva monetaria', False)
 
         #return disablePassButton
         

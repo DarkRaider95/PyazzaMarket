@@ -1,2 +1,4 @@
-/lib/__pycache__/
-/.vscode/
+.vscode/
+__pycache__/
+.pytest_cache/
+htmlcov/
