@@ -20,14 +20,14 @@ class Player:
         self.old_position = self.position
         self.position = (self.position + step) % 40
 
-    def setPosition(self, position):
+    def set_position(self, position):
         self.old_position = self.position
         self.position = position
 
     def stockValue(self):
         value = 0
         for stock in self.__stocks:
-            value += stock.getStockValue()
+            value += stock.get_stock_value()
 
         return value
 
@@ -81,7 +81,7 @@ class Player:
 
         self.__stocks.pop(stockToRemoveIndex)
 
-    def getStocks(self):
+    def get_stocks(self):
         return self.__stocks.copy()
     
     def skipTurn(self, skip):
@@ -102,5 +102,5 @@ class Player:
     def getFreeMartini(self):
         return self.__freeMartini
 
-    def getBalance(self):
+    def get_balance(self):
         return self.__balance

@@ -136,18 +136,18 @@ class Board:
     def get_availble_stocks(self):
         stocks = []
         for cell in self.__cells:
-            if(cell.getStocks() is not None and len(cell.getStocks()) > 0):
-                stocks.append(cell.getStocks()[0])
+            if(cell.get_stocks() is not None and len(cell.get_stocks()) > 0):
+                stocks.append(cell.get_stocks()[0])
 
         return stocks
     
     def get_purchasable_stocks(self, balance):
         stocks = []
         for cell in self.__cells:
-            if(cell.getStocks() is not None and 
-               len(cell.getStocks()) > 0 and 
-               cell.getStocks()[0].getStockValue() <= balance):
-                stocks.append(cell.getStocks()[0])
+            if(cell.get_stocks() is not None and 
+               len(cell.get_stocks()) > 0 and 
+               cell.get_stocks()[0].get_stock_value() <= balance):
+                stocks.append(cell.get_stocks()[0])
 
         return stocks
     
@@ -156,10 +156,10 @@ class Board:
 
     def getStockIfAvailable(self, stockPos):
         for cell in self.__cells:
-            if(cell.getStocks() is not None and len(cell.getStocks()) > 0 and stockPos == cell.position):
+            if(cell.get_stocks() is not None and len(cell.get_stocks()) > 0 and stockPos == cell.position):
                 return cell.sellStock()
             
         return None
     
     def get_cells(self):
-        return self.__cells
+        return self.__cells.copy()

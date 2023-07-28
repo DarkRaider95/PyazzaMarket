@@ -58,10 +58,10 @@ class Stock:
     def getOriginalValue(self):
         return self.__original_value
     
-    def getStockValue(self):
+    def get_stock_value(self):
         return self.__new_value
     
-    def getIndex(self):
+    def get_index(self):
         return self.__index
     
     def updatePenalties(self):

@@ -79,7 +79,7 @@ class Cell:
     def get_cell_value(self):
         return self.__new_value
     
-    def getStocks(self):
+    def get_stocks(self):
         if self.__stocks is None:
             return None
         return self.__stocks.copy()
@@ -87,7 +87,7 @@ class Cell:
     def updateCellValue(self, value):
         self.__new_value = value
 
-    def getIndex(self):
+    def get_index(self):
         return self.__stockIndex
     
     def sellStock(self):

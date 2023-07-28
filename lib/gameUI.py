@@ -95,7 +95,7 @@ class GameUI:
         # ADDING THE PLAYERS LABELS
         for i, player in enumerate(players): # considerare di fare una lable unica e andare a capo per ogni riga
             player_label_rect = pygame.Rect((position_x, 70 + (20 * (i + 1))), label_dimension)
-            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.getBalance()) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
+            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.get_balance()) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
             self.playerLabels.append(label)
     
     def updateSquareBalanceLabel(self, squareBalance):
@@ -107,8 +107,8 @@ class GameUI:
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
         label_dimension = (150, LABEL_HEIGHT)
-        sorted_players = sorted(players, key=lambda x: len(x.getStocks()), reverse=True)
-        max_stock = max(len(sorted_players[0].getStocks()), 1)
+        sorted_players = sorted(players, key=lambda x: len(x.get_stocks()), reverse=True)
+        max_stock = max(len(sorted_players[0].get_stocks()), 1)
         num_columns = min(3, len(sorted_players))
         self.drawRowStockboard(0,num_columns,sorted_players, 20, 0, label_dimension, True)
         if len(sorted_players) > 3:
@@ -127,14 +127,14 @@ class GameUI:
             title_rect = pygame.Rect((position_x, offset + CELL_HEIGHT + (max_stock * 20)),(label_dimension))
             nameLabel = UILabel(title_rect, player.playerName, manager=self.manager)
             self.stockboardLabels.append(nameLabel)
-            if len(player.getStocks()) == 0:
+            if len(player.get_stocks()) == 0:
                 player_label_rect = pygame.Rect((position_x, offset + 20 + CELL_HEIGHT + (max_stock * 20)), label_dimension)
                 noStockLabel = UILabel(player_label_rect,  "No stock", manager=self.manager)
                 self.stockboardLabels.append(noStockLabel)
             else:
                 count_label = 0
                 latest_stock_position = -1 # setted to -1 because the first stock will always be different
-                for stock in player.getStocks(): # considerare di fare una lable unica e andare a capo per ogni riga
+                for stock in player.get_stocks(): # considerare di fare una lable unica e andare a capo per ogni riga
                     position_y = offset + 20 + CELL_HEIGHT + (20 * count_label) + (max_stock * 20)
                     if latest_stock_position == stock.position:
                         self.stockboardLabels[-1].set_text(stock.name + " 2x")
@@ -156,9 +156,9 @@ class GameUI:
             self.draw_stockboard(players)
 
     def updateAllPlayerLables(self, players):
-        sorted_players = sorted(players, key=lambda x: x.getBalance() + x.stockValue(), reverse=True)
+        sorted_players = sorted(players, key=lambda x: x.get_balance() + x.stockValue(), reverse=True)
         for i, player in enumerate(sorted_players):
-            self.playerLabels[i].set_text(player.playerName + " : " + str(player.getBalance()) + " | " + str(player.stockValue()))
+            self.playerLabels[i].set_text(player.playerName + " : " + str(player.get_balance()) + " | " + str(player.stockValue()))
 
     def showStocksUi(self, stocks, title):
         self.stocks = stocks
@@ -255,7 +255,7 @@ class GameUI:
         self.stocksUi.kill()
 
     def enableShowStockButton(self, player):
-        if len(player.getStocks()) > 0:
+        if len(player.get_stocks()) > 0:
             self.showStocks.enable()
         else:
             self.showStocks.disable()

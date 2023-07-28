@@ -27,7 +27,7 @@ class Game:
         random.shuffle(self.events)
         self.__squareBalance = 2000
         random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
-        self.newQuotation = deque(QUOTATION) # this function create a ring list that work using rotate()
+        self.new_quotation = deque(QUOTATION) # this function create a ring list that work using rotate()
         self.establishPlayersOrder = True # we use this variable to understand when we have launched the game for the first time
         self.highestScore = 0 # we save the score for deciding which is the play with the highest score that will start first
         self.firstPlayerIndex = 0 # we save the index of the player that will start first
@@ -79,7 +79,7 @@ class Game:
                     elif event.ui_element == self.gameUI.showStocks:
                         curr_player = self.__players[self.currentPlayer]
                         self.gameUI.disableActions()
-                        self.gameUI.showStocksUi(curr_player.getStocks(), 'Le cedole di '+curr_player.playerName)
+                        self.gameUI.showStocksUi(curr_player.get_stocks(), 'Le cedole di '+curr_player.playerName)
                     elif event.ui_element == self.gameUI.nextStock:
                         curr_player = self.__players[self.currentPlayer]
                         self.gameUI.showNextStock()
@@ -95,7 +95,7 @@ class Game:
                         curr_player = self.__players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
                         curr_player.addStock(chosenStock)
-                        curr_player.change_balance(-chosenStock.getStockValue())
+                        curr_player.change_balance(-chosenStock.get_stock_value())
                         self.board.removeStock(chosenStock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
@@ -106,7 +106,7 @@ class Game:
                         curr_player = self.__players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
                         curr_cell = self.board.get_cell(chosenStock.position)
-                        curr_player.setPosition(chosenStock.position)
+                        curr_player.set_position(chosenStock.position)
                         self.enableBuyButton(curr_cell, curr_player)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
@@ -202,8 +202,8 @@ class Game:
         #curr_player.move(4)
         cell = self.board.get_cells()[curr_player.position]
         #check turn and crash before any other events or effect of the cells
-        checkTurn(curr_player)
-        crash = checkCrash(self.getPlayers(), self.currentPlayer)
+        check_turn(curr_player)
+        crash = check_crash(self.getPlayers(), self.currentPlayer)
         if tiroDoppio and crash:
             self.gameUI.drawAlert("Doppio e incidente!")
         elif tiroDoppio:
@@ -244,11 +244,10 @@ class Game:
         elif cell.cellType == EVENTS_TYPE:
             self.gameUI.disableActions()
             self.gameUI.showEventUi(self.events[0])
-            #disablePassButton = True  
         elif cell.cellType == STOCKS_PRIZE_TYPE:
-            stockPrizeLogic(player)
+            stock_prize_logic(player)
         elif cell.cellType == QUOTATION_TYPE:
-            quotationLogic(self.getPlayers(), self.board, self.newQuotation, self)
+            quotation_logic(self.getPlayers(), self.board, self.new_quotation, self)
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.get_availble_stocks()
             self.gameUI.disableActions()
@@ -257,7 +256,7 @@ class Game:
         elif cell.cellType == SIX_HUNDRED_TYPE:
             sixHundredLogic(player)
         elif cell.cellType == FREE_STOP_TYPE:
-            stocks = self.board.get_purchasable_stocks(player.getBalance())
+            stocks = self.board.get_purchasable_stocks(player.get_balance())
             self.gameUI.disableActions()
             self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
             #disablePassButton = True
@@ -275,7 +274,7 @@ class Game:
             stocks = self.board.get_availble_stocks()            
             for p in self.__players:
                 if p != player:
-                    stocks.extend(player.getStocks())
+                    stocks.extend(player.get_stocks())
             self.gameUI.disableActions()
             self.gameUI.showBuyAnythingStock(stocks, 'Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)')            
         elif event.evenType == STOP_1:
@@ -289,7 +288,7 @@ class Game:
         elif event.evenType == PREVIOUS_PLAYER_GALUP:
             previousPlayerIndex = (self.currentPlayer-1) % len(self.__players)
             previousPlayer = self.__players[previousPlayerIndex]
-            previousPlayer.setPosition(39)
+            previousPlayer.set_position(39)
             playerOwnStock = whoOwnsStock(self.getPlayers(), 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
             stock = playerOwnStock.getStockByPos(39)
             amount = playerOwnStock.computePenalty(stock)
@@ -378,9 +377,9 @@ class Game:
         if effectData['get'] is not None:
             player.change_balance(effectData['get'])
 
-        player.setPosition(effectData['destination'])
+        player.set_position(effectData['destination'])
 
-    def setSquareBalance(self, new_balance):
+    def set_square_balance(self, new_balance):
         self.__squareBalance += new_balance
         if self.__squareBalance < 0:
             self.__squareBalance == 0

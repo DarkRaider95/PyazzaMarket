@@ -51,8 +51,8 @@ class Event:
         elif eventName == 'player+1_pay_200':
             eventType = NEXT_PLAYER_PAY
         elif 'gift' in actionsAndValues:            
-            getIndex = actionsAndValues.index('get')
-            value = actionsAndValues[getIndex+1]
+            get_index = actionsAndValues.index('get')
+            value = actionsAndValues[get_index+1]
             eventType = GIFT_EVENT
             effectData = {'stockIndex':int(actionsAndValues[1]), 'amount':int(value)}
         elif actionsAndValues[0] == 'get':
@@ -76,8 +76,8 @@ class Event:
             passValue = None
 
             if 'get' in actionsAndValues:
-                getIndex = actionsAndValues.index('get')
-                getValue = int(actionsAndValues[getIndex+1])
+                get_index = actionsAndValues.index('get')
+                getValue = int(actionsAndValues[get_index+1])
 
             if 'pass' in actionsAndValues:
                 passIndex = actionsAndValues.index('pass')
@@ -111,8 +111,8 @@ class Event:
             payValue = None
             
             if 'get' in actionsAndValues:
-                getIndex = actionsAndValues.index('get')
-                getValue = int(actionsAndValues[getIndex+1])
+                get_index = actionsAndValues.index('get')
+                getValue = int(actionsAndValues[get_index+1])
 
             if 'each' in actionsAndValues:
                 each = True
