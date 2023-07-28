@@ -6,7 +6,7 @@ class Player:
 
     def __init__(self, playerName, car):
         self.playerName = playerName
-        self.balance = INITIAL_BALANCE
+        self.__balance = INITIAL_BALANCE
         self.position = 0
         self.__stocks = []
         self.car = Car(car)
@@ -34,8 +34,8 @@ class Player:
     def getName(self):
         return self.playerName
 
-    def changeBalance(self, balance):
-        self.balance += balance
+    def change_balance(self, balance):
+        self.__balance += balance
     
     def addStock(self, stocks):
         self.__stocks.append(stocks)
@@ -101,3 +101,6 @@ class Player:
 
     def getFreeMartini(self):
         return self.__freeMartini
+
+    def getBalance(self):
+        return self.__balance

@@ -76,10 +76,12 @@ class Cell:
         else:
             screen.blit(self.surface, (self.cell_x, self.cell_y))
         
-    def getCellValue(self):
+    def get_cell_value(self):
         return self.__new_value
     
     def getStocks(self):
+        if self.__stocks is None:
+            return None
         return self.__stocks.copy()
     
     def updateCellValue(self, value):

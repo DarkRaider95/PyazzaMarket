@@ -9,27 +9,28 @@ def roll():
 def is_double(dice):
     return dice[0] == dice[1]
 
-def buyStock(cells, player):
+def buy_stock(cells, player):
     curr_pos = player.position
     stock_value = cells[curr_pos].getStocks()[0].getStockValue()
     if(len(cells[curr_pos].getStocks()) > 0):
-        if player.balance >= stock_value:
+        if player.getBalance() >= stock_value:
             stock = cells[curr_pos].sellStock()
-            player.changeBalance(-stock_value)
+            player.change_balance(-stock_value)
             player.addStock(stock)
 
-def checkIfCanBuyStock(cell, player):
+def check_if_can_buy_stock(cell, player):
         if(cell.cellType != STOCKS_TYPE or len(cell.getStocks())  == 0):
             return False
         else:
-            if player.balance >= cell.getStocks()[0].getStockValue():
+            if player.getBalance() >= cell.getStocks()[0].getStockValue():
                 return True
             else:
                 return False
 
-def checkForPenalty(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
+def check_for_penalty(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
     cell = cells[current_player.position]
+    players = players.copy() # we copy the list in order to not modify the original one
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
     own_by_the_player = False # then we check if the player own the stock
     for stock in current_player.getStocks():
@@ -40,8 +41,8 @@ def checkForPenalty(cells, players, player_number): # testare per vedere se rico
             for stock in player.getStocks():
                 if cell.position == stock.position:
                     penality = player.computePenalty(stock)
-                    current_player.changeBalance(-penality)
-                    player.changeBalance(penality)
+                    current_player.change_balance(-penality)
+                    player.change_balance(penality)
                     break # we break in order to pay only once the fee if the player have more than one card in the same cell
 
 def checkCrash(players, player_number): # since current_player is the one that have done the last move it will be the one that will pay for the crash
@@ -50,26 +51,26 @@ def checkCrash(players, player_number): # since current_player is the one that h
     crash = 0
     for player in players:
         if player.position == current_player.position:
-            current_player.changeBalance(-CRASH_FEE)
-            player.changeBalance(CRASH_FEE)
+            current_player.change_balance(-CRASH_FEE)
+            player.change_balance(CRASH_FEE)
             crash = 1
     return crash
 
 def checkTurn(player):
     if player.old_position > player.position:
-        player.changeBalance(TURN_FEE)
+        player.change_balance(TURN_FEE)
 
 def stockPrizeLogic(player):
-    player.changeBalance(len(player.getStocks()) * 100)
+    player.change_balance(len(player.getStocks()) * 100)
 
 def quotationLogic(players, board, quotation, game):
     newQuotation = quotation[0]
     for player in players:
         for stock in player.getStocks():
             difference = stock.updateValue(newQuotation[stock.getIndex()])
-            player.changeBalance(difference)
+            player.change_balance(difference)
             game.setSquareBalance(difference)
-    for cell in board.getCells():
+    for cell in board.get_cells():
         if cell.getStocks() is not None:                                                                          
             cell.updateCellValue(newQuotation[cell.getIndex()])
             for stock in cell.getStocks():
@@ -81,22 +82,22 @@ def chanceLogic(player, squareBalance):
     score = roll()
     if (score[0] + score[1]) > 3:
         amount = squareBalance//3
-        player.changeBalance(amount)        
+        player.change_balance(amount)        
     else:
         amount = -squareBalance//2
-        player.changeBalance(amount)
+        player.change_balance(amount)
 
     return score, amount
 
 def sixHundredLogic(player):
-    player.changeBalance(600)
+    player.change_balance(600)
 
 def startLogic(player):
-    player.changeBalance(TURN_FEE * 2)
+    player.change_balance(TURN_FEE * 2)
 
 def everyOneFifty(players):
     for player in players:
-        player.changeBalance(50)
+        player.change_balance(50)
 
 def whoOwnsStock(players, stockPos):
     owners = []
@@ -132,9 +133,9 @@ def getMoneyFromOthers(players, player_number, amount):
     players.pop(player_number)
     
     for player in players:
-        player.changeBalance(-amount)
+        player.change_balance(-amount)
     
-    current_player.changeBalance(len(players) * amount)
+    current_player.change_balance(len(players) * amount)
 
 def checkStartPass(player, destination):
     if player.position <= 39 and destination > 0:
@@ -171,15 +172,15 @@ def payMoneyToOthers(players, player_number, amount):
     players.pop(player_number)
     
     for player in players:
-        player.changeBalance(+amount)
+        player.change_balance(+amount)
     
-    current_player.changeBalance(len(players) * (-amount))
+    current_player.change_balance(len(players) * (-amount))
 
 #this method is executed when an event with own some stock occurs
 def update_owner_balance(owner, stockName, amount, each):
     for stock in owner.getStocks():
         if stock.name == stockName:
-            owner.changeBalance(amount)
+            owner.change_balance(amount)
             if each == False:
                 break
 
@@ -188,4 +189,4 @@ def update_owner_balance(owner, stockName, amount, each):
 def update_others_balance(players, owners, amount):
     for player in players:
         if player not in owners:
-            player.changeBalance(-amount)
+            player.change_balance(-amount)

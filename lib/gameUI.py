@@ -95,7 +95,7 @@ class GameUI:
         # ADDING THE PLAYERS LABELS
         for i, player in enumerate(players): # considerare di fare una lable unica e andare a capo per ogni riga
             player_label_rect = pygame.Rect((position_x, 70 + (20 * (i + 1))), label_dimension)
-            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
+            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.getBalance()) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
             self.playerLabels.append(label)
     
     def updateSquareBalanceLabel(self, squareBalance):
@@ -156,9 +156,9 @@ class GameUI:
             self.draw_stockboard(players)
 
     def updateAllPlayerLables(self, players):
-        sorted_players = sorted(players, key=lambda x: x.balance + x.stockValue(), reverse=True)
+        sorted_players = sorted(players, key=lambda x: x.getBalance() + x.stockValue(), reverse=True)
         for i, player in enumerate(sorted_players):
-            self.playerLabels[i].set_text(player.playerName + " : " + str(player.balance) + " | " + str(player.stockValue()))
+            self.playerLabels[i].set_text(player.playerName + " : " + str(player.getBalance()) + " | " + str(player.stockValue()))
 
     def showStocksUi(self, stocks, title):
         self.stocks = stocks

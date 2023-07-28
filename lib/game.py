@@ -20,7 +20,7 @@ class Game:
         pygame.display.set_caption('PyazzaMarket')
         self.board = Board()
         self.gameUI = GameUI(self.screen, self.clock)
-        self.players = []
+        self.__players = []
         #creating events
         events = Event.initialize_events()
         self.events = deque(events)
@@ -35,7 +35,7 @@ class Game:
 
         Player.last_stock_update = time.time()
         for player in players:
-            self.players.append(Player(player["name"], player["color"]))
+            self.__players.append(Player(player["name"], player["color"]))
 
         self.currentPlayer = 0 # Magari al posto dell'indice possiamo salvare direttamente il giocatare, così evitiamo di cercarlo all'interno dell'array di giocatori
 
@@ -43,14 +43,14 @@ class Game:
         self.board.draw(self.screen)
         self.gameUI.drawDices()
         self.gameUI.draw_actions_ui()
-        self.gameUI.draw_leaderboard(self.players, self.__squareBalance, self.players[self.currentPlayer])
-        self.gameUI.draw_stockboard(self.players)
+        self.gameUI.draw_leaderboard(self.getPlayers(), self.__squareBalance, self.__players[self.currentPlayer])
+        self.gameUI.draw_stockboard(self.getPlayers())
 
-        self.gameUI.drawDiceOverlay(self.players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
+        self.gameUI.drawDiceOverlay(self.__players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
         # we will handle the next players in the while loop
 
-        for index, player in enumerate(self.players):
-            self.board.drawPlayerCar(self.screen, player, index, len(self.players))
+        for index, player in enumerate(self.getPlayers()):
+            self.board.draw_player_car(self.screen, player, index, len(self.__players))
 
         while self.running:
             self.clock.tick(FPS)            
@@ -63,28 +63,28 @@ class Game:
                     if event.ui_element == self.gameUI.launchDice:                        
                         self.turn()
                     elif event.ui_element == self.gameUI.buyButton:
-                        curr_player = self.players[self.currentPlayer]
-                        buyStock(self.board.getCells(), curr_player)
-                        self.gameUI.updateAllPlayerLables(self.players)
+                        curr_player = self.__players[self.currentPlayer]
+                        buy_stock(self.board.get_cells(), curr_player)
+                        self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.buyButton.disable()
-                        self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
+                        self.gameUI.enableShowStockButton(self.__players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.passButton:
-                        self.currentPlayer = (self.currentPlayer + 1) % len(self.players)
+                        self.currentPlayer = (self.currentPlayer + 1) % len(self.getPlayers())
                         self.skipTurn()
-                        self.gameUI.updateTurnLabel(self.players[self.currentPlayer])
+                        self.gameUI.updateTurnLabel(self.__players[self.currentPlayer])
                         self.gameUI.launchDice.enable()
                         self.gameUI.passButton.disable()
                         self.gameUI.buyButton.disable()
-                        self.gameUI.enableShowStockButton(self.players[self.currentPlayer])
+                        self.gameUI.enableShowStockButton(self.__players[self.currentPlayer])
                     elif event.ui_element == self.gameUI.showStocks:
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         self.gameUI.disableActions()
                         self.gameUI.showStocksUi(curr_player.getStocks(), 'Le cedole di '+curr_player.playerName)
                     elif event.ui_element == self.gameUI.nextStock:
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         self.gameUI.showNextStock()
                     elif event.ui_element == self.gameUI.previousStock:
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         self.gameUI.showPreviousStock()
                     elif event.ui_element == self.gameUI.closeStock:                        
                         self.gameUI.closeStockUi()
@@ -92,20 +92,20 @@ class Game:
                         self.gameUI.drawDices()
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseBut:
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
                         curr_player.addStock(chosenStock)
-                        curr_player.changeBalance(-chosenStock.getStockValue())
+                        curr_player.change_balance(-chosenStock.getStockValue())
                         self.board.removeStock(chosenStock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.gameUI.drawDices()
-                        self.gameUI.updateAllPlayerLables(self.players)
+                        self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseMoveBut:
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
-                        curr_cell = self.board.getCell(chosenStock.position)
+                        curr_cell = self.board.get_cell(chosenStock.position)
                         curr_player.setPosition(chosenStock.position)
                         self.enableBuyButton(curr_cell, curr_player)
                         self.gameUI.closeStockUi()
@@ -114,34 +114,34 @@ class Game:
                         self.gameUI.passButton.enable()
                         self.gameUI.showStocks.enable()
                     elif event.ui_element == self.gameUI.eventBut:
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         self.eventsLogic(curr_player)
                         self.gameUI.closeEventUi()
                         self.screen.fill(BLACK)
                         self.gameUI.drawDices()
-                        self.gameUI.updateAllPlayerLables(self.players)
+                        self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.buyAnyBut:
                         chosenStock = self.gameUI.getShowedStock()
-                        curr_player = self.players[self.currentPlayer]
+                        curr_player = self.__players[self.currentPlayer]
                         transferStock(self.board, curr_player, chosenStock)
-                        self.gameUI.updateAllPlayerLables(self.players)
+                        self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.closeAlertBut:
-                        self.gameUI.closeAlert(self.players, self.gameUI)
+                        self.gameUI.closeAlert(self.getPlayers(), self.gameUI)
                     elif event.ui_element == self.gameUI.closeDiceOverlayBut:
                         if self.establishPlayersOrder:
-                            self.gameUI.closeDiceOverlay(self.players, self.gameUI)
-                            self.currentPlayer =  (self.currentPlayer+1) % len(self.players)
-                            self.gameUI.drawDiceOverlay(self.players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
+                            self.gameUI.closeDiceOverlay(self.getPlayers(), self.gameUI)
+                            self.currentPlayer =  (self.currentPlayer+1) % len(self.getPlayers())
+                            self.gameUI.drawDiceOverlay(self.__players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
                         elif self.firstPlayerStarted:
                             # this will be fired only after all the players have throw the dices
-                            self.gameUI.closeDiceOverlay(self.players, self.gameUI)
+                            self.gameUI.closeDiceOverlay(self.getPlayers(), self.gameUI)
                             self.currentPlayer = self.firstPlayerIndex
-                            self.gameUI.updateTurnLabel(self.players[self.currentPlayer])
+                            self.gameUI.updateTurnLabel(self.__players[self.currentPlayer])
                             self.firstPlayerStarted = False
                         else:
-                            self.gameUI.closeDiceOverlay(self.players, self.gameUI)
+                            self.gameUI.closeDiceOverlay(self.getPlayers(), self.gameUI)
                     elif event.ui_element == self.gameUI.launchOverlayDiceBut:
                         if self.establishPlayersOrder:
                             score = roll()
@@ -150,7 +150,7 @@ class Game:
                             if self.highestScore < diceSum:
                                 self.firstPlayerIndex = self.currentPlayer
                                 self.highestScore = diceSum
-                            if self.currentPlayer == len(self.players) - 1:
+                            if self.currentPlayer == len(self.getPlayers()) - 1:
                                 self.establishPlayersOrder = False
                         else:
                             # in case you are in chance cell
@@ -167,10 +167,10 @@ class Game:
                 self.gameUI.manager.process_events(event)            
             
             # Now we update at all turn the stockboard for avoiding 
-            self.gameUI.updateStockboard(self.players, Player.last_stock_update, self.gameUI)
+            self.gameUI.updateStockboard(self.getPlayers(), Player.last_stock_update, self.gameUI)
             self.board.draw(self.screen)
-            for i, player in enumerate(self.players):
-                self.board.drawPlayerCar(self.screen, player, i, len(self.players))
+            for i, player in enumerate(self.getPlayers()):
+                self.board.draw_player_car(self.screen, player, i, len(self.getPlayers()))
             
             time_delta = self.clock.tick(FPS) / 1000.0
             self.gameUI.manager.update(time_delta)            
@@ -178,11 +178,11 @@ class Game:
             pygame.display.update()
 
     def skipTurn(self):
-        curr_player = self.players[self.currentPlayer]
+        curr_player = self.__players[self.currentPlayer]
         while curr_player.getSkipTurn():
             curr_player.skipTurn(False)
-            self.currentPlayer =  (self.currentPlayer+1) % len(self.players)
-            curr_player = self.players[self.currentPlayer]
+            self.currentPlayer =  (self.currentPlayer+1) % len(self.getPlayers())
+            curr_player = self.__players[self.currentPlayer]
 
     def turn(self):
         tiroDoppio = False
@@ -197,13 +197,13 @@ class Game:
             self.gameUI.launchDice.enable()
             tiroDoppio = True
 
-        curr_player = self.players[self.currentPlayer]
+        curr_player = self.__players[self.currentPlayer]
         curr_player.move(score[0] + score[1])
         #curr_player.move(4)
-        cell = self.board.getCells()[curr_player.position]
+        cell = self.board.get_cells()[curr_player.position]
         #check turn and crash before any other events or effect of the cells
         checkTurn(curr_player)
-        crash = checkCrash(self.players.copy(), self.currentPlayer)
+        crash = checkCrash(self.getPlayers(), self.currentPlayer)
         if tiroDoppio and crash:
             self.gameUI.drawAlert("Doppio e incidente!")
         elif tiroDoppio:
@@ -215,13 +215,13 @@ class Game:
             #curr_player.move(10)
             self.enableBuyButton(cell, curr_player)
             # we need to create a copy of the list in order to perform some edit of the list later
-            checkForPenalty(self.board.getCells(), self.players.copy(), self.currentPlayer)            
+            check_for_penalty(self.board.get_cells(), self.getPlayers(), self.currentPlayer)            
         #case special cell
         else:
             #disablePassButton = self.specialCellLogic(cell, curr_player)
             self.specialCellLogic(cell, curr_player)
 
-        self.gameUI.updateAllPlayerLables(self.players)
+        self.gameUI.updateAllPlayerLables(self.getPlayers())
         
         #self.gameUI.passButton.enable()
 #        if disablePassButton:
@@ -231,7 +231,7 @@ class Game:
             #disablePassButton = self.specialCellLogic(cell, curr_player)
 
     def enableBuyButton(self, cell, player):
-        if checkIfCanBuyStock(cell, player):
+        if check_if_can_buy_stock(cell, player):
             self.gameUI.buyButton.enable()
         else:
             self.gameUI.buyButton.disable()
@@ -248,21 +248,21 @@ class Game:
         elif cell.cellType == STOCKS_PRIZE_TYPE:
             stockPrizeLogic(player)
         elif cell.cellType == QUOTATION_TYPE:
-            quotationLogic(self.players, self.board, self.newQuotation, self)
+            quotationLogic(self.getPlayers(), self.board, self.newQuotation, self)
         elif cell.cellType == CHOOSE_STOCK_TYPE:
-            stocks = self.board.getAvailbleStocks()
+            stocks = self.board.get_availble_stocks()
             self.gameUI.disableActions()
             self.gameUI.showMoveToStock(stocks, 'Scegli su quale cedola vuoi spostarti')
             #disablePassButton = True
         elif cell.cellType == SIX_HUNDRED_TYPE:
             sixHundredLogic(player)
         elif cell.cellType == FREE_STOP_TYPE:
-            stocks = self.board.getPurchasableStocks(player.balance)
+            stocks = self.board.get_purchasable_stocks(player.getBalance())
             self.gameUI.disableActions()
             self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
             #disablePassButton = True
         elif cell.cellType == CHANCE_TYPE:
-            self.gameUI.drawDiceOverlay(self.players[self.currentPlayer].playerName + ' tira dadi', 'Riserva monetaria', False)
+            self.gameUI.drawDiceOverlay(self.__players[self.currentPlayer].playerName + ' tira dadi', 'Riserva monetaria', False)
 
         #return disablePassButton
         
@@ -272,8 +272,8 @@ class Game:
         if event.evenType == COLOR_EVENT:
             pass
         elif event.evenType == BUY_ANTHING_EVENT:
-            stocks = self.board.getAvailbleStocks()            
-            for p in self.players:
+            stocks = self.board.get_availble_stocks()            
+            for p in self.__players:
                 if p != player:
                     stocks.extend(player.getStocks())
             self.gameUI.disableActions()
@@ -285,35 +285,35 @@ class Game:
         elif event.evenType == FREE_PENALTY_MARTINI:
             player.freeMartini(True)
         elif event.evenType == EVERYONE_FIFTY_EVENT:
-            everyOneFifty(self.players)
+            everyOneFifty(self.getPlayers())
         elif event.evenType == PREVIOUS_PLAYER_GALUP:
-            previousPlayerIndex = (self.currentPlayer-1) % len(self.players)
-            previousPlayer = self.players[previousPlayerIndex]
+            previousPlayerIndex = (self.currentPlayer-1) % len(self.__players)
+            previousPlayer = self.__players[previousPlayerIndex]
             previousPlayer.setPosition(39)
-            playerOwnStock = whoOwnsStock(self.players, 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
+            playerOwnStock = whoOwnsStock(self.getPlayers(), 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
             stock = playerOwnStock.getStockByPos(39)
             amount = playerOwnStock.computePenalty(stock)
-            previousPlayer.changeBalance(amount)
+            previousPlayer.change_balance(amount)
         elif event.evenType == NEXT_PLAYER_PAY:
-            nextPlayerIndex = (self.currentPlayer+1) % len(self.players)
-            nextPlayer = self.players[nextPlayerIndex]
-            nextPlayer.changeBalance(-200)
+            nextPlayerIndex = (self.currentPlayer+1) % len(self.__players)
+            nextPlayer = self.__players[nextPlayerIndex]
+            nextPlayer.change_balance(-200)
         elif event.evenType == GIFT_EVENT:
             effectData = event.effectData   
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
                 player.addStock(stock)
             else:                
-                player.changeBalance(effectData['amount'])
+                player.change_balance(effectData['amount'])
         elif event.evenType == GET_EVENT:
             effectData = event.effectData
             
             if 'from' in effectData.keys():
                 fromWho = effectData['from']
                 if fromWho == 'others':
-                    getMoneyFromOthers(self.players.copy(), self.currentPlayer, effectData['amount'])
+                    getMoneyFromOthers(self.getPlayers(), self.currentPlayer, effectData['amount'])
             else:
-                player.changeBalance(effectData['amount'])
+                player.change_balance(effectData['amount'])
         elif event.evenType == GO_EVENT:
             self.goEventLogic(player, event)
         elif event.evenType == PAY_EVENT:
@@ -322,26 +322,26 @@ class Game:
             if 'to' in effectData.keys():
                 toWho = effectData['to']
                 if toWho == 'others':
-                    payMoneyToOthers(self.players.copy(), self.currentPlayer, effectData['amount'])
+                    payMoneyToOthers(self.getPlayers(), self.currentPlayer, effectData['amount'])
             else:
-                player.changeBalance(-effectData['amount'])
+                player.change_balance(-effectData['amount'])
         elif event.evenType == OWN_EVENT:
             effectData = event.effectData
             
-            owners = whoOwnsStockByName(self.players, effectData['stockName'])
+            owners = whoOwnsStockByName(self.getPlayers(), effectData['stockName'])
             
             if len(owners) > 0:
                 for owner in owners:
                     update_owner_balance(owner, effectData['stockName'], effectData['getAmount'], effectData['each'])
 
             if effectData['othersPayValue'] is not None:
-                update_others_balance(self.players.copy(), owners, effectData['othersPayValue'])
+                update_others_balance(self.__players, owners, effectData['othersPayValue'])
 
         elif event.evenType == BUY_EVENT:
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
                 player.addStock(stock)
-                player.changeBalance(-stock.getOriginalValue())
+                player.change_balance(-stock.getOriginalValue())
             else:
                 print('BUY CASE START NEGOTIATION')
                 pass # avviare trattativa con proprietario
@@ -356,11 +356,11 @@ class Game:
         if effectData['startCheck']:
             passStart = checkStartPass(player, effectData['destination'])
             if passStart:
-                player.changeBalance(300)
+                player.change_balance(300)
 
         if effectData['pass'] is not None:
-            passAmount = computePassAmount(self.players.copy(), player.position, self.currentPlayer, effectData['pass'], effectData['destination'])
-            player.changeBalance(passAmount)
+            passAmount = computePassAmount(self.__players, player.position, self.currentPlayer, effectData['pass'], effectData['destination'])
+            player.change_balance(passAmount)
 
         if effectData['someone']:#implement interface to choose someone
             print('GOTO SOMEONE CASE')
@@ -370,13 +370,13 @@ class Game:
             stock = self.board.getStockIfAvailable(effectData['destination'])
             if stock is not None:
                 player.addStock(stock)
-                player.changeBalance(-stock.getOriginalValue())
+                player.change_balance(-stock.getOriginalValue())
             else:
                 print('GOTO BUY CASE START NEGOTIATION')
                 pass #implement gui to start negotiation with owner
 
         if effectData['get'] is not None:
-            player.changeBalance(effectData['get'])
+            player.change_balance(effectData['get'])
 
         player.setPosition(effectData['destination'])
 
@@ -385,3 +385,6 @@ class Game:
         if self.__squareBalance < 0:
             self.__squareBalance == 0
         self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
+
+    def getPlayers(self):
+        return self.__players.copy()

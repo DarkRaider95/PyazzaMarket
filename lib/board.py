@@ -26,7 +26,7 @@ class Board:
         self.__cells.append(corner1)
         
         #create bottom side
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["ORANGE","LIGHT_BLUE"], self.eventImage, self.fermataLibImage, FREE_STOP_TYPE, position)
+        curr_x, curr_y, position = self.create_side(curr_x, curr_y, ["ORANGE","LIGHT_BLUE"], self.eventImage, self.fermataLibImage, FREE_STOP_TYPE, position)
         
         #create corner2
         curr_x = curr_x-CORNER_WIDTH
@@ -34,7 +34,7 @@ class Board:
         self.__cells.append(corner2)
         
         #create left side
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["PINK","GREEN"], self.eventImage, self.quotationImage, QUOTATION_TYPE, position)
+        curr_x, curr_y, position = self.create_side(curr_x, curr_y, ["PINK","GREEN"], self.eventImage, self.quotationImage, QUOTATION_TYPE, position)
         
         #create corner3
         curr_y = curr_y-CORNER_HEIGHT        
@@ -43,7 +43,7 @@ class Board:
         
         #create top side
         curr_x = curr_x + CELL_WIDTH
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["RED","BLUE"], self.eventImage, self.chanceImage, CHANCE_TYPE, position)
+        curr_x, curr_y, position = self.create_side(curr_x, curr_y, ["RED","BLUE"], self.eventImage, self.chanceImage, CHANCE_TYPE, position)
         
         #create corner4
         curr_x = curr_x + CELL_WIDTH
@@ -52,16 +52,16 @@ class Board:
         
         #create right side
         curr_y = curr_y+CELL_WIDTH
-        curr_x, curr_y, position = self.createSide(curr_x, curr_y, ["YELLOW","PURPLE"], self.eventImage, self.quotationImage, QUOTATION_TYPE, position)
+        curr_x, curr_y, position = self.create_side(curr_x, curr_y, ["YELLOW","PURPLE"], self.eventImage, self.quotationImage, QUOTATION_TYPE, position)
     
-    def createSide(self, curr_x, curr_y, colors, eventImage, centralImage, centralType, position):        
+    def create_side(self, curr_x, curr_y, colors, eventImage, centralImage, centralType, position):        
         x = curr_x
         y = curr_y
         # saving the names of the __cells following the order of the __cells
         names = CELLS_DEF[colors[0]]['names'] + CELLS_DEF[colors[1]]['names']
     
         for i in range(0, 9):
-            x, y = Board.computeNextCoord(x, y, CELLS_DEF[colors[0]]['side'])
+            x, y = Board.compute_next_coord(x, y, CELLS_DEF[colors[0]]['side'])
             position += 1
             
             if(i == 2 or i == 6): # check if it is an event cell
@@ -80,7 +80,7 @@ class Board:
 
         return x, y, position + 1
     
-    def computeNextCoord(x, y, side):
+    def compute_next_coord(x, y, side):
         if side == 'BOT':
             x = x - CELL_WIDTH
             y = y
@@ -101,7 +101,7 @@ class Board:
         for cell in self.__cells:
             cell.draw(screen)
 
-    def drawPlayerCar(self, screen, player, playerNumber, totalPlayers):
+    def draw_player_car(self, screen, player, playerNumber, totalPlayers):
         cell = self.__cells[player.position]
         #old_cell = self.__cells[player.old_position]
 
@@ -125,19 +125,15 @@ class Board:
 
         player.car.move(car_x, car_y)
         player.car.draw(screen)
-    
-    def checkIfStockCell(self, player):
-        cell = self.__cells[player.position]
-        return cell.cellImage is not None
-    
-    def getCellValue(self, position):
+
+    def get_cell_value(self, position):
         cell = self.__cells[position]
-        return cell.getCellValue()
+        return cell.get_cell_value()
     
-    def getCell(self, position):
+    def get_cell(self, position):
         return self.__cells[position]
     
-    def getAvailbleStocks(self):
+    def get_availble_stocks(self):
         stocks = []
         for cell in self.__cells:
             if(cell.getStocks() is not None and len(cell.getStocks()) > 0):
@@ -145,7 +141,7 @@ class Board:
 
         return stocks
     
-    def getPurchasableStocks(self, balance):
+    def get_purchasable_stocks(self, balance):
         stocks = []
         for cell in self.__cells:
             if(cell.getStocks() is not None and 
@@ -165,5 +161,5 @@ class Board:
             
         return None
     
-    def getCells(self):
+    def get_cells(self):
         return self.__cells
