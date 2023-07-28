@@ -16,7 +16,7 @@ def buy_stock(cells, player):
         if player.get_balance() >= stock_value:
             stock = cells[curr_pos].sellStock()
             player.change_balance(-stock_value)
-            player.addStock(stock)
+            player.add_stock(stock)
 
 def check_if_can_buy_stock(cell, player):
         if(cell.cellType != STOCKS_TYPE or len(cell.get_stocks())  == 0):
@@ -79,9 +79,9 @@ def quotation_logic(players, board, quotation, game):
                 
     quotation.rotate(-1)
 
-def chanceLogic(player, squareBalance):
+def chance_logic(player, squareBalance):
     score = roll()
-    if (score[0] + score[1]) > 3:
+    if score[0] > 3:
         amount = squareBalance//3
         player.change_balance(amount)        
     else:
@@ -90,43 +90,42 @@ def chanceLogic(player, squareBalance):
 
     return score, amount
 
-def sixHundredLogic(player):
+def six_hundred_logic(player):
     player.change_balance(600)
 
-def startLogic(player):
+def start_logic(player):
     player.change_balance(TURN_FEE * 2)
 
-def everyOneFifty(players):
+def every_one_fifty(players):
     for player in players:
         player.change_balance(50)
 
-def whoOwnsStock(players, stockPos):
+def who_owns_stock(players, stock_pos):
     owners = []
     for player in players:
         for stock in player.get_stocks():
-            if stockPos == stock.position:
+            if stock_pos == stock.position:
                 owners.append(player)
     
     return owners
 
-def whoOwnsStockByName(players, stockName):
+def who_owns_stock_by_name(players, stock_name):
     owners = []
     for player in players:
         for stock in player.get_stocks():
-            if stockName == stock.name:
+            if stock_name == stock.name:
                 owners.append(player)
     
     return owners
 
-def transferStock(board, current_player, chosenStock):
-
-    if chosenStock.owner is not None:
-        chosenStock.owner.removeStock(chosenStock)    
+def transfer_stock(board, current_player, chosen_stock):
+    if chosen_stock.get_owner() is not None:
+        chosen_stock.get_owner().remove_stock(chosen_stock)    
     else:
-        board.removeStock(chosenStock)
-        
-    chosenStock.owner = current_player
-    current_player.addStock(chosenStock)
+        board.remove_stock(chosen_stock)
+
+    chosen_stock.set_owner(current_player)
+    current_player.add_stock(chosen_stock)
 
             
 def getMoneyFromOthers(players, player_number, amount):
@@ -178,9 +177,9 @@ def payMoneyToOthers(players, player_number, amount):
     current_player.change_balance(len(players) * (-amount))
 
 #this method is executed when an event with own some stock occurs
-def update_owner_balance(owner, stockName, amount, each):
+def update_owner_balance(owner, stock_name, amount, each):
     for stock in owner.get_stocks():
-        if stock.name == stockName:
+        if stock.name == stock_name:
             owner.change_balance(amount)
             if each == False:
                 break

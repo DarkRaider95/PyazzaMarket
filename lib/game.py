@@ -28,7 +28,7 @@ class Game:
         self.__squareBalance = 2000
         random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
         self.new_quotation = deque(QUOTATION) # this function create a ring list that work using rotate()
-        self.establishPlayersOrder = True # we use this variable to understand when we have launched the game for the first time
+        self.establish_players_order = True # we use this variable to understand when we have launched the game for the first time
         self.highestScore = 0 # we save the score for deciding which is the play with the highest score that will start first
         self.firstPlayerIndex = 0 # we save the index of the player that will start first
         self.firstPlayerStarted = True # we check if the all the players have throw the dices for decide who will start first
@@ -94,9 +94,9 @@ class Game:
                     elif event.ui_element == self.gameUI.chooseBut:
                         curr_player = self.__players[self.currentPlayer]
                         chosenStock = self.gameUI.getShowedStock()
-                        curr_player.addStock(chosenStock)
+                        curr_player.add_stock(chosenStock)
                         curr_player.change_balance(-chosenStock.get_stock_value())
-                        self.board.removeStock(chosenStock)
+                        self.board.remove_stock(chosenStock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.gameUI.drawDices()
@@ -124,13 +124,13 @@ class Game:
                     elif event.ui_element == self.gameUI.buyAnyBut:
                         chosenStock = self.gameUI.getShowedStock()
                         curr_player = self.__players[self.currentPlayer]
-                        transferStock(self.board, curr_player, chosenStock)
+                        transfer_stock(self.board, curr_player, chosenStock)
                         self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.closeAlertBut:
                         self.gameUI.closeAlert(self.getPlayers(), self.gameUI)
                     elif event.ui_element == self.gameUI.closeDiceOverlayBut:
-                        if self.establishPlayersOrder:
+                        if self.establish_players_order:
                             self.gameUI.closeDiceOverlay(self.getPlayers(), self.gameUI)
                             self.currentPlayer =  (self.currentPlayer+1) % len(self.getPlayers())
                             self.gameUI.drawDiceOverlay(self.__players[self.currentPlayer].playerName + ' tira dadi', 'Decisione turni')
@@ -143,7 +143,9 @@ class Game:
                         else:
                             self.gameUI.closeDiceOverlay(self.getPlayers(), self.gameUI)
                     elif event.ui_element == self.gameUI.launchOverlayDiceBut:
-                        if self.establishPlayersOrder:
+                        # when you throw the dices maybe you are deciding the order of the players
+                        # or you are in a chance cell
+                        if self.establish_players_order:
                             score = roll()
                             self.gameUI.updateDiceOverlay(score)
                             diceSum = score[0] + score[1]
@@ -151,13 +153,13 @@ class Game:
                                 self.firstPlayerIndex = self.currentPlayer
                                 self.highestScore = diceSum
                             if self.currentPlayer == len(self.getPlayers()) - 1:
-                                self.establishPlayersOrder = False
+                                self.establish_players_order = False
                         else:
-                            # in case you are in chance cell
-                            score, amount = chanceLogic(player, self.__squareBalance)
+                            # amount is the amount of money that the player has to pay or receive
+                            score, amount = chance_logic(player, self.__squareBalance)
                             self.gameUI.updateDiceOverlay(score)
-                            if amount < 0:
-                                self.__squareBalance += 0
+                            if self.__squareBalance + amount < 0:
+                                self.__squareBalance == 0
                             else:
                                 self.__squareBalance += amount
                             self.gameUI.updateDice(score)
@@ -240,7 +242,7 @@ class Game:
         #disablePassButton = False
 
         if cell.cellType == START_TYPE:
-            startLogic(player)        
+            start_logic(player)        
         elif cell.cellType == EVENTS_TYPE:
             self.gameUI.disableActions()
             self.gameUI.showEventUi(self.events[0])
@@ -254,7 +256,7 @@ class Game:
             self.gameUI.showMoveToStock(stocks, 'Scegli su quale cedola vuoi spostarti')
             #disablePassButton = True
         elif cell.cellType == SIX_HUNDRED_TYPE:
-            sixHundredLogic(player)
+            six_hundred_logic(player)
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.board.get_purchasable_stocks(player.get_balance())
             self.gameUI.disableActions()
@@ -284,12 +286,12 @@ class Game:
         elif event.evenType == FREE_PENALTY_MARTINI:
             player.freeMartini(True)
         elif event.evenType == EVERYONE_FIFTY_EVENT:
-            everyOneFifty(self.getPlayers())
+            every_one_fifty(self.getPlayers())
         elif event.evenType == PREVIOUS_PLAYER_GALUP:
             previousPlayerIndex = (self.currentPlayer-1) % len(self.__players)
             previousPlayer = self.__players[previousPlayerIndex]
             previousPlayer.set_position(39)
-            playerOwnStock = whoOwnsStock(self.getPlayers(), 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
+            playerOwnStock = who_owns_stock(self.getPlayers(), 39)[0] #bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
             stock = playerOwnStock.getStockByPos(39)
             amount = playerOwnStock.computePenalty(stock)
             previousPlayer.change_balance(amount)
@@ -301,7 +303,7 @@ class Game:
             effectData = event.effectData   
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
-                player.addStock(stock)
+                player.add_stock(stock)
             else:                
                 player.change_balance(effectData['amount'])
         elif event.evenType == GET_EVENT:
@@ -327,7 +329,7 @@ class Game:
         elif event.evenType == OWN_EVENT:
             effectData = event.effectData
             
-            owners = whoOwnsStockByName(self.getPlayers(), effectData['stockName'])
+            owners = who_owns_stock_by_name(self.getPlayers(), effectData['stockName'])
             
             if len(owners) > 0:
                 for owner in owners:
@@ -339,7 +341,7 @@ class Game:
         elif event.evenType == BUY_EVENT:
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
-                player.addStock(stock)
+                player.add_stock(stock)
                 player.change_balance(-stock.getOriginalValue())
             else:
                 print('BUY CASE START NEGOTIATION')
@@ -368,7 +370,7 @@ class Game:
         if effectData['buy']:
             stock = self.board.getStockIfAvailable(effectData['destination'])
             if stock is not None:
-                player.addStock(stock)
+                player.add_stock(stock)
                 player.change_balance(-stock.getOriginalValue())
             else:
                 print('GOTO BUY CASE START NEGOTIATION')

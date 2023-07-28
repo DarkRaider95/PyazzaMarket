@@ -151,7 +151,7 @@ class Board:
 
         return stocks
     
-    def removeStock(self, stock):
+    def remove_stock(self, stock):
         self.__cells[stock.position].sellStock()
 
     def getStockIfAvailable(self, stockPos):

@@ -4,6 +4,7 @@ from lib.board import Board
 from lib.constants import *
 from lib.player import Player
 from collections import deque
+from pytest import MonkeyPatch
 
 def test_roll():
     for _ in range(10):
@@ -142,23 +143,6 @@ def test_stock_prize_logic(player_with_cell: Player):
     balance_before = player_with_cell.get_balance()
     stock_prize_logic(player_with_cell)
     assert player_with_cell.get_balance() == balance_before + 100
-
-""" 
-def quotation_logic(players, board, quotation, game):
-    new_quotation = quotation[0]
-    for player in players:
-        for stock in player.get_stocks():
-            difference = stock.updateValue(new_quotation[stock.get_index()])
-            player.change_balance(difference)
-            game.set_square_balance(difference)
-    for cell in board.get_cells():
-        if cell.get_stocks() is not None:                                                                          
-            cell.updateCellValue(new_quotation[cell.get_index()])
-            for stock in cell.get_stocks():
-                _ = stock.updateValue(new_quotation[stock.get_index()])
-
-    quotation.rotate(-1)
- """
 class fakeGame:
     def __init__(self):
         self.square_balance = 0
@@ -181,8 +165,51 @@ def test_quotation_logic(board_witout_one_cell: Board, player_with_cell: Player)
     for stock in stocks_owned:
         assert stock.get_stock_value() == new_quotation[stock.get_index()]
 
-"""     
-    for i in range(40):
-        cells = board.get_cells()
-        buy_stock
- """
+def test_chance_logic(player: Player,monkeypatch:  MonkeyPatch):
+    monkeypatch.setattr('lib.gameLogic.roll', lambda: (1, 2))
+    score, amount = chance_logic(player, 3000)
+    assert score == (1, 2)
+    assert amount == -1500
+    monkeypatch.setattr('lib.gameLogic.roll', lambda: (4, 2))
+    score, amount = chance_logic(player, 3000)
+    assert score == (4, 2)
+    assert amount == 1000
+
+def test_six_hundred_logic(player: Player):
+    six_hundred_logic(player)
+    assert player.get_balance() == INITIAL_BALANCE + 600
+
+def test_start_logic(player: Player):
+    start_logic(player)
+    assert player.get_balance() == INITIAL_BALANCE + (TURN_FEE * 2)
+
+def test_every_one_fifty():
+    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    every_one_fifty(players)
+    for player in players:
+        assert player.get_balance() == INITIAL_BALANCE + 50
+
+def test_who_owns_stock(player_with_cell: Player, player: Player):
+    players = [player, player_with_cell]
+    assert who_owns_stock(players, 1) == [player_with_cell]
+    
+def test_who_owns_stock_by_name(player_with_cell: Player, player: Player):
+    players = [player, player_with_cell]
+    assert who_owns_stock_by_name(players, 'gled') == [player_with_cell]
+
+""" 
+def transfer_stock(board, current_player, chosen_stock):
+    if chosen_stock.owner is not None:
+        chosen_stock.owner.remove_stock(chosen_stock)    
+    else:
+        board.remove_stock(chosen_stock)
+        
+    chosen_stock.owner = current_player
+    current_player.add_stock(chosen_stock)
+"""
+
+def test_transfer_stock(board_witout_one_cell: Board, player_with_cell: Player, player: Player):
+    stock = player_with_cell.get_stocks()[0]
+    transfer_stock(board_witout_one_cell, player, player_with_cell.get_stocks()[0])
+    assert len(player_with_cell.get_stocks()) == 0
+    assert player.get_stocks()[0] == stock

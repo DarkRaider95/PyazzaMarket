@@ -37,7 +37,7 @@ class Player:
     def change_balance(self, balance):
         self.__balance += balance
     
-    def addStock(self, stocks):
+    def add_stock(self, stocks):
         self.__stocks.append(stocks)
         self.__stocks = sorted(self.__stocks, key=lambda x: x.position)
         Player.last_stock_update = time.time()
@@ -72,14 +72,14 @@ class Player:
             
         return None
     
-    def removeStock(self, chosenStock):
-        stockToRemoveIndex = None
+    def remove_stock(self, chosenStock):
+        stock_to_remove_index = None
         
         for i, stock in enumerate(self.__stocks):
             if stock.position == chosenStock.position:
-                stockToRemoveIndex = i
+                stock_to_remove_index = i
 
-        self.__stocks.pop(stockToRemoveIndex)
+        self.__stocks.pop(stock_to_remove_index)
 
     def get_stocks(self):
         return self.__stocks.copy()
