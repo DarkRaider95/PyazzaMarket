@@ -90,5 +90,5 @@ class Cell:
     def get_index(self):
         return self.__stockIndex
     
-    def sellStock(self):
+    def sell_stock(self):
         return self.__stocks.pop()

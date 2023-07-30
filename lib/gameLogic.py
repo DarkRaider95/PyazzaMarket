@@ -14,7 +14,8 @@ def buy_stock(cells, player):
     stock_value = cells[curr_pos].get_stocks()[0].get_stock_value()
     if(len(cells[curr_pos].get_stocks()) > 0):
         if player.get_balance() >= stock_value:
-            stock = cells[curr_pos].sellStock()
+            stock = cells[curr_pos].sell_stock()
+            stock.set_owner(player)
             player.change_balance(-stock_value)
             player.add_stock(stock)
 

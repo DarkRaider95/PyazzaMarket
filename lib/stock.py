@@ -17,7 +17,7 @@ class Stock:
         self.position = position
         self.name = name
         self.__penalties = cellDef['penalty']
-        self.__owner = None        
+        self.__owner = None
         self.__new_value = self.__original_value
         self.__index = cellDef['index']
         self.__new_penalties = self.__penalties

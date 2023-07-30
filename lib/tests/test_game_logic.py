@@ -63,8 +63,8 @@ def test_check_if_can_buy_stock(player: Player, board: Board):
     cells = board.get_cells()
     assert check_if_can_buy_stock(cells[1], player) is True
     assert check_if_can_buy_stock(cells[0], player) is False
-    cells[1].sellStock()
-    cells[1].sellStock()
+    cells[1].sell_stock()
+    cells[1].sell_stock()
     assert check_if_can_buy_stock(cells[1], player) is False
     player.change_balance(-3000)
     assert check_if_can_buy_stock(cells[2], player) is False
@@ -210,6 +210,12 @@ def transfer_stock(board, current_player, chosen_stock):
 
 def test_transfer_stock(board_witout_one_cell: Board, player_with_cell: Player, player: Player):
     stock = player_with_cell.get_stocks()[0]
-    transfer_stock(board_witout_one_cell, player, player_with_cell.get_stocks()[0])
+    transfer_stock(board_witout_one_cell, player, stock)
     assert len(player_with_cell.get_stocks()) == 0
     assert player.get_stocks()[0] == stock
+    cell = board_witout_one_cell.get_cell(2)
+    stock = cell.get_stocks()[0]
+    number_of_cells_before = len(board_witout_one_cell.get_cells())
+    transfer_stock(board_witout_one_cell, player, stock)
+    assert len(board_witout_one_cell.get_cells()) == number_of_cells_before - 1
+    assert player.get_stocks()[1] == stock 
