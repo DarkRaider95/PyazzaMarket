@@ -14,7 +14,7 @@ class Stock:
         self.color = cellDef['color']
         self.__original_value = cellDef['value']
         self.logo = None # cellDef['logo']
-        self.position = position
+        self.__position = position
         self.name = name
         self.__penalties = cellDef['penalty']
         self.__owner = None
@@ -80,3 +80,6 @@ class Stock:
 
     def get_owner(self):
         return self.__owner
+    
+    def get_position(self):
+        return self.__position

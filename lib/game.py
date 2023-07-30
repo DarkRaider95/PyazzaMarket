@@ -93,10 +93,10 @@ class Game:
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseBut:
                         curr_player = self.__players[self.currentPlayer]
-                        chosenStock = self.gameUI.getShowedStock()
-                        curr_player.add_stock(chosenStock)
-                        curr_player.change_balance(-chosenStock.get_stock_value())
-                        self.board.remove_stock(chosenStock)
+                        chosen_stock = self.gameUI.getShowedStock()
+                        curr_player.add_stock(chosen_stock)
+                        curr_player.change_balance(-chosen_stock.get_stock_value())
+                        self.board.remove_stock(chosen_stock)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
                         self.gameUI.drawDices()
@@ -104,9 +104,9 @@ class Game:
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.chooseMoveBut:
                         curr_player = self.__players[self.currentPlayer]
-                        chosenStock = self.gameUI.getShowedStock()
-                        curr_cell = self.board.get_cell(chosenStock.position)
-                        curr_player.set_position(chosenStock.position)
+                        chosen_stock = self.gameUI.getShowedStock()
+                        curr_cell = self.board.get_cell(chosen_stock.get_position())
+                        curr_player.set_position(chosen_stock.get_position())
                         self.enableBuyButton(curr_cell, curr_player)
                         self.gameUI.closeStockUi()
                         self.screen.fill(BLACK)
@@ -122,9 +122,9 @@ class Game:
                         self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.buyAnyBut:
-                        chosenStock = self.gameUI.getShowedStock()
+                        chosen_stock = self.gameUI.getShowedStock()
                         curr_player = self.__players[self.currentPlayer]
-                        transfer_stock(self.board, curr_player, chosenStock)
+                        transfer_stock(self.board, curr_player, chosen_stock)
                         self.gameUI.updateAllPlayerLables(self.getPlayers())
                         self.gameUI.renableActions()
                     elif event.ui_element == self.gameUI.closeAlertBut:
@@ -312,7 +312,7 @@ class Game:
             if 'from' in effectData.keys():
                 fromWho = effectData['from']
                 if fromWho == 'others':
-                    getMoneyFromOthers(self.getPlayers(), self.currentPlayer, effectData['amount'])
+                    get_money_from_others(self.getPlayers(), self.currentPlayer, effectData['amount'])
             else:
                 player.change_balance(effectData['amount'])
         elif event.evenType == GO_EVENT:

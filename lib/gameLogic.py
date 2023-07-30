@@ -35,12 +35,12 @@ def check_for_penalty(cells, players, player_number): # testare per vedere se ri
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
     own_by_the_player = False # then we check if the player own the stock
     for stock in current_player.get_stocks():
-        if cell.position == stock.position:
+        if cell.position == stock.get_position():
             own_by_the_player = True
     if not own_by_the_player: # if it is not owned by the player we check if it is owned by another player
         for player in players:
             for stock in player.get_stocks():
-                if cell.position == stock.position:
+                if cell.position == stock.get_position():
                     penality = player.computePenalty(stock)
                     current_player.change_balance(-penality)
                     player.change_balance(penality)
@@ -105,7 +105,7 @@ def who_owns_stock(players, stock_pos):
     owners = []
     for player in players:
         for stock in player.get_stocks():
-            if stock_pos == stock.position:
+            if stock_pos == stock.get_position():
                 owners.append(player)
     
     return owners
@@ -129,7 +129,7 @@ def transfer_stock(board, current_player, chosen_stock):
     current_player.add_stock(chosen_stock)
 
             
-def getMoneyFromOthers(players, player_number, amount):
+def get_money_from_others(players, player_number, amount):
     current_player = players[player_number]
     players.pop(player_number)
     

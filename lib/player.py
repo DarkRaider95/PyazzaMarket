@@ -37,9 +37,9 @@ class Player:
     def change_balance(self, balance):
         self.__balance += balance
     
-    def add_stock(self, stocks):
-        self.__stocks.append(stocks)
-        self.__stocks = sorted(self.__stocks, key=lambda x: x.position)
+    def add_stock(self, stock):
+        self.__stocks.append(stock)
+        self.__stocks = sorted(self.__stocks, key=lambda x: x.get_position())
         Player.last_stock_update = time.time()
 
     def sameColorCount(self, color):
@@ -67,16 +67,16 @@ class Player:
     
     def getStockByPos(self, stockPos):
         for stock in self.__stocks:
-            if stock.position == stockPos:
+            if stock.get_position() == stockPos:
                 return stock
             
         return None
     
-    def remove_stock(self, chosenStock):
+    def remove_stock(self, chosen_stock):
         stock_to_remove_index = None
         
         for i, stock in enumerate(self.__stocks):
-            if stock.position == chosenStock.position:
+            if stock.get_position() == chosen_stock.get_position():
                 stock_to_remove_index = i
 
         self.__stocks.pop(stock_to_remove_index)

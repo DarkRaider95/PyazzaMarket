@@ -197,24 +197,32 @@ def test_who_owns_stock_by_name(player_with_cell: Player, player: Player):
     players = [player, player_with_cell]
     assert who_owns_stock_by_name(players, 'gled') == [player_with_cell]
 
-""" 
-def transfer_stock(board, current_player, chosen_stock):
-    if chosen_stock.owner is not None:
-        chosen_stock.owner.remove_stock(chosen_stock)    
-    else:
-        board.remove_stock(chosen_stock)
-        
-    chosen_stock.owner = current_player
-    current_player.add_stock(chosen_stock)
-"""
-
 def test_transfer_stock(board_witout_one_cell: Board, player_with_cell: Player, player: Player):
     stock = player_with_cell.get_stocks()[0]
     transfer_stock(board_witout_one_cell, player, stock)
     assert len(player_with_cell.get_stocks()) == 0
     assert player.get_stocks()[0] == stock
     cell = board_witout_one_cell.get_cell(2)
+    stocks_before = len(cell.get_stocks())
     stock = cell.get_stocks()[0]
     transfer_stock(board_witout_one_cell, player, stock)
-    assert len(cell.get_stocks()) == 1
-    assert player.get_stocks()[1] == stock 
+    assert len(cell.get_stocks()) == stocks_before - 1
+    assert player.get_stocks()[1].get_position() == stock.get_position()
+
+""" 
+def get_money_from_others(players, player_number, amount):
+    current_player = players[player_number]
+    players.pop(player_number)
+    
+    for player in players:
+        player.change_balance(-amount)
+    
+    current_player.change_balance(len(players) * amount)
+"""
+
+def test_get_money_from_others():
+    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    get_money_from_others(players, 0, 100)
+    assert players[0].get_balance() == INITIAL_BALANCE + 200
+    assert players[1].get_balance() == INITIAL_BALANCE - 100
+    assert players[2].get_balance() == INITIAL_BALANCE - 100
