@@ -215,7 +215,6 @@ def test_transfer_stock(board_witout_one_cell: Board, player_with_cell: Player, 
     assert player.get_stocks()[0] == stock
     cell = board_witout_one_cell.get_cell(2)
     stock = cell.get_stocks()[0]
-    number_of_cells_before = len(board_witout_one_cell.get_cells())
     transfer_stock(board_witout_one_cell, player, stock)
-    assert len(board_witout_one_cell.get_cells()) == number_of_cells_before - 1
+    assert len(cell.get_stocks()) == 1
     assert player.get_stocks()[1] == stock 
