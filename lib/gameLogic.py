@@ -131,6 +131,7 @@ def transfer_stock(board, current_player, chosen_stock):
             
 def get_money_from_others(players, player_number, amount):
     current_player = players[player_number]
+    players = players.copy()
     players.pop(player_number)
     
     for player in players:
@@ -138,13 +139,15 @@ def get_money_from_others(players, player_number, amount):
     
     current_player.change_balance(len(players) * amount)
 
-def checkStartPass(player, destination):
+def check_start_pass(player, destination):
     if player.position <= 39 and destination > 0:
         return True
     else:
         return False
     
-def computePassAmount(players, curr_player_pos, player_number, passAmount, destination):
+def compute_pass_amount(players, player_number, passAmount, destination):
+    players = players.copy()
+    curr_player_pos = players[player_number].position
     players.pop(player_number)
 
     totPassAmount = 0
@@ -191,3 +194,4 @@ def update_others_balance(players, owners, amount):
     for player in players:
         if player not in owners:
             player.change_balance(-amount)
+

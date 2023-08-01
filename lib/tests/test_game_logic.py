@@ -92,9 +92,8 @@ def test_check_for_penalty():
     assert players[1].get_balance() == INITIAL_BALANCE - CELLS_DEF["ORANGE"]["penalty"][0] - stock_value
     assert players[0].get_balance() == INITIAL_BALANCE + CELLS_DEF["ORANGE"]["penalty"][0] - stock_value
 
-def test_check_for_penalty_owning_both_stokcs_in_the_cell():
+def test_check_for_penalty_owning_both_stokcs_in_the_cell(board: Board):
     # creating board and players
-    board = Board(enableGraphics = False)
     cells = board.get_cells()
     players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
     # saving the price of the stock
@@ -143,6 +142,7 @@ def test_stock_prize_logic(player_with_cell: Player):
     balance_before = player_with_cell.get_balance()
     stock_prize_logic(player_with_cell)
     assert player_with_cell.get_balance() == balance_before + 100
+
 class fakeGame:
     def __init__(self):
         self.square_balance = 0
@@ -209,20 +209,54 @@ def test_transfer_stock(board_witout_one_cell: Board, player_with_cell: Player, 
     assert len(cell.get_stocks()) == stocks_before - 1
     assert player.get_stocks()[1].get_position() == stock.get_position()
 
-""" 
-def get_money_from_others(players, player_number, amount):
-    current_player = players[player_number]
-    players.pop(player_number)
-    
-    for player in players:
-        player.change_balance(-amount)
-    
-    current_player.change_balance(len(players) * amount)
-"""
-
 def test_get_money_from_others():
     players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
     get_money_from_others(players, 0, 100)
     assert players[0].get_balance() == INITIAL_BALANCE + 200
     assert players[1].get_balance() == INITIAL_BALANCE - 100
     assert players[2].get_balance() == INITIAL_BALANCE - 100
+
+def test_check_start_pass(player: Player):
+    assert check_start_pass(player, 1) == True
+    assert check_start_pass(player, 0) == False
+    player.set_position(40)
+    assert check_start_pass(player, 1) == False
+
+""" 
+def compute_pass_amount(players, player_number, passAmount, destination):
+    players.pop(player_number)
+
+    totPassAmount = 0
+
+    for player in players:
+        if (           
+            (
+                curr_player_pos < player.position and
+                destination > player.position
+            ) 
+            or 
+            (
+                destination < curr_player_pos and 
+                (
+                    curr_player_pos < player.position or
+                    player.position < destination
+                )
+            )
+        ):
+            totPassAmount += passAmount
+
+    return totPassAmount
+ """
+
+def test_compute_pass_amount():
+    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE)]
+    assert compute_pass_amount(players, 0, 100, 0) == 0 # false, false, false, false, false
+    players[1].set_position(1)
+    assert compute_pass_amount(players, 0, 100, 0) == 0 # true, false, false, true, false
+    players[1].set_position(0)
+    assert compute_pass_amount(players, 0, 100, 1) == 0 # false, true, false, false, false
+    players[0].set_position(2)
+    assert compute_pass_amount(players, 0, 100, 1) == 100 # false, false, true, false, true
+    players[1].set_position(3)
+    assert compute_pass_amount(players, 0, 100, 4) == 100 # true, true, false, true, true
+    assert compute_pass_amount(players, 0, 100, 1) == 100 # true, false, true, true, false

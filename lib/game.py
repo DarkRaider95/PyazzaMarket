@@ -355,12 +355,12 @@ class Game:
         effectData = event.effectData
 
         if effectData['startCheck']:
-            passStart = checkStartPass(player, effectData['destination'])
+            passStart = check_start_pass(player, effectData['destination'])
             if passStart:
                 player.change_balance(300)
 
         if effectData['pass'] is not None:
-            passAmount = computePassAmount(self.__players, player.position, self.currentPlayer, effectData['pass'], effectData['destination'])
+            passAmount = compute_pass_amount(self.__players, self.currentPlayer, effectData['pass'], effectData['destination'])
             player.change_balance(passAmount)
 
         if effectData['someone']:#implement interface to choose someone

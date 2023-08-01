@@ -356,7 +356,7 @@ class GameUI:
         self.twoDices = twoDices
 
     def createDiceSurface(self, twoDices = True):
-        if twoDices:
+        if twoDices: # guardare se si può aggiornare solo la superficie con blit
             diceSurface = pygame.Surface((DICE_WIDTH * 2, DICE_HEIGHT))
             diceSurface.blit(self.image_dice_1, (0, 0))
             diceSurface.blit(self.image_dice_2, (0 + DICE_WIDTH, 0))
