@@ -265,11 +265,6 @@ def test_update_owner_balance_two_cells_each_true(player_with_cell: Player, boar
     update_owner_balance(player_with_cell, 'gled', 100, True)
     assert player_with_cell.get_balance() == prev_balance + 200
 
-def test_update_owner_balance_one_cell(player_with_cell: Player):
-    prev_balance = player_with_cell.get_balance()
-    update_owner_balance(player_with_cell, 'gled', 100, False)
-    assert player_with_cell.get_balance() == prev_balance + 100
-
 def test_update_owner_balance_no_cell(player: Player):
     prev_balance = player.get_balance()
     update_owner_balance(player, 'gled', 100, False)

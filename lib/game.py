@@ -301,7 +301,7 @@ class Game:
             nextPlayer.change_balance(-200)
         elif event.evenType == GIFT_EVENT:
             effectData = event.effectData   
-            stock = self.board.getStockIfAvailable(effectData['stockIndex'])
+            stock = self.board.get_stock_if_available(effectData['stockIndex'])
             if stock is not None:
                 player.add_stock(stock)
             else:                
@@ -339,7 +339,7 @@ class Game:
                 update_others_balance(self.__players, owners, effectData['othersPayValue'])
 
         elif event.evenType == BUY_EVENT:
-            stock = self.board.getStockIfAvailable(effectData['stockIndex'])
+            stock = self.board.get_stock_if_available(effectData['stockIndex'])
             if stock is not None:
                 player.add_stock(stock)
                 player.change_balance(-stock.getOriginalValue())
@@ -368,7 +368,7 @@ class Game:
             pass
 
         if effectData['buy']:
-            stock = self.board.getStockIfAvailable(effectData['destination'])
+            stock = self.board.get_stock_if_available(effectData['destination'])
             if stock is not None:
                 player.add_stock(stock)
                 player.change_balance(-stock.getOriginalValue())
