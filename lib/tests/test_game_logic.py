@@ -240,17 +240,45 @@ def test_pay_money_to_others():
     assert players[0].get_balance() == INITIAL_BALANCE - 200
     assert players[1].get_balance() == INITIAL_BALANCE + 100
     assert players[2].get_balance() == INITIAL_BALANCE + 100
-""" 
-def update_others_balance(players, owners, amount):
-    for player in players:
-        if player not in owners:
-            player.change_balance(-amount)
- """
+
+def test_update_owner_balance_one_cell(player_with_cell: Player):
+    prev_balance = player_with_cell.get_balance()
+    update_owner_balance(player_with_cell, 'gled', 100, False)
+    assert player_with_cell.get_balance() == prev_balance + 100
+
+def test_update_owner_balance_one_cell_each_true(player_with_cell: Player):
+    prev_balance = player_with_cell.get_balance()
+    update_owner_balance(player_with_cell, 'gled', 100, True)
+    assert player_with_cell.get_balance() == prev_balance + 100
+
+def test_update_owner_balance_two_cells(player_with_cell: Player, board_witout_one_cell: Board):
+    cells = board_witout_one_cell.get_cells()
+    buy_stock(cells, player_with_cell)
+    prev_balance = player_with_cell.get_balance()
+    update_owner_balance(player_with_cell, 'gled', 100, False)
+    assert player_with_cell.get_balance() == prev_balance + 100
+
+def test_update_owner_balance_two_cells_each_true(player_with_cell: Player, board_witout_one_cell: Board):
+    cells = board_witout_one_cell.get_cells()
+    buy_stock(cells, player_with_cell)
+    prev_balance = player_with_cell.get_balance()
+    update_owner_balance(player_with_cell, 'gled', 100, True)
+    assert player_with_cell.get_balance() == prev_balance + 200
+
+def test_update_owner_balance_one_cell(player_with_cell: Player):
+    prev_balance = player_with_cell.get_balance()
+    update_owner_balance(player_with_cell, 'gled', 100, False)
+    assert player_with_cell.get_balance() == prev_balance + 100
+
+def test_update_owner_balance_no_cell(player: Player):
+    prev_balance = player.get_balance()
+    update_owner_balance(player, 'gled', 100, False)
+    assert player.get_balance() == prev_balance
 
 def test_update_others_balance():
     players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
     owners = [players[0]]
     update_others_balance(players, owners, 100)
-    assert players[0].get_balance() == INITIAL_BALANCE + 200
+    assert players[0].get_balance() == INITIAL_BALANCE
     assert players[1].get_balance() == INITIAL_BALANCE - 100
     assert players[2].get_balance() == INITIAL_BALANCE - 100

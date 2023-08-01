@@ -191,6 +191,7 @@ def update_owner_balance(owner, stock_name, amount, each):
 
 #this method is executed when an event with own some stock occurs
 #there is an event where the ones that aren't owners pay some money
+# to the bank
 def update_others_balance(players, owners, amount):
     for player in players:
         if player not in owners:
