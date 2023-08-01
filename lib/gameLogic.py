@@ -140,7 +140,7 @@ def get_money_from_others(players, player_number, amount):
     current_player.change_balance(len(players) * amount)
 
 def check_start_pass(player, destination):
-    if player.position <= 39 and destination > 0:
+    if player.position > destination:
         return True
     else:
         return False
@@ -171,8 +171,9 @@ def compute_pass_amount(players, player_number, passAmount, destination):
 
     return totPassAmount
 
-def payMoneyToOthers(players, player_number, amount):
+def pay_money_to_others(players, player_number, amount):
     current_player = players[player_number]
+    players = players.copy()
     players.pop(player_number)
     
     for player in players:

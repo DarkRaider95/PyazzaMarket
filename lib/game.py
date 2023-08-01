@@ -323,7 +323,7 @@ class Game:
             if 'to' in effectData.keys():
                 toWho = effectData['to']
                 if toWho == 'others':
-                    payMoneyToOthers(self.getPlayers(), self.currentPlayer, effectData['amount'])
+                    pay_money_to_others(self.getPlayers(), self.currentPlayer, effectData['amount'])
             else:
                 player.change_balance(-effectData['amount'])
         elif event.evenType == OWN_EVENT:

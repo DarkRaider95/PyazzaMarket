@@ -217,36 +217,9 @@ def test_get_money_from_others():
     assert players[2].get_balance() == INITIAL_BALANCE - 100
 
 def test_check_start_pass(player: Player):
-    assert check_start_pass(player, 1) == True
-    assert check_start_pass(player, 0) == False
-    player.set_position(40)
-    assert check_start_pass(player, 1) == False
-
-""" 
-def compute_pass_amount(players, player_number, passAmount, destination):
-    players.pop(player_number)
-
-    totPassAmount = 0
-
-    for player in players:
-        if (           
-            (
-                curr_player_pos < player.position and
-                destination > player.position
-            ) 
-            or 
-            (
-                destination < curr_player_pos and 
-                (
-                    curr_player_pos < player.position or
-                    player.position < destination
-                )
-            )
-        ):
-            totPassAmount += passAmount
-
-    return totPassAmount
- """
+    player.set_position(5)
+    assert check_start_pass(player, 4) == True
+    assert check_start_pass(player, 6) == False
 
 def test_compute_pass_amount():
     players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE)]
@@ -260,3 +233,24 @@ def test_compute_pass_amount():
     players[1].set_position(3)
     assert compute_pass_amount(players, 0, 100, 4) == 100 # true, true, false, true, true
     assert compute_pass_amount(players, 0, 100, 1) == 100 # true, false, true, true, false
+
+def test_pay_money_to_others():
+    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    pay_money_to_others(players, 0, 100)
+    assert players[0].get_balance() == INITIAL_BALANCE - 200
+    assert players[1].get_balance() == INITIAL_BALANCE + 100
+    assert players[2].get_balance() == INITIAL_BALANCE + 100
+""" 
+def update_others_balance(players, owners, amount):
+    for player in players:
+        if player not in owners:
+            player.change_balance(-amount)
+ """
+
+def test_update_others_balance():
+    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    owners = [players[0]]
+    update_others_balance(players, owners, 100)
+    assert players[0].get_balance() == INITIAL_BALANCE + 200
+    assert players[1].get_balance() == INITIAL_BALANCE - 100
+    assert players[2].get_balance() == INITIAL_BALANCE - 100
