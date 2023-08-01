@@ -281,4 +281,4 @@ def test_update_others_balance():
     update_others_balance(players, owners, 100)
     assert players[0].get_balance() == INITIAL_BALANCE
     assert players[1].get_balance() == INITIAL_BALANCE - 100
-    assert players[2].get_balance() == INITIAL_BALANCE - 100
+    assert players[2].get_balance() == INITIAL_BALANCE - 100 
