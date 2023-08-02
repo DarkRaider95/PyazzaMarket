@@ -3,7 +3,6 @@ from lib.gameLogic import *
 from lib.board import Board
 from lib.constants import *
 from lib.player import Player
-from pytest import MonkeyPatch
 
 @pytest.fixture
 def board() -> Board:
