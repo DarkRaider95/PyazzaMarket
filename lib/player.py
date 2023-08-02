@@ -1,73 +1,67 @@
-from .constants import INITIAL_BALANCE, CELLS_DEF
+from .constants import INITIAL_BALANCE
 from .car import Car
 import time
 class Player:
     last_stock_update = None
 
     def __init__(self, playerName, car):
-        self.playerName = playerName
+        self.__playerName = playerName
         self.__balance = INITIAL_BALANCE
-        self.position = 0
+        self.__position = 0
         self.__stocks = []
-        self.car = Car(car)
-        self.old_position = 0
-        self.stockUpdatedAt = time.time()
-        self.__skipTurn = False
+        self.__car = Car(car)
+        self.__old_position = 0
+        self.__set_skip_turn = False
         self.__freePenalty = False
-        self.__freeMartini = False
+        self.__free_martini = False
 
     def move(self, step):
-        self.old_position = self.position
-        self.position = (self.position + step) % 40
+        self.__old_position = self.__position
+        self.__position = (self.__position + step) % 40
 
     def set_position(self, position):
-        self.old_position = self.position
-        self.position = position
+        self.__old_position = self.__position
+        self.__position = position
 
-    def stockValue(self):
+    def stock_value(self):
         value = 0
         for stock in self.__stocks:
             value += stock.get_stock_value()
 
         return value
-
-    def getName(self):
-        return self.playerName
-
-    def change_balance(self, balance):
-        self.__balance += balance
     
     def add_stock(self, stock):
         self.__stocks.append(stock)
         self.__stocks = sorted(self.__stocks, key=lambda x: x.get_position())
         Player.last_stock_update = time.time()
 
-    def sameColorCount(self, color):
+    def same_color_count(self, color):
         count = 0
         for stock in self.__stocks:
             if stock.color == color:
                 count += 1
         return count
 
-    def sameCompanyCount(self, stock1): # we check if the player own two stocks of the same company
-        for stock2 in self.__stocks:
-            if stock1.name == stock2.name:
-                return True
+    def compute_penalty(self, choosen_stock):
+        same_color_cells = self.same_color_count(choosen_stock.color)
+        if same_color_cells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
+            return choosen_stock.getPenalty()[same_color_cells - 1]
+        elif same_color_cells == 2: # we check if the player own two stocks of the same company
+            stocks = self.__stocks.copy() # create a copy of stocks
+            
+            for i, stock in enumerate(stocks): # cycle for pop choosen_stock
+                if stock.get_position() == choosen_stock.get_position():
+                    stock_to_remove_index = i
+            stocks.pop(stock_to_remove_index)
 
-        return False
-
-    def computePenalty(self, stock):
-        sameColorCells = self.sameColorCount(stock.color)
-        if sameColorCells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
-            return stock.getPenalty()[sameColorCells - 1]
-        elif sameColorCells == 2: # we check if the player own two stocks of the same company
-            if self.sameCompanyCount(stock):
-                return stock.getPenalty()[1]
-        return stock.getPenalty()[0] # this will return if the stock of the company is only one
+            for stock in stocks: # if the stock is the same return the right penalty
+                if stock.name == choosen_stock.name:
+                    return choosen_stock.getPenalty()[1]
+        return choosen_stock.getPenalty()[0] # this will return if the stock of the company is only one
     
-    def getStockByPos(self, stockPos):
+    def get_stock_by_pos(self, stock_pos):
         for stock in self.__stocks:
-            if stock.get_position() == stockPos:
+            if stock.get_position() == stock_pos:
                 return stock
             
         return None
@@ -81,26 +75,43 @@ class Player:
 
         self.__stocks.pop(stock_to_remove_index)
 
-    def get_stocks(self):
+    # all the getters and setters are below
+
+    def get_stocks(self): # pragma: no cover
         return self.__stocks.copy()
     
-    def skipTurn(self, skip):
-        self.__skipTurn = skip
+    def set_skip_turn(self, skip): # pragma: no cover
+        self.__set_skip_turn = skip
 
-    def getSkipTurn(self):
-        return self.__skipTurn
+    def get_skip_turn(self): # pragma: no cover
+        return self.__set_skip_turn
     
-    def freePenalty(self, free):
+    def freePenalty(self, free): # pragma: no cover
         self.__freePenalty = free
 
-    def getFreePenalty(self):
+    def get_free_penalty(self): # pragma: no cover
         return self.__freePenalty
     
-    def freeMartini(self, free):
-        self.__freeMartini = free
+    def set_free_martini(self, free): # pragma: no cover
+        self.__free_martini = free
 
-    def getFreeMartini(self):
-        return self.__freeMartini
+    def get_free_martini(self): # pragma: no cover
+        return self.__free_martini
 
-    def get_balance(self):
+    def get_balance(self): # pragma: no cover
         return self.__balance
+    
+    def get_name(self): # pragma: no cover
+        return self.__playerName
+    
+    def change_balance(self, balance): # pragma: no cover
+        self.__balance += balance
+
+    def get_position(self): # pragma: no cover
+        return self.__position
+    
+    def get_old_position(self): # pragma: no cover
+        return self.__old_position
+    
+    def get_car(self): # pragma: no cover
+        return self.__car

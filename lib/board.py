@@ -102,8 +102,8 @@ class Board:
             cell.draw(screen)
 
     def draw_player_car(self, screen, player, playerNumber, totalPlayers):
-        cell = self.__cells[player.position]
-        #old_cell = self.__cells[player.old_position]
+        cell = self.__cells[player.get_position()]
+        #old_cell = self.__cells[player.get_old_position()]
 
         if (cell.angle == 0):
             car_x = cell.cell_x + 5

@@ -85,7 +85,7 @@ class GameUI:
         UILabel(title_rect, "LEADERBOARD", manager=self.manager, container=leaderboard)
         # ADDING WHO IS THE TURN
         turn_rect = pygame.Rect((position_x, 30), label_dimension)
-        self.turnName = UILabel(turn_rect, "Turno di " + currentPlayer.playerName, manager=self.manager, container=leaderboard)
+        self.turnName = UILabel(turn_rect, "Turno di " + currentPlayer.get_name(), manager=self.manager, container=leaderboard)
         # ADDING SQUARE BALANCE LABEL
         balance_rect = pygame.Rect((position_x, 50), label_dimension)
         self.squareBalanceLabel = UILabel(balance_rect, "Riserva di piazza : " + str(squareBalance), manager=self.manager, container=leaderboard)
@@ -95,14 +95,14 @@ class GameUI:
         # ADDING THE PLAYERS LABELS
         for i, player in enumerate(players): # considerare di fare una lable unica e andare a capo per ogni riga
             player_label_rect = pygame.Rect((position_x, 70 + (20 * (i + 1))), label_dimension)
-            label = UILabel(player_label_rect,  player.playerName + " : " + str(player.get_balance()) + " | " + str(player.stockValue()), manager=self.manager, container=leaderboard)
+            label = UILabel(player_label_rect,  player.get_name() + " : " + str(player.get_balance()) + " | " + str(player.stock_value()), manager=self.manager, container=leaderboard)
             self.playerLabels.append(label)
     
     def updateSquareBalanceLabel(self, squareBalance):
         self.squareBalanceLabel.set_text("Riserva di piazza : " + str(squareBalance))
 
     def updateTurnLabel(self, currentPlayer):
-        self.turnName.set_text("Turno di " + currentPlayer.playerName)
+        self.turnName.set_text("Turno di " + currentPlayer.get_name())
          
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
@@ -125,7 +125,7 @@ class GameUI:
                 position_x = WIDTH + 25 - CORNER_WIDTH - (CELL_WIDTH * 9) + (STOCKBOARD_WIDTH * (i - 3))
             # ADDING THE TITLE LABEL
             title_rect = pygame.Rect((position_x, offset + CELL_HEIGHT + (max_stock * 20)),(label_dimension))
-            nameLabel = UILabel(title_rect, player.playerName, manager=self.manager)
+            nameLabel = UILabel(title_rect, player.get_name(), manager=self.manager)
             self.stockboardLabels.append(nameLabel)
             if len(player.get_stocks()) == 0:
                 player_label_rect = pygame.Rect((position_x, offset + 20 + CELL_HEIGHT + (max_stock * 20)), label_dimension)
@@ -156,9 +156,9 @@ class GameUI:
             self.draw_stockboard(players)
 
     def updateAllPlayerLables(self, players):
-        sorted_players = sorted(players, key=lambda x: x.get_balance() + x.stockValue(), reverse=True)
+        sorted_players = sorted(players, key=lambda x: x.get_balance() + x.stock_value(), reverse=True)
         for i, player in enumerate(sorted_players):
-            self.playerLabels[i].set_text(player.playerName + " : " + str(player.get_balance()) + " | " + str(player.stockValue()))
+            self.playerLabels[i].set_text(player.get_name() + " : " + str(player.get_balance()) + " | " + str(player.stock_value()))
 
     def showStocksUi(self, stocks, title):
         self.stocks = stocks

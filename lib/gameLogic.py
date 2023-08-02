@@ -10,7 +10,7 @@ def is_double(dice):
     return dice[0] == dice[1]
 
 def buy_stock(cells, player):
-    curr_pos = player.position
+    curr_pos = player.get_position()
     stock_value = cells[curr_pos].get_stocks()[0].get_stock_value()
     if(len(cells[curr_pos].get_stocks()) > 0):
         if player.get_balance() >= stock_value:
@@ -30,7 +30,7 @@ def check_if_can_buy_stock(cell, player):
 
 def check_for_penalty(cells, players, player_number): # testare per vedere se riconosce quando le celle sono uguali
     current_player = players[player_number]
-    cell = cells[current_player.position]
+    cell = cells[current_player.get_position()]
     players = players.copy() # we copy the list in order to not modify the original one
     players.pop(player_number) # we drop the current player in order to not check him self in the for loops
     own_by_the_player = False # then we check if the player own the stock
@@ -41,7 +41,7 @@ def check_for_penalty(cells, players, player_number): # testare per vedere se ri
         for player in players:
             for stock in player.get_stocks():
                 if cell.position == stock.get_position():
-                    penality = player.computePenalty(stock)
+                    penality = player.compute_penalty(stock)
                     current_player.change_balance(-penality)
                     player.change_balance(penality)
                     break # we break in order to pay only once the fee if the player have more than one card in the same cell
@@ -52,14 +52,14 @@ def check_crash(players, player_number): # since current_player is the one that 
     players.pop(player_number)
     crash = 0
     for player in players:
-        if player.position == current_player.position:
+        if player.get_position() == current_player.get_position():
             current_player.change_balance(-CRASH_FEE)
             player.change_balance(CRASH_FEE)
             crash = 1
     return crash
 
 def check_turn(player):
-    if player.old_position > player.position:
+    if player.get_old_position() > player.get_position():
         player.change_balance(TURN_FEE)
 
 def stock_prize_logic(player):
@@ -140,14 +140,14 @@ def get_money_from_others(players, player_number, amount):
     current_player.change_balance(len(players) * amount)
 
 def check_start_pass(player, destination):
-    if player.position > destination:
+    if player.get_position() > destination:
         return True
     else:
         return False
     
 def compute_pass_amount(players, player_number, passAmount, destination):
     players = players.copy()
-    curr_player_pos = players[player_number].position
+    curr_player_pos = players[player_number].get_position()
     players.pop(player_number)
 
     totPassAmount = 0
@@ -155,15 +155,15 @@ def compute_pass_amount(players, player_number, passAmount, destination):
     for player in players:
         if (            
             (
-                curr_player_pos < player.position and
-                destination > player.position
+                curr_player_pos < player.get_position() and
+                destination > player.get_position()
             ) 
             or 
             (
                 destination < curr_player_pos and 
                 (
-                    curr_player_pos < player.position or
-                    player.position < destination
+                    curr_player_pos < player.get_position() or
+                    player.get_position() < destination
                 )
             )
         ):
