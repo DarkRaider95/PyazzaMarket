@@ -342,7 +342,7 @@ class Game:
             stock = self.board.getStockIfAvailable(effectData['stockIndex'])
             if stock is not None:
                 player.add_stock(stock)
-                player.change_balance(-stock.getOriginalValue())
+                player.change_balance(-stock.get_original_value())
             else:
                 print('BUY CASE START NEGOTIATION')
                 pass # avviare trattativa con proprietario
@@ -371,7 +371,7 @@ class Game:
             stock = self.board.getStockIfAvailable(effectData['destination'])
             if stock is not None:
                 player.add_stock(stock)
-                player.change_balance(-stock.getOriginalValue())
+                player.change_balance(-stock.get_original_value())
             else:
                 print('GOTO BUY CASE START NEGOTIATION')
                 pass #implement gui to start negotiation with owner

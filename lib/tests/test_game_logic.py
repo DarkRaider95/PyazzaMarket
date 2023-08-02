@@ -50,13 +50,13 @@ def test_buy_stock(player: Player, board: Board):
     cells = board.get_cells()
     buy_stock(cells, player)
     assert len(player.get_stocks()) == 1
-    assert player.get_stocks()[0].name == 'gled'
+    assert player.get_stocks()[0].get_name() == 'gled'
     assert len(cells[1].get_stocks()) == 1
 
     cells = board.get_cells()
     buy_stock(cells, player)
     assert (len(player.get_stocks()) == 2)
-    assert player.get_stocks()[1].name == 'gled'
+    assert player.get_stocks()[1].get_name() == 'gled'
     assert len(cells[1].get_stocks()) == 0
 
 def test_check_if_can_buy_stock(player: Player, board: Board):

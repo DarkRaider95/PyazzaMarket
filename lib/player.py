@@ -45,7 +45,7 @@ class Player:
     def compute_penalty(self, choosen_stock):
         same_color_cells = self.same_color_count(choosen_stock.color)
         if same_color_cells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
-            return choosen_stock.getPenalty()[same_color_cells - 1]
+            return choosen_stock.get_penalty()[same_color_cells - 1]
         elif same_color_cells == 2: # we check if the player own two stocks of the same company
             stocks = self.__stocks.copy() # create a copy of stocks
             
@@ -55,9 +55,9 @@ class Player:
             stocks.pop(stock_to_remove_index)
 
             for stock in stocks: # if the stock is the same return the right penalty
-                if stock.name == choosen_stock.name:
-                    return choosen_stock.getPenalty()[1]
-        return choosen_stock.getPenalty()[0] # this will return if the stock of the company is only one
+                if stock.get_name() == choosen_stock.get_name():
+                    return choosen_stock.get_penalty()[1]
+        return choosen_stock.get_penalty()[0] # this will return if the stock of the company is only one
     
     def get_stock_by_pos(self, stock_pos):
         for stock in self.__stocks:

@@ -69,14 +69,14 @@ def quotation_logic(players, board, quotation, game):
     new_quotation = quotation[0]
     for player in players:
         for stock in player.get_stocks():
-            difference = stock.updateValue(new_quotation[stock.get_index()])
+            difference = stock.update_value(new_quotation[stock.get_index()])
             player.change_balance(difference)
             game.set_square_balance(difference)
     for cell in board.get_cells():
         if cell.get_stocks() is not None:                                                                          
             cell.updateCellValue(new_quotation[cell.get_index()])
             for stock in cell.get_stocks():
-                _ = stock.updateValue(new_quotation[stock.get_index()])
+                _ = stock.update_value(new_quotation[stock.get_index()])
                 
     quotation.rotate(-1)
 
@@ -114,7 +114,7 @@ def who_owns_stock_by_name(players, stock_name):
     owners = []
     for player in players:
         for stock in player.get_stocks():
-            if stock_name == stock.name:
+            if stock_name == stock.get_name():
                 owners.append(player)
     
     return owners
@@ -184,7 +184,7 @@ def pay_money_to_others(players, player_number, amount):
 #this method is executed when an event with own some stock occurs
 def update_owner_balance(owner, stock_name, amount, each):
     for stock in owner.get_stocks():
-        if stock.name == stock_name:
+        if stock.get_name() == stock_name:
             owner.change_balance(amount)
             if each == False:
                 break

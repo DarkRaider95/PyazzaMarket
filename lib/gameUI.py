@@ -137,10 +137,10 @@ class GameUI:
                 for stock in player.get_stocks(): # considerare di fare una lable unica e andare a capo per ogni riga
                     position_y = offset + 20 + CELL_HEIGHT + (20 * count_label) + (max_stock * 20)
                     if latest_stock_position == stock.get_position():
-                        self.stockboardLabels[-1].set_text(stock.name + " 2x")
+                        self.stockboardLabels[-1].set_text(stock.get_name() + " 2x")
                     else:    
                         player_label_rect = pygame.Rect((position_x, position_y), label_dimension)
-                        stockNameLabel = UILabel(player_label_rect,  stock.name, manager=self.manager)
+                        stockNameLabel = UILabel(player_label_rect,  stock.get_name(), manager=self.manager)
                         count_label += 1
                         latest_stock_position = stock.get_position()
                         self.stockboardLabels.append(stockNameLabel)
