@@ -102,29 +102,29 @@ class Board:
             cell.draw(screen)
 
     def draw_player_car(self, screen, player, playerNumber, totalPlayers):  # pragma: no cover
-        cell = self.__cells[player.position]
+        cell = self.__cells[player.get_position()]
         #old_cell = self.__cells[player.old_position]
 
         if (cell.angle == 0):
             car_x = cell.cell_x + 5
             car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
-            player.car.rotate(90)
+            player.get_car().rotate(90)
         elif(cell.angle == -90):
             car_x = cell.cell_x + CELL_HEIGHT - ((CELL_HEIGHT // totalPlayers) * (playerNumber+1))
             car_y = cell.cell_y + 5
-            player.car.rotate(0)
+            player.get_car().rotate(0)
         elif(cell.angle == 180):
             car_x = cell.cell_x + 5
             car_y = cell.cell_y + ((CELL_HEIGHT // totalPlayers) * playerNumber)
-            player.car.rotate(-90)
+            player.get_car().rotate(-90)
         elif (cell.angle == 90):
             car_x = cell.cell_x + CELL_HEIGHT - ((CELL_HEIGHT // totalPlayers) * (playerNumber+1))
             car_y = cell.cell_y + 5
-            player.car.rotate(180)
+            player.get_car().rotate(180)
         
 
-        player.car.move(car_x, car_y)
-        player.car.draw(screen)
+        player.get_car().move(car_x, car_y)
+        player.get_car().draw(screen)
 
     def get_cell_value(self, position):  # pragma: no cover
         cell = self.__cells[position]

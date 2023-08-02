@@ -15,7 +15,7 @@ class Stock:
         self.__original_value = cellDef['value']
         self.logo = None # cellDef['logo']
         self.__position = position
-        self.name = name
+        self.__name = name
         self.__penalties = cellDef['penalty']
         self.__owner = None
         self.__new_value = self.__original_value
@@ -26,7 +26,7 @@ class Stock:
             self.fees = pygame.font.Font(None, 32)
             self.font_stock_value = pygame.font.Font(None, 100)
 
-    def draw(self):
+    def draw(self): # pragma: no cover
         #Draw stock and spaces for logo and fees
         logo_x = STOCK_WIDTH // 2 - LOGO_WIDTH // 2
         logo_y = 50 
@@ -50,36 +50,41 @@ class Stock:
             fee_price = self.fees.render(str(self.__new_penalties[i]) + " SCUDI", True, BLACK)
             self.surface.blit(fee_price, (price_x + PRICE_WIDTH - fee_price.get_width() - 10, price_y + 30 * i + 1))
 
-    def updateValue(self, new_value):
+    def update_value(self, new_value):
         self.__new_value = new_value
-        self.updatePenalties()
+        self.update_penalties()
         return self.__new_value - self.__original_value
 
-    def getOriginalValue(self):
-        return self.__original_value
-    
-    def get_stock_value(self):
-        return self.__new_value
-    
-    def get_index(self):
-        return self.__index
-    
-    def updatePenalties(self):
+    def update_penalties(self):
         self.__new_penalties = []
         for penalty in self.__penalties:
             self.__new_penalties.append(int(round((penalty / self.__original_value) * self.__new_value)))
 
-    def getPenalty(self):
+    # all the getters and setters are below
+
+    def get_original_value(self): # pragma: no cover
+        return self.__original_value
+    
+    def get_stock_value(self): # pragma: no cover
+        return self.__new_value
+    
+    def get_index(self): # pragma: no cover
+        return self.__index
+    
+    def get_penalty(self): # pragma: no cover
         return self.__new_penalties.copy() # we pass a copy so that the original list is not modified
     
-    def get_name(self):
-        return self.name
+    def get_name(self): # pragma: no cover
+        return self.__name
 
-    def set_owner(self, player):
+    def set_owner(self, player): # pragma: no cover
         self.__owner = player
 
-    def get_owner(self):
+    def get_owner(self): # pragma: no cover
         return self.__owner
     
-    def get_position(self):
+    def get_position(self): # pragma: no cover
         return self.__position
+    
+    def get_color(self): # pragma: no cover
+        return self.color
