@@ -9,7 +9,7 @@ import pygame_gui
 from collections import deque
 import time
 import random
-from .dice_overlay import dice_overlay
+from .dice_overlay import DiceOverlay
 class Game:
     def __init__(self, width, height, clock, players):
         self.clock = clock
@@ -28,7 +28,7 @@ class Game:
         self.__squareBalance = 2000
         random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
         self.new_quotation = deque(QUOTATION) # this function create a ring list that work using rotate()
-        self.dice_overlay = dice_overlay(self.gameUI, self)
+        self.dice_overlay = DiceOverlay(self)
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -359,14 +359,17 @@ class Game:
     def get_players(self): # pragma: no cover
         return self.__players.copy()
     
-    def get_square_balance(self):
+    def get_square_balance(self): # pragma: no cover
         return self.__squareBalance
     
-    def get_current_player(self):
+    def get_current_player(self): # pragma: no cover
         return self.__players[self.__current_player_index]
     
-    def get_current_player_index(self):
+    def get_current_player_index(self): # pragma: no cover
         return self.__current_player_index
     
-    def set_current_player_index(self, index):
+    def set_current_player_index(self, index): # pragma: no cover
         self.__current_player_index = index
+
+    def get_gameUI(self): # pragma: no cover
+        return self.gameUI

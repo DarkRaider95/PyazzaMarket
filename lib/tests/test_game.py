@@ -16,14 +16,15 @@ class FakeEvent:
         self.type = event_type
         self.ui_element = ui_element
 
+# check if we can remove drawdices, drawleaderboard and drawstockboard
 @pytest.fixture
 def game() -> Game:
     players = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
     game = Game(WIDTH, HEIGHT, clock, players)
-    game.gameUI.drawDices()
-    game.gameUI.draw_actions_ui()
-    game.gameUI.draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get__current_player_index()])
-    game.gameUI.draw_stockboard(game.get_players())
+    game.get_gameUI().drawDices()
+    game.get_gameUI().draw_actions_ui()
+    game.get_gameUI().draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get_current_player_index()])
+    game.get_gameUI().draw_stockboard(game.get_players())
 
     return game
 
@@ -31,14 +32,14 @@ def game() -> Game:
 def game_after_launch_dice(monkeypatch: MonkeyPatch) -> Game:
     players = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
     game = Game(WIDTH, HEIGHT, clock, players)
-    game.gameUI.drawDices()
-    game.gameUI.draw_actions_ui()
-    game.gameUI.draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get__current_player_index()])
-    game.gameUI.draw_stockboard(game.get_players())
+    game.get_gameUI().drawDices()
+    game.get_gameUI().draw_actions_ui()
+    game.get_gameUI().draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get_current_player_index()])
+    game.get_gameUI().draw_stockboard(game.get_players())
 
     monkeypatch.setattr('lib.game.roll', lambda: (1, 3))
 
-    game.manage_events(FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.gameUI.launchDice))
+    game.manage_events(FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().launchDice))
 
     return game
 
@@ -55,7 +56,7 @@ def test_launch_dice(game: Game, monkeypatch: MonkeyPatch):
     #in this case we have roll that it is inside gameLogic.py, we need to mock it but it is called inside game.py
     #so we need to mock lib.game.roll and not lib.gameLogic.roll
     #because game.py has a copy of roll inside
-    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.gameUI.launchDice)
+    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().launchDice)
     player = game.get_players()[0]
 
     monkeypatch.setattr('lib.game.roll', lambda: (1, 5))
@@ -63,14 +64,14 @@ def test_launch_dice(game: Game, monkeypatch: MonkeyPatch):
     game.manage_events(fakeEvent)     
 
     assert player.get_position() == 6
-    assert game.gameUI.launchDice.is_enabled == False
-    assert game.gameUI.passButton.is_enabled == True
-    assert game.gameUI.buyButton.is_enabled == True
-    assert game.gameUI.showStocks.is_enabled == False
+    assert game.get_gameUI().launchDice.is_enabled == False
+    assert game.get_gameUI().passButton.is_enabled == True
+    assert game.get_gameUI().buyButton.is_enabled == True
+    assert game.get_gameUI().showStocks.is_enabled == False
 
 # later we will need to test turn
 def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):    
-    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.gameUI.launchDice)
+    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().launchDice)
     player = game.get_players()[0]
 
     monkeypatch.setattr('lib.game.roll', lambda: (1, 1))
@@ -78,10 +79,10 @@ def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):
     game.manage_events(fakeEvent)     
 
     assert player.get_position() == 2
-    assert game.gameUI.launchDice.is_enabled == False
-    assert game.gameUI.passButton.is_enabled == False
-    assert game.gameUI.buyButton.is_enabled == True
-    assert game.gameUI.showStocks.is_enabled == False
+    assert game.get_gameUI().launchDice.is_enabled == False
+    assert game.get_gameUI().passButton.is_enabled == False
+    assert game.get_gameUI().buyButton.is_enabled == True
+    assert game.get_gameUI().showStocks.is_enabled == False
 
 def test_buy_button(game_after_launch_dice: Game):
     fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.gameUI.buyButton)
@@ -102,4 +103,4 @@ def test_pass_button(game_after_launch_dice: Game):
     assert game_after_launch_dice.gameUI.passButton.is_enabled == False
     assert game_after_launch_dice.gameUI.buyButton.is_enabled == False
     assert game_after_launch_dice.gameUI.showStocks.is_enabled == False
-    assert game_after_launch_dice.get__current_player_index() == 1
+    assert game_after_launch_dice.get_current_player_index() == 1
