@@ -308,7 +308,7 @@ class GameUI:
 
     def drawAlert(self, message):
         surface = pygame.Rect(((WIDTH - ALERT_WIDTH) // 2, (HEIGHT - ALERT_HEIGHT) // 2), (ALERT_WIDTH, ALERT_HEIGHT))
-        self.alertUi = UIPanel(surface, starting_height=2, manager=self.manager)
+        self.alertUi = UIPanel(surface, starting_height=3, manager=self.manager)
 
         message_rect = pygame.Rect(((ALERT_WIDTH - ALERT_MESSAGE_WIDTH) // 2, (ALERT_HEIGHT - ALERT_MESSAGE_HEIGHT - 20) // 2), (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT))
         UILabel(message_rect, message, manager=self.manager, container=self.alertUi)

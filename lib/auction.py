@@ -19,6 +19,7 @@ class Auction:
         self.lowerBid = None        
         self.bids = None
         self.stock = None
+        self.__finished = False
 
     def start_auction(self, start_price, bidders, stock):
         self.startPrice = start_price
@@ -45,21 +46,26 @@ class Auction:
         highest_bid_rect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH // 2, 50), (AUCTION_UI_TITLE_WIDTH, AUCTION_UI_TITLE_HEIGHT))
         self.currentHighestBid = UILabel(highest_bid_rect, "L'offerta più alta è di "+ currBidderName, manager=self.manager, container=self.auctionUI)
 
-        current_bidder_text = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH - 20, AUCTION_UI_HEIGHT // 2, AUCTION_BID_TEXT_WIDTH), (AUCTION_UI_TITLE_WIDTH, AUCTION_UI_TITLE_HEIGHT))
-        self.currentBidderText = UILabel(highest_bid_rect, "Offerta di "+ currBidderName+ ":", manager=self.manager, container=self.auctionUI)
+        current_bidder_rect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH - 20, AUCTION_UI_HEIGHT // 2), (AUCTION_UI_TITLE_WIDTH, AUCTION_UI_TITLE_HEIGHT))
+        self.currentBidderText = UILabel(current_bidder_rect, "Offerta di "+ currBidderName+ ":", manager=self.manager, container=self.auctionUI)
 
 
-        bid_text_rect = pygame.Rect(WIDTH // 2 - AUCTION_BID_TEXT_WIDTH // 2, AUCTION_UI_HEIGHT // 2, AUCTION_BID_TEXT_WIDTH, AUCTION_BID_TEXT_HEIGHT)
-        self.currentBidText = UITextEntryLine(relative_rect=bid_text_rect,
-                                                manager=self.manager,
-                                                object_id="AUCTION_BID_TEXT",
-                                                initial_text=str(self.startPrice))
+        #bid_text_rect = pygame.Rect((WIDTH // 2 - AUCTION_BID_TEXT_WIDTH, AUCTION_UI_HEIGHT // 2), (AUCTION_BID_TEXT_WIDTH, AUCTION_BID_TEXT_HEIGHT))
+        bid_text_rect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_BID_TEXT_WIDTH // 2, AUCTION_UI_HEIGHT // 2), (AUCTION_BID_TEXT_WIDTH, AUCTION_BID_TEXT_HEIGHT))
+        self.currentBidText = UILabel(bid_text_rect, str(self.startPrice), manager=self.manager, container=self.auctionUI)
+        #self.currentBidText = UITextEntryLine(relative_rect=bid_text_rect,
+        #                                        manager=self.manager,
+        #                                        object_id="AUCTION_BID_TEXT",
+        #                                        initial_text=str(self.startPrice))
 
         raiseBidRect = pygame.Rect((bid_text_rect.x + AUCTION_BID_TEXT_WIDTH + 30, AUCTION_UI_HEIGHT // 2), (AUCTION_RL_BID_BUT_WIDTH, AUCTION_RL_BID_BUT_HEIGHT))
         lowerBidRect = pygame.Rect((bid_text_rect.x + AUCTION_BID_TEXT_WIDTH + AUCTION_RL_BID_BUT_WIDTH + 30, AUCTION_UI_HEIGHT // 2), (AUCTION_RL_BID_BUT_WIDTH, AUCTION_RL_BID_BUT_HEIGHT))
-        bidRect = pygame.Rect((AUCTION_UI_WIDTH // 3 - AUCTION_UI_BUT_WIDTH, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
-        nextRect = pygame.Rect((AUCTION_UI_WIDTH // 3 * 2 - AUCTION_UI_BUT_WIDTH, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
-        retireRect = pygame.Rect((AUCTION_UI_WIDTH - AUCTION_UI_WIDTH // 3 - AUCTION_UI_BUT_WIDTH, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
+        bidRect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_BUT_WIDTH * 1.5, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
+        nextRect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_BUT_WIDTH // 2, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
+        retireRect = pygame.Rect((AUCTION_UI_WIDTH // 2  + AUCTION_UI_BUT_WIDTH // 2, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
+        #bidRect = pygame.Rect((AUCTION_UI_WIDTH // 3 - AUCTION_UI_BUT_WIDTH, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
+        #nextRect = pygame.Rect((AUCTION_UI_WIDTH // 3 * 2 - AUCTION_UI_BUT_WIDTH, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
+        #retireRect = pygame.Rect((AUCTION_UI_WIDTH - AUCTION_UI_WIDTH // 3 - AUCTION_UI_BUT_WIDTH, AUCTION_UI_HEIGHT // 2 + 100), (AUCTION_UI_BUT_WIDTH, AUCTION_UI_BUT_HEIGHT))
 
         self.raiseBid = UIButton(relative_rect=raiseBidRect,
                                 text="+",
@@ -98,35 +104,40 @@ class Auction:
         else:
             rounded_number = self.currentBid + (10 - remainder)
 
-        self.currentBidText.text = str(rounded_number)
+        #self.currentBidText.text = str(rounded_number)
+        self.currentBidText.set_text(str(rounded_number))
         self.currentBid = rounded_number
 
     def raise_bid(self):
         self.currentBid += 10
-        self.currentBidText.text = str(self.currentBid)
+        #self.currentBidText.text = str(self.currentBid)
+        self.currentBidText.set_text(str(self.currentBid))
         
     def lower_bid(self):
         self.currentBid -= 10
-        self.currentBidText.text = str(self.currentBid)
+        #self.currentBidText.text = str(self.currentBid)
+        self.currentBidText.set_text(str(self.currentBid))
 
     def bid_but(self):
-        self.currentHighestBid.text = "L'offerta più alta è di "+ self.bidders[self.currentBidder].get_name()
+        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.bidders[self.currentBidder].get_name())
         self.round_text_bid()
         self.bids[self.currentBidder] = self.currentBid
         self.currentBidder = (self.currentBidder +  1) % len(self.bidders)
-        self.currentBidderText.text = "Offerta di "+ self.bidders[self.currentBidder].get_name()
+        self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
         
     def pass_bid(self):
         self.currentBidder = (self.currentBidder +  1) % len(self.bidders)
-        self.currentBidderText.text = "Offerta di "+ self.bidders[self.currentBidder].get_name()
+        self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
     
     def retire_auction(self):
         nextBidder = (self.currentBidder +  1) % len(self.bidders)
         self.bidders.pop(self.currentBidder)
         self.currentBidder = nextBidder
-        self.currentBidderText.text = "Offerta di "+ self.bidders[nextBidder].get_name()
+        self.currentBidderText.set_text("Offerta di "+ self.bidders[nextBidder].get_name())
         maxBidIndex = self.find_max_bid()
-        self.currentHighestBid.text = "L'offerta più alta è di "+ self.bidders[maxBidIndex].get_name()
+        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.bidders[maxBidIndex].get_name())
+        if len(self.bidders) == 1:
+            self.finished = True
     
     def find_max_bid(self):
         max_value = self.bids[0]
@@ -137,3 +148,6 @@ class Auction:
                 max_index = i
 
         return max_index
+    
+    def is_finished(self):
+        return self.__finished

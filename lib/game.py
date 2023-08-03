@@ -1,4 +1,6 @@
 import pygame
+
+from lib.auction import Auction
 from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
 from .board import Board
 from .player import Player
@@ -32,6 +34,7 @@ class Game:
         self.highestScore = 0 # we save the score for deciding which is the play with the highest score that will start first
         self.firstPlayerIndex = 0 # we save the index of the player that will start first
         self.firstPlayerStarted = True # we check if the all the players have throw the dices for decide who will start first
+        self.auction = None
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -183,7 +186,7 @@ class Game:
                 self.gameUI.showStocks.enable()
             elif event.ui_element == self.gameUI.eventBut:
                 curr_player = self.__players[self.currentPlayer]
-                self.eventsLogic(curr_player)
+                self.events_logic(curr_player)
                 self.gameUI.closeEventUi()
                 self.screen.fill(BLACK)
                 self.gameUI.drawDices()
@@ -224,7 +227,7 @@ class Game:
                         self.establish_players_order = False
                 else:
                     # amount is the amount of money that the player has to pay or receive
-                    score, amount = chance_logic(self.get_players[self.currentPlayer], self.__squareBalance)
+                    score, amount = chance_logic(self.get_players()[self.currentPlayer], self.__squareBalance)
                     self.gameUI.updateDiceOverlay(score)
                     if self.__squareBalance + amount < 0:
                         self.__squareBalance == 0
@@ -232,8 +235,28 @@ class Game:
                         self.__squareBalance += amount
                     self.gameUI.updateDice(score)
                     self.gameUI.updateSquareBalanceLabel(self.__squareBalance)
+            elif self.auction is not None: 
+                self.manage_auction_events(event)
             else:
                 print("Evento non gestito")
+    
+    def manage_auction_events(self, event):
+        if event.ui_element == self.auction.raiseBid:
+            self.auction.raise_bid()
+        elif event.ui_element == self.auction.lowerBid:
+            self.auction.lower_bid()
+        elif event.ui_element == self.auction.bidBut:
+            self.auction.bid_but()
+        elif event.ui_element == self.auction.nextBidder:
+            self.auction.pass_bid()
+        elif event.ui_element == self.auction.retireAutction:
+            self.auction.retire_auction()
+            if self.auction.is_finished():
+                self.auctionUI.kill()
+                self.screen.fill(BLACK)
+                self.gameUI.drawDices()
+                self.gameUI.updateAllPlayerLables(self.get_players())
+                self.gameUI.renableActions()
 
     def enableBuyButton(self, cell, player):
         if check_if_can_buy_stock(cell, player):
@@ -253,6 +276,9 @@ class Game:
             stock_prize_logic(player)
         elif cell.cellType == QUOTATION_TYPE:
             quotation_logic(self.get_players(), self.board, self.new_quotation, self)
+            self.auction = Auction(self.gameUI.manager, self.screen)
+            players = self.get_players()
+            self.auction.start_auction(100, players, players[0].get_stocks()[0])
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.get_availble_stocks()
             self.gameUI.disableActions()
@@ -270,7 +296,7 @@ class Game:
 
         #return disablePassButton
         
-    def eventsLogic(self, player):
+    def events_logic(self, player):
         event = self.events[0]
         
         if event.evenType == COLOR_EVENT:
@@ -319,7 +345,7 @@ class Game:
             else:
                 player.change_balance(effectData['amount'])
         elif event.evenType == GO_EVENT:
-            self.goEventLogic(player, event)
+            self.go_event_logic(player, event)
         elif event.evenType == PAY_EVENT:
             effectData = event.effectData
 
@@ -354,7 +380,7 @@ class Game:
         self.events.rotate(-1)
 
 
-    def goEventLogic(self, player, event):
+    def go_event_logic(self, player, event):
         effectData = event.effectData
 
         if effectData['startCheck']:
