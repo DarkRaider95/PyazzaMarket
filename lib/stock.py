@@ -10,7 +10,7 @@ class Stock:
         "5 Cedole della stesso colore",
         "6 Cedole della stesso colore",
     ]
-    def __init__(self, cellDef, position, name, enableGraphics):
+    def __init__(self, cellDef, position, name, enable_graphics):
         self.color = cellDef['color']
         self.__original_value = cellDef['value']
         self.logo = None # cellDef['logo']
@@ -21,7 +21,7 @@ class Stock:
         self.__new_value = self.__original_value
         self.__index = cellDef['index']
         self.__new_penalties = self.__penalties
-        if enableGraphics:
+        if enable_graphics:
             self.surface = pygame.Surface((STOCK_WIDTH, STOCK_HEIGHT))
             self.fees = pygame.font.Font(None, 32)
             self.font_stock_value = pygame.font.Font(None, 100)

@@ -36,6 +36,7 @@ To do list funzionalità:
         - gestire tiro pari
 - aggiungere lunghezza massima nome giocatore
 - add requirements.txt
+- fix the two line to draw in stock
 
 To do list codice:
 - fare getters and setters
