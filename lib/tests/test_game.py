@@ -22,7 +22,7 @@ def game() -> Game:
     game = Game(WIDTH, HEIGHT, clock, players)
     game.gameUI.drawDices()
     game.gameUI.draw_actions_ui()
-    game.gameUI.draw_leaderboard(game.get_players(), 2000, game.get_players()[game.currentPlayer])
+    game.gameUI.draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get__current_player_index()])
     game.gameUI.draw_stockboard(game.get_players())
 
     return game
@@ -33,7 +33,7 @@ def game_after_launch_dice(monkeypatch: MonkeyPatch) -> Game:
     game = Game(WIDTH, HEIGHT, clock, players)
     game.gameUI.drawDices()
     game.gameUI.draw_actions_ui()
-    game.gameUI.draw_leaderboard(game.get_players(), 2000, game.get_players()[game.currentPlayer])
+    game.gameUI.draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get__current_player_index()])
     game.gameUI.draw_stockboard(game.get_players())
 
     monkeypatch.setattr('lib.game.roll', lambda: (1, 3))
@@ -102,4 +102,4 @@ def test_pass_button(game_after_launch_dice: Game):
     assert game_after_launch_dice.gameUI.passButton.is_enabled == False
     assert game_after_launch_dice.gameUI.buyButton.is_enabled == False
     assert game_after_launch_dice.gameUI.showStocks.is_enabled == False
-    assert game_after_launch_dice.currentPlayer == 1
+    assert game_after_launch_dice.get__current_player_index() == 1
