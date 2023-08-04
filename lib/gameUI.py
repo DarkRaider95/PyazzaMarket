@@ -151,7 +151,7 @@ class GameUI:
             for label in self.stockboardLabels:
                 label.kill()
             self.screen.fill(BLACK)
-            dice.drawDices()
+            dice.draw_dices()
             self.stockboardLabels = []
             self.draw_stockboard(players)
 
@@ -366,7 +366,7 @@ class GameUI:
         return diceSurface
 
     def updateDiceOverlay(self, score):
-        self.updateDice(score)
+        self.update_dice(score)
         self.diceOverlayImg.set_image(self.createDiceSurface(self.twoDices))
         self.launchOverlayDiceBut.disable()
         self.closeDiceOverlayBut.enable()
@@ -378,11 +378,11 @@ class GameUI:
         self.updateStockboard(players, time.time(), dice)
         self.renableActions()
 
-    def drawDices(self):
+    def draw_dices(self):
         surface = self.createDiceSurface()
         self.screen.blit(surface, (DICE_SURFACE_X, DICE_SURFACE_Y))
 
-    def updateDice(self, score): # score is a tuple from roll in gameLogic
+    def update_dice(self, score): # score is a tuple from roll in gameLogic
         scoreToImage = [{"score": 1, "image": DICE_1},{"score": 2, "image": DICE_2},{"score": 3, "image": DICE_3},{"score": 4, "image": DICE_4},{"score": 5, "image": DICE_5},{"score": 6, "image": DICE_6}]
         for scoreImage in scoreToImage:
             if(scoreImage["score"] == score[0]):
@@ -392,4 +392,4 @@ class GameUI:
                 self.image_dice_2 = pygame.image.load(scoreImage["image"])
                 self.image_dice_2 = pygame.transform.scale(self.image_dice_2, (DICE_WIDTH, DICE_HEIGHT))
             
-        self.drawDices()
+        self.draw_dices()

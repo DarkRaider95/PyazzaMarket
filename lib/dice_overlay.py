@@ -11,6 +11,7 @@ class DiceOverlay:
         self.__second_round_who_start = [] # we save the players that have the same score for decide who will start first
         self.__copy_of_second_round_who_start = [] # we need a copy in order to pop players from the list, and we don't want to modify the original list
         self.__establish_player_again = False # this will be true in case of two or more player score the same number
+        self.__test = self.__game.get_test()
 
     def launch_but_pressed(self): # pragma: no cover
         # when you throw the dices maybe you are deciding the order of the players
@@ -24,7 +25,7 @@ class DiceOverlay:
             score, amount = chance_logic(self.__game.get_current_player(), self.__game.get_square_balance())
             self.__gameUI.updateDiceOverlay(score)
             self.__game.set_square_balance(amount)
-            self.__gameUI.updateDice(score)
+            self.__gameUI.update_dice(score)
 
     def establish_players_order(self): # pragma: no cover
         self.roll_dice()
@@ -37,7 +38,8 @@ class DiceOverlay:
             self.last_player_logic()
 
     def roll_dice(self):
-        score = roll()
+        dice = self.__game.get_test_dice()
+        score = roll(self.__test, dice)
         self.__gameUI.updateDiceOverlay(score)
         diceSum = score[0] + score[1]
         if self.__highestScore < diceSum:
@@ -85,3 +87,6 @@ class DiceOverlay:
     
     def get_second_round_who_start(self): # pragma: no cover
         return self.__second_round_who_start.copy()
+    
+    def overlay_on(self):
+        return self.__establishing_players_order or self.__establish_player_again

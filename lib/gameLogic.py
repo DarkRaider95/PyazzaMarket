@@ -1,9 +1,14 @@
 import random
 from .constants import *
 
-def roll():
-    dice1 = random.randint(1, 6)
-    dice2 = random.randint(1, 6)
+def roll(test = False, dice = (0,0)):
+    if test:
+        dice1 = dice[0]
+        dice2 = dice[1]
+    else:
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+
     return (dice1, dice2)
 
 def is_double(dice):

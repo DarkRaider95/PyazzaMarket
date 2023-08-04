@@ -13,7 +13,7 @@ clock = pygame.time.Clock()
 @pytest.fixture
 def game() -> Game:
     game = Game(WIDTH, HEIGHT, clock, [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}])
-    game.get_gameUI().drawDices()
+    game.get_gameUI().draw_dices()
     game.get_gameUI().draw_actions_ui()
     game.get_gameUI().drawDiceOverlay(game.get_current_player().get_name() + ' tira dadi', 'Decisione turni')
     return game
@@ -24,23 +24,23 @@ def diceOverlay(game: Game) -> DiceOverlay:
     return diceOverlay
 
 def test_roll_dice(diceOverlay: DiceOverlay, monkeypatch: MonkeyPatch, game: Game):
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda: (1, 3))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (1, 3))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 0
     assert diceOverlay.get_hihgest_score() == 4
     game.set_current_player_index(1)
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda: (2, 3))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (2, 3))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 1
     assert diceOverlay.get_hihgest_score() == 5
 
 def test_roll_dice_double(diceOverlay: DiceOverlay, monkeypatch: MonkeyPatch, game: Game):
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda: (2, 2))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (2, 2))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 0
     assert diceOverlay.get_hihgest_score() == 4
     game.set_current_player_index(1)
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda: (2, 2))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (2, 2))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 0
     assert diceOverlay.get_hihgest_score() == 4

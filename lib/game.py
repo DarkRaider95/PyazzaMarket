@@ -11,7 +11,7 @@ import time
 import random
 from .dice_overlay import DiceOverlay
 class Game:
-    def __init__(self, width, height, clock, players):
+    def __init__(self, width, height, clock, players, test=False):
         self.clock = clock
         self.width = width
         self.height = height
@@ -28,6 +28,8 @@ class Game:
         self.__squareBalance = 2000
         random.shuffle(QUOTATION) # this function do an inplace shuffle to QUOTATION
         self.new_quotation = deque(QUOTATION) # this function create a ring list that work using rotate()
+        self.__test = test # used to input the dice value in the test
+        self.__test_dice = (0,0) # used when the game is running in test mode
         self.dice_overlay = DiceOverlay(self)
 
         Player.last_stock_update = time.time()
@@ -38,7 +40,7 @@ class Game:
 
     def start(self): # pragma: no cover
         self.board.draw(self.screen)
-        self.gameUI.drawDices()
+        self.gameUI.draw_dices()
         self.gameUI.draw_actions_ui()
         self.gameUI.draw_leaderboard(self.get_players(), self.__squareBalance, self.__players[self.__current_player_index])
         self.gameUI.draw_stockboard(self.get_players())
@@ -79,8 +81,8 @@ class Game:
         #disablePassButton = False
         self.gameUI.launchDice.disable()
         self.gameUI.passButton.enable()
-        score = roll()
-        self.gameUI.updateDice(score)
+        score = roll(self.__test, self.__test_dice)
+        self.gameUI.update_dice(score)
         #is double
         if is_double(score):
             self.gameUI.passButton.disable()
@@ -154,7 +156,7 @@ class Game:
             elif event.ui_element == self.gameUI.closeStock: # pragma: no cover                     
                 self.gameUI.closeStockUi()
                 self.screen.fill(BLACK)
-                self.gameUI.drawDices()
+                self.gameUI.draw_dices()
                 self.gameUI.renableActions()
             elif event.ui_element == self.gameUI.chooseBut: # pragma: no cover
                 curr_player = self.__players[self.__current_player_index]
@@ -164,7 +166,7 @@ class Game:
                 self.board.remove_stock(chosen_stock)
                 self.gameUI.closeStockUi()
                 self.screen.fill(BLACK)
-                self.gameUI.drawDices()
+                self.gameUI.draw_dices()
                 self.gameUI.updateAllPlayerLables(self.get_players())
                 self.gameUI.renableActions()
             elif event.ui_element == self.gameUI.chooseMoveBut: # pragma: no cover
@@ -175,7 +177,7 @@ class Game:
                 self.enableBuyButton(curr_cell, curr_player)
                 self.gameUI.closeStockUi()
                 self.screen.fill(BLACK)
-                self.gameUI.drawDices()
+                self.gameUI.draw_dices()
                 self.gameUI.passButton.enable()
                 self.gameUI.showStocks.enable()
             elif event.ui_element == self.gameUI.eventBut: # pragma: no cover
@@ -183,7 +185,7 @@ class Game:
                 self.eventsLogic(curr_player)
                 self.gameUI.closeEventUi()
                 self.screen.fill(BLACK)
-                self.gameUI.drawDices()
+                self.gameUI.draw_dices()
                 self.gameUI.updateAllPlayerLables(self.get_players())
                 self.gameUI.renableActions()
             elif event.ui_element == self.gameUI.buyAnyBut: # pragma: no cover
@@ -200,6 +202,45 @@ class Game:
                 self.dice_overlay.launch_but_pressed()
             else: # pragma: no cover
                 print("Evento non gestito")
+        elif event.type == pygame.KEYDOWN and self.__test:
+            if event.key == pygame.K_0: #or pygame.K_KP0:
+                self.set_test_dice(0)
+                print("Test dice set to 0")
+            elif event.key == pygame.K_1: #or pygame.K_KP1:
+                self.set_test_dice(1)
+            elif event.key == pygame.K_2: #or pygame.K_KP2:
+                self.set_test_dice(2)
+            elif event.key == pygame.K_3: #or pygame.K_KP3:
+                self.set_test_dice(3)
+            elif event.key == pygame.K_4: #or pygame.K_KP4:
+                self.set_test_dice(4)
+            elif event.key == pygame.K_5: #or pygame.K_KP5:
+                self.set_test_dice(5)
+            elif event.key == pygame.K_6: #or pygame.K_KP6:
+                self.set_test_dice(6)
+            elif event.key == pygame.K_7: #or pygame.K_KP7:
+                self.set_test_dice(7)
+            elif event.key == pygame.K_8: #or pygame.K_KP8:
+                self.set_test_dice(8)
+            elif event.key == pygame.K_9: #or pygame.K_KP9:
+                self.set_test_dice(9)
+            elif event.key == pygame.K_SPACE:
+                self.__test_dice = (0, 0)
+                self.gameUI.update_dice((1,1))
+            elif event.key == pygame.K_RETURN:
+                if self.dice_overlay.overlay_on():
+                    self.dice_overlay.launch_but_pressed()
+                else:
+                    self.turn()
+                self.__test_dice = (0, 0)
+                self.gameUI.update_dice((1,1))
+
+    def set_test_dice(self, value):
+        if self.__test_dice[0] == 0:
+            self.__test_dice = (value,0)
+        elif self.__test_dice[1] == 0:
+            self.__test_dice = (self.__test_dice[0], value)
+            self.gameUI.update_dice(self.__test_dice)
 
     def enableBuyButton(self, cell, player): # pragma: no cover
         if check_if_can_buy_stock(cell, player):
@@ -373,3 +414,9 @@ class Game:
 
     def get_gameUI(self): # pragma: no cover
         return self.gameUI
+    
+    def get_test(self): # pragma: no cover
+        return self.__test
+    
+    def get_test_dice(self): # pragma: no cover
+        return self.__test_dice

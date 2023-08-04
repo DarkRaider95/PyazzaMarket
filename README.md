@@ -36,7 +36,11 @@ To do list funzionalità:
         - gestire tiro pari
 - aggiungere lunghezza massima nome giocatore
 - add requirements.txt
+- aggiungere un logger
+
+To fix:
 - fix the two line to draw in stock
+- fix doppio prima di casella combi
 
 To do list codice:
 - fare getters and setters
