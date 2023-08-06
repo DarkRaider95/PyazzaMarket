@@ -1,4 +1,6 @@
 import pygame
+
+from lib.auction import Auction
 from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
 from .board import Board
 from .player import Player
@@ -182,7 +184,7 @@ class Game:
                 self.gameUI.showStocks.enable()
             elif event.ui_element == self.gameUI.eventBut: # pragma: no cover
                 curr_player = self.__players[self.__current_player_index]
-                self.eventsLogic(curr_player)
+                self.events_logic(curr_player)
                 self.gameUI.closeEventUi()
                 self.screen.fill(BLACK)
                 self.gameUI.draw_dices()
@@ -200,6 +202,8 @@ class Game:
                 self.dice_overlay.close_dice_overlay()
             elif event.ui_element == self.gameUI.launchOverlayDiceBut: # pragma: no cover
                 self.dice_overlay.launch_but_pressed()
+            elif self.auction is not None: 
+                self.manage_auction_events(event)
             else: # pragma: no cover
                 print("Evento non gestito")
         elif event.type == pygame.KEYDOWN and self.__test:
@@ -234,6 +238,24 @@ class Game:
                     self.turn()
                 self.__test_dice = (0, 0)
                 self.gameUI.update_dice((1,1))
+    
+    def manage_auction_events(self, event):
+        if event.ui_element == self.auction.raiseBid:
+            self.auction.raise_bid()
+        elif event.ui_element == self.auction.lowerBid:
+            self.auction.lower_bid()
+        elif event.ui_element == self.auction.bidBut:
+            self.auction.bid_but()
+        elif event.ui_element == self.auction.nextBidder:
+            self.auction.pass_bid()
+        elif event.ui_element == self.auction.retireAutction:
+            self.auction.retire_auction()
+            if self.auction.is_finished():
+                self.auctionUI.kill()
+                self.screen.fill(BLACK)
+                self.gameUI.drawDices()
+                self.gameUI.updateAllPlayerLables(self.get_players())
+                self.gameUI.renableActions()
 
     def set_test_dice(self, value):
         if self.__test_dice[0] == 0:
@@ -260,6 +282,9 @@ class Game:
             stock_prize_logic(player)
         elif cell.cellType == QUOTATION_TYPE:
             quotation_logic(self.get_players(), self.board, self.new_quotation, self)
+            self.auction = Auction(self.gameUI.manager, self.screen)
+            players = self.get_players()
+            self.auction.start_auction(100, players, players[0].get_stocks()[0])
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.get_availble_stocks()
             self.gameUI.disableActions()
@@ -277,7 +302,7 @@ class Game:
 
         #return disablePassButton
         
-    def eventsLogic(self, player): # pragma: no cover
+    def events_logic(self, player):
         event = self.events[0]
         
         if event.evenType == COLOR_EVENT:
@@ -326,7 +351,7 @@ class Game:
             else:
                 player.change_balance(effectData['amount'])
         elif event.evenType == GO_EVENT:
-            self.goEventLogic(player, event)
+            self.go_event_logic(player, event)
         elif event.evenType == PAY_EVENT:
             effectData = event.effectData
 
@@ -361,7 +386,7 @@ class Game:
         self.events.rotate(-1)
 
 
-    def goEventLogic(self, player, event): # pragma: no cover
+    def go_event_logic(self, player, event):
         effectData = event.effectData
 
         if effectData['startCheck']:
