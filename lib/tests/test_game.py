@@ -37,7 +37,7 @@ def game_after_launch_dice(monkeypatch: MonkeyPatch) -> Game:
     game.get_gameUI().draw_leaderboard(game.get_players(), 2000, game.get_players()[game.get_current_player_index()])
     game.get_gameUI().draw_stockboard(game.get_players())
 
-    monkeypatch.setattr('lib.game.roll', lambda x: (1, 3))
+    monkeypatch.setattr('lib.game.roll', lambda x,y: (1, 3))
 
     game.manage_events(FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().launchDice))
 
@@ -59,7 +59,7 @@ def test_launch_dice(game: Game, monkeypatch: MonkeyPatch):
     fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().launchDice)
     player = game.get_players()[0]
 
-    monkeypatch.setattr('lib.game.roll', lambda x: (1, 5))
+    monkeypatch.setattr('lib.game.roll', lambda x,y: (1, 5))
 
     game.manage_events(fakeEvent)     
 
@@ -74,7 +74,7 @@ def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):
     fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().launchDice)
     player = game.get_players()[0]
 
-    monkeypatch.setattr('lib.game.roll', lambda x: (1, 1))
+    monkeypatch.setattr('lib.game.roll', lambda x,y: (1, 1))
 
     game.manage_events(fakeEvent)     
 

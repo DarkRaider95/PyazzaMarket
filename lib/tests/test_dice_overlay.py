@@ -24,23 +24,23 @@ def diceOverlay(game: Game) -> DiceOverlay:
     return diceOverlay
 
 def test_roll_dice(diceOverlay: DiceOverlay, monkeypatch: MonkeyPatch, game: Game):
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (1, 3))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x,y: (1, 3))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 0
     assert diceOverlay.get_hihgest_score() == 4
     game.set_current_player_index(1)
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (2, 3))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x,y: (2, 3))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 1
     assert diceOverlay.get_hihgest_score() == 5
 
 def test_roll_dice_double(diceOverlay: DiceOverlay, monkeypatch: MonkeyPatch, game: Game):
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (2, 2))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x,y: (2, 2))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 0
     assert diceOverlay.get_hihgest_score() == 4
     game.set_current_player_index(1)
-    monkeypatch.setattr('lib.dice_overlay.roll', lambda x: (2, 2))
+    monkeypatch.setattr('lib.dice_overlay.roll', lambda x,y: (2, 2))
     diceOverlay.roll_dice()
     assert diceOverlay.get_who_will_start() == 0
     assert diceOverlay.get_hihgest_score() == 4
