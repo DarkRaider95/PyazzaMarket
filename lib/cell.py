@@ -48,11 +48,15 @@ class Cell:
         pygame.draw.rect(self.surface, self.color, colorrect)
 
         #Draw stock price
-        stock_price = self.font_stock_value.render("  "+ str(self.__new_value) + "\nSCUDI", True, BLACK)
+        stock_price = self.font_stock_value.render( str(self.__new_value), True, BLACK)
         price_x = (CELL_WIDTH - (CELL_WIDTH // 2)) - (stock_price.get_width() // 2)
-        price_y = cell_color_y - stock_price.get_height() - 10
+        price_y = cell_color_y - stock_price.get_height() - 30
         self.surface.blit(stock_price, (price_x, price_y))
 
+        scudi_text = self.font_stock_value.render("SCUDI", True, BLACK)
+        scudi_x = (CELL_WIDTH - (CELL_WIDTH // 2)) - (scudi_text.get_width() // 2)
+        scudi_y = cell_color_y - scudi_text.get_height() - 10
+        self.surface.blit(scudi_text, (scudi_x, scudi_y))
         surfaceRotated = None
 
         if(self.angle != 0):        

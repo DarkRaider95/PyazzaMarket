@@ -113,7 +113,7 @@ class Game:
         #case special cell
         else:
             #disablePassButton = self.specialCellLogic(cell, curr_player)
-            self.specialCellLogic(cell, curr_player)
+            self.special_cell_logic(cell, curr_player)
 
         self.gameUI.updateAllPlayerLables(self.get_players())
         
@@ -180,8 +180,9 @@ class Game:
                 self.gameUI.closeStockUi()
                 self.screen.fill(BLACK)
                 self.gameUI.draw_dices()
-                self.gameUI.passButton.enable()
-                self.gameUI.showStocks.enable()
+                #self.gameUI.passButton.enable()
+                #self.gameUI.showStocks.enable()
+                self.gameUI.renableActions()
             elif event.ui_element == self.gameUI.eventBut: # pragma: no cover
                 curr_player = self.__players[self.__current_player_index]
                 self.events_logic(curr_player)
@@ -200,6 +201,9 @@ class Game:
                 self.gameUI.closeAlert(self.get_players(), self.gameUI)
             elif event.ui_element == self.gameUI.closeDiceOverlayBut:  # pragma: no cover
                 self.dice_overlay.close_dice_overlay()
+                if not self.dice_overlay.overlay_on():
+                    self.__current_player_index = self.dice_overlay.get_who_will_start()
+                    self.gameUI.updateTurnLabel(self.__players[self.__current_player_index])
             elif event.ui_element == self.gameUI.launchOverlayDiceBut: # pragma: no cover
                 self.dice_overlay.launch_but_pressed()
             elif self.auction is not None: 
@@ -232,12 +236,13 @@ class Game:
                 self.__test_dice = (0, 0)
                 self.gameUI.update_dice((1,1))
             elif event.key == pygame.K_RETURN:
-                if self.dice_overlay.overlay_on():
-                    self.dice_overlay.launch_but_pressed()
-                else:
-                    self.turn()
-                self.__test_dice = (0, 0)
-                self.gameUI.update_dice((1,1))
+                if self.__test_dice != (0, 0):
+                    if self.dice_overlay.overlay_on():
+                        self.dice_overlay.launch_but_pressed()
+                    else:
+                        self.turn()
+                    self.__test_dice = (0, 0)
+                    self.gameUI.update_dice((1,1))
     
     def manage_auction_events(self, event):
         if event.ui_element == self.auction.raiseBid:
@@ -270,7 +275,7 @@ class Game:
         else:
             self.gameUI.buyButton.disable()
 
-    def specialCellLogic(self, cell, player): # pragma: no cover
+    def special_cell_logic(self, cell, player): # pragma: no cover
         #disablePassButton = False
 
         if cell.cellType == START_TYPE:

@@ -72,7 +72,7 @@ class DiceOverlay:
             self.__gameUI.drawDiceOverlay(self.__game.get_current_player().get_name() + ' tira dadi', 'Decisione turni')
         elif self.__establishing_players_order:
             self.__gameUI.closeDiceOverlay(self.__game.get_players(), self.__gameUI)
-            self.__game.set_current_player_index((self.__game.get_current_player_index() + 1) % len(self.__game.get_players())) 
+            self.__game.set_current_player_index((self.__game.get_current_player_index() + 1) % len(self.__game.get_players()))
             self.__gameUI.updateTurnLabel(self.__game.get_current_player())
             self.__gameUI.drawDiceOverlay(self.__game.get_current_player().get_name() + ' tira dadi', 'Decisione turni')
         else:

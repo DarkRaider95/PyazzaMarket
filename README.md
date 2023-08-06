@@ -41,6 +41,7 @@ To do list funzionalità:
 To fix:
 - fix the two line to draw in stock
 - fix doppio prima di casella combi
+- asta no offerte per il giocatore che vende
 
 To do list codice:
 - fare getters and setters
