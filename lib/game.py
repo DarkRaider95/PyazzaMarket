@@ -1,17 +1,18 @@
 import pygame
 
 from lib.auction import Auction
-from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
-from .board import Board
-from .player import Player
-from .gameUI import GameUI
-from .event import Event
-from .gameLogic import *
+from lib.constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
+from lib.board import Board
+from lib.player import Player
+from lib.gameUI import GameUI
+from lib.event import Event
+from lib.gameLogic import *
 import pygame_gui
 from collections import deque
 import time
 import random
-from .dice_overlay import DiceOverlay
+from lib.dice_overlay import DiceOverlay
+
 class Game:
     def __init__(self, width, height, clock, players, test=False):
         self.clock = clock

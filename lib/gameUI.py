@@ -1,7 +1,7 @@
 import pygame
 from pygame_gui import UIManager
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIImage
-from .constants import *
+from lib.constants import *
 import time
 
 # Inizializzazione della finestra di gioco
