@@ -1,10 +1,11 @@
 import pygame
 
 from lib.auction import Auction
+from lib.uiComponents.showStockUI import ShowStockUI
 from .constants import FPS, WIDTH, HEIGHT, CHOOSE_STOCK_TYPE, FREE_STOP_TYPE, CHANCE_TYPE, QUOTATION
 from .board import Board
 from .player import Player
-from .gameUI import GameUI
+from .uiComponents.gameUI import GameUI
 from .event import Event
 from .gameLogic import *
 import pygame_gui
@@ -33,6 +34,8 @@ class Game:
         self.__test = test # used to input the dice value in the test
         self.__test_dice = (0,0) # used when the game is running in test mode
         self.dice_overlay = DiceOverlay(self)
+        self.auction = None
+        self.showStockUI = None
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -125,6 +128,8 @@ class Game:
             #disablePassButton = self.specialCellLogic(cell, curr_player)
 
     def manage_events(self, event):
+        curr_player = self.__players[self.__current_player_index]
+
         if event.type == pygame.QUIT:
             self.running = False
 
@@ -132,69 +137,29 @@ class Game:
             if event.ui_element == self.gameUI.launchDice:                        
                 self.turn()
             elif event.ui_element == self.gameUI.buyButton:
-                curr_player = self.__players[self.__current_player_index]
                 buy_stock(self.board.get_cells(), curr_player)
                 self.gameUI.updateAllPlayerLables(self.get_players())
                 self.gameUI.buyButton.disable()
-                self.gameUI.enableShowStockButton(self.__players[self.__current_player_index])
+                self.gameUI.enableShowStockButton(curr_player)
             elif event.ui_element == self.gameUI.passButton:
                 self.__current_player_index = (self.__current_player_index + 1) % len(self.get_players())
+                curr_player = self.__players[self.__current_player_index]
                 self.set_skip_turn()
-                self.gameUI.updateTurnLabel(self.__players[self.__current_player_index])
+                self.gameUI.updateTurnLabel(curr_player)
                 self.gameUI.launchDice.enable()
                 self.gameUI.passButton.disable()
                 self.gameUI.buyButton.disable()
-                self.gameUI.enableShowStockButton(self.__players[self.__current_player_index])
+                self.gameUI.enableShowStockButton(curr_player)
             elif event.ui_element == self.gameUI.showStocks: # pragma: no cover
-                curr_player = self.__players[self.__current_player_index]
                 self.gameUI.disableActions()
-                self.gameUI.showStocksUi(curr_player.get_stocks(), 'Le cedole di '+curr_player.get_name())
-            elif event.ui_element == self.gameUI.nextStock: # pragma: no cover
-                curr_player = self.__players[self.__current_player_index]
-                self.gameUI.showNextStock()
-            elif event.ui_element == self.gameUI.previousStock: # pragma: no cover
-                curr_player = self.__players[self.__current_player_index]
-                self.gameUI.showPreviousStock()
-            elif event.ui_element == self.gameUI.closeStock: # pragma: no cover                     
-                self.gameUI.closeStockUi()
-                self.screen.fill(BLACK)
-                self.gameUI.draw_dices()
-                self.gameUI.renableActions()
-            elif event.ui_element == self.gameUI.chooseBut: # pragma: no cover
-                curr_player = self.__players[self.__current_player_index]
-                chosen_stock = self.gameUI.getShowedStock()
-                curr_player.add_stock(chosen_stock)
-                curr_player.change_balance(-chosen_stock.get_stock_value())
-                self.board.remove_stock(chosen_stock)
-                self.gameUI.closeStockUi()
-                self.screen.fill(BLACK)
-                self.gameUI.draw_dices()
-                self.gameUI.updateAllPlayerLables(self.get_players())
-                self.gameUI.renableActions()
-            elif event.ui_element == self.gameUI.chooseMoveBut: # pragma: no cover
-                curr_player = self.__players[self.__current_player_index]
-                chosen_stock = self.gameUI.getShowedStock()
-                curr_cell = self.board.get_cell(chosen_stock.get_position())
-                curr_player.set_position(chosen_stock.get_position())
-                self.enableBuyButton(curr_cell, curr_player)
-                self.gameUI.closeStockUi()
-                self.screen.fill(BLACK)
-                self.gameUI.draw_dices()
-                #self.gameUI.passButton.enable()
-                #self.gameUI.showStocks.enable()
-                self.gameUI.renableActions()
+                self.showStockUI = ShowStockUI(self, self.gameUI, self.screen)
+                self.showStockUI.show_stocks_ui(curr_player.get_stocks(), 'Le cedole di '+curr_player.get_name())
             elif event.ui_element == self.gameUI.eventBut: # pragma: no cover
                 curr_player = self.__players[self.__current_player_index]
                 self.events_logic(curr_player)
                 self.gameUI.closeEventUi()
                 self.screen.fill(BLACK)
                 self.gameUI.draw_dices()
-                self.gameUI.updateAllPlayerLables(self.get_players())
-                self.gameUI.renableActions()
-            elif event.ui_element == self.gameUI.buyAnyBut: # pragma: no cover
-                chosen_stock = self.gameUI.getShowedStock()
-                curr_player = self.__players[self.__current_player_index]
-                transfer_stock(self.board, curr_player, chosen_stock)
                 self.gameUI.updateAllPlayerLables(self.get_players())
                 self.gameUI.renableActions()
             elif event.ui_element == self.gameUI.closeAlertBut: # pragma: no cover
@@ -208,6 +173,8 @@ class Game:
                 self.dice_overlay.launch_but_pressed()
             elif self.auction is not None: 
                 self.manage_auction_events(event)
+            elif self.showStockUI is not None:
+                self.showStockUI.manage_stock_events(event, self.get_players(), curr_player)
             else: # pragma: no cover
                 print("Evento non gestito")
         elif event.type == pygame.KEYDOWN and self.__test:
@@ -276,7 +243,6 @@ class Game:
             self.gameUI.buyButton.disable()
 
     def special_cell_logic(self, cell, player): # pragma: no cover
-        #disablePassButton = False
 
         if cell.cellType == START_TYPE:
             start_logic(player)        
@@ -293,19 +259,17 @@ class Game:
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.get_availble_stocks()
             self.gameUI.disableActions()
-            self.gameUI.showMoveToStock(stocks, 'Scegli su quale cedola vuoi spostarti')
-            #disablePassButton = True
-        elif cell.cellType == SIX_HUNDRED_TYPE:
-            six_hundred_logic(player)
+            self.showStockUI = ShowStockUI(self, self.gameUI, self.screen)
+            self.showStockUI.show_move_to_stock(stocks, 'Scegli su quale cedola vuoi spostarti')            
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.board.get_purchasable_stocks(player.get_balance())
             self.gameUI.disableActions()
-            self.gameUI.showChooseStock(stocks, 'Scegli quale vuoi comprare')
-            #disablePassButton = True
+            self.showStockUI = ShowStockUI(self, self.gameUI, self.screen)
+            self.showStockUI.show_choose_stock(stocks, 'Scegli quale vuoi comprare')
+        elif cell.cellType == SIX_HUNDRED_TYPE:
+            six_hundred_logic(player)                
         elif cell.cellType == CHANCE_TYPE:
             self.gameUI.drawDiceOverlay(self.__players[self.__current_player_index].get_name() + ' tira dadi', 'Riserva monetaria', False)
-
-        #return disablePassButton
         
     def events_logic(self, player):
         event = self.events[0]
@@ -318,7 +282,8 @@ class Game:
                 if p != player:
                     stocks.extend(player.get_stocks())
             self.gameUI.disableActions()
-            self.gameUI.showBuyAnythingStock(stocks, 'Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)')            
+            self.showStockUI = ShowStockUI(self, self.gameUI, self.screen)
+            self.showStockUI.show_buy_anything_stock(stocks, 'Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)')
         elif event.evenType == STOP_1:
             player.set_skip_turn(True)
         elif event.evenType == FREE_PENALTY:
