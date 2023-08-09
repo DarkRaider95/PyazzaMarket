@@ -85,22 +85,22 @@ def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):
     assert game.get_gameUI().showStocks.is_enabled == False
 
 def test_buy_button(game_after_launch_dice: Game):
-    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.gameUI.buyButton)
+    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.__gameUI.buyButton)
 
     game_after_launch_dice.manage_events(fakeEvent)     
 
-    assert game_after_launch_dice.gameUI.launchDice.is_enabled == False
-    assert game_after_launch_dice.gameUI.passButton.is_enabled == True
-    assert game_after_launch_dice.gameUI.buyButton.is_enabled == False
-    assert game_after_launch_dice.gameUI.showStocks.is_enabled == True
+    assert game_after_launch_dice.__gameUI.launchDice.is_enabled == False
+    assert game_after_launch_dice.__gameUI.passButton.is_enabled == True
+    assert game_after_launch_dice.__gameUI.buyButton.is_enabled == False
+    assert game_after_launch_dice.__gameUI.showStocks.is_enabled == True
 
 def test_pass_button(game_after_launch_dice: Game):
-    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.gameUI.passButton)
+    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.__gameUI.passButton)
 
     game_after_launch_dice.manage_events(fakeEvent)     
 
-    assert game_after_launch_dice.gameUI.launchDice.is_enabled == True
-    assert game_after_launch_dice.gameUI.passButton.is_enabled == False
-    assert game_after_launch_dice.gameUI.buyButton.is_enabled == False
-    assert game_after_launch_dice.gameUI.showStocks.is_enabled == False
+    assert game_after_launch_dice.__gameUI.launchDice.is_enabled == True
+    assert game_after_launch_dice.__gameUI.passButton.is_enabled == False
+    assert game_after_launch_dice.__gameUI.buyButton.is_enabled == False
+    assert game_after_launch_dice.__gameUI.showStocks.is_enabled == False
     assert game_after_launch_dice.get_current_player_index() == 1

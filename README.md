@@ -37,6 +37,7 @@ To do list funzionalità:
 - aggiungere lunghezza massima nome giocatore
 - add requirements.txt
 - aggiungere un logger
+- aggiungere aggiornamento bottoni basato su timestamp
 
 To fix:
 - fix the two line to draw in stock

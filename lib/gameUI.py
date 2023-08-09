@@ -15,7 +15,7 @@ class GameUI:
         self.clock = clock
         # Create something similar to pygame.display.set_mode((WIDTH, HEIGHT))
         self.manager = UIManager((WIDTH, HEIGHT))
-        self.buyButton = None
+        #self.buyButton = None
         self.playerLabels = []
         self.closeStock = None
         self.chooseMoveBut = None

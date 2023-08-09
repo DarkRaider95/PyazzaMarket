@@ -1,7 +1,7 @@
 import pygame
 import pytest
-from .constants import *
-from .cell import Cell
+from lib.constants import *
+from lib.cell import Cell
 
 class Board:
     
