@@ -35,6 +35,7 @@ class Game:
         self.__test_dice = (0,0) # used when the game is running in test mode
         self.dice_overlay = DiceOverlay(self)
         self.__auctions = []
+        self.currentAuction = None
         self.showStockUI = None
         self.listShowStockToAuction = []
 
@@ -172,9 +173,9 @@ class Game:
                     self.gameUI.updateTurnLabel(self.__players[self.__current_player_index])
             elif event.ui_element == self.gameUI.launchOverlayDiceBut: # pragma: no cover
                 self.dice_overlay.launch_but_pressed()
-            elif self.auction is not None: 
+            elif self.currentAuction is not None: 
                 self.manage_auction_events(event)
-            elif self.showStockUI is not None or len(self.listShowStockToAuction) > 0:
+            elif self.showStockUI is not None:
                 self.showStockUI.manage_stock_events(event, self.get_players(), curr_player)
             else: # pragma: no cover
                 print("Evento non gestito")
@@ -213,22 +214,30 @@ class Game:
                     self.gameUI.update_dice((1,1))
     
     def manage_auction_events(self, event):
-        if event.ui_element == self.auction.raiseBid:
-            self.auction.raise_bid()
-        elif event.ui_element == self.auction.lowerBid:
-            self.auction.lower_bid()
-        elif event.ui_element == self.auction.bidBut:
-            self.auction.bid_but()
-        elif event.ui_element == self.auction.nextBidder:
-            self.auction.pass_bid()
-        elif event.ui_element == self.auction.retireAutction:
-            self.auction.retire_auction()
-            if self.auction.is_finished():
-                self.auctionUI.kill()
-                self.screen.fill(BLACK)
-                self.gameUI.drawDices()
-                self.gameUI.updateAllPlayerLables(self.get_players())
-                self.gameUI.renableActions()
+        if event.ui_element == self.currentAuction.raiseBid:
+            self.currentAuction.raise_bid()
+        elif event.ui_element == self.currentAuction.lowerBid:
+            self.currentAuction.lower_bid()
+        elif event.ui_element == self.currentAuction.bidBut:
+            self.currentAuction.bid_but()
+        elif event.ui_element == self.currentAuction.nextBidder:
+            self.currentAuction.pass_bid()
+        elif event.ui_element == self.currentAuction.retireAuction:
+            self.currentAuction.retire_auction()
+            if self.currentAuction.is_finished():
+                #if there are other auctions open next otherwise close it
+                if len(self.__auctions) > 0:
+                    self.currentAuction.auctionUI.kill()
+                    self.screen.fill(BLACK)
+                    self.currentAuction = self.__auctions.pop(0)
+                    self.currentAuction.start_auction()
+                else:
+                    self.currentAuction.auctionUI.kill()
+                    self.currentAuction = None
+                    self.screen.fill(BLACK)
+                    self.gameUI.updateAllPlayerLables(self.get_players())
+                    self.gameUI.renableActions()
+                
 
     def set_test_dice(self, value):
         if self.__test_dice[0] == 0:
@@ -395,12 +404,12 @@ class Game:
         player.set_position(effectData['destination'])
 
     def add_auction(self, player, stock):
-        players = filter(lambda obj: obj.get_name() == player.get_name(), players)
-        self.__auctions.append(Auction(self.gameUI.manager, self.screen, players, stock))
+        players = filter(lambda obj: obj.get_name() == player.get_name(), self.get_players())
+        self.__auctions.append(Auction(self.gameUI.manager, self.screen, player, players, stock))
 
     def start_first_auction(self):
-        auction = self.__auctions.pop(0)
-        auction.start_auction()
+        self.currentAuction = self.__auctions.pop(0)
+        self.currentAuction.start_auction()
 
     def set_square_balance(self, new_balance): # pragma: no cover
         self.__squareBalance += new_balance

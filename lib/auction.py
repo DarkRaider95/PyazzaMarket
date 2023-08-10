@@ -4,7 +4,7 @@ from .constants import *
 
 class Auction:
 
-    def __init__(self, manager, screen, bidders, stock):
+    def __init__(self, manager, screen, owner, bidders, stock):
         self.startPrice = 0
         self.endPrice = 0
         self.currentBid = 0
@@ -13,7 +13,8 @@ class Auction:
         self.manager = manager
         self.screen = screen
         self.nextBidder = None
-        self.retireAutction = None
+        self.owner = owner
+        self.retireAuction = None
         self.bidBut = None
         self.raiseBid = None
         self.lowerBid = None        
@@ -21,6 +22,7 @@ class Auction:
         self.stock = stock
         self.__finished = False
         self.bidders = bidders
+        self.winner = None
 
     def start_auction(self):
         self.startPrice = self.stock.get_new_value()
@@ -90,7 +92,7 @@ class Auction:
                                 object_id = 'PASS_BID',
                                 manager=self.manager)
         
-        self.retireAutction = UIButton(relative_rect=retireRect,
+        self.retireAuction = UIButton(relative_rect=retireRect,
                                 text="RITIRATI",
                                 container=self.auctionUI,
                                 object_id = 'RETIRE_AUCTION',
@@ -129,14 +131,18 @@ class Auction:
         self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
     
     def retire_auction(self):
-        nextBidder = (self.currentBidder +  1) % len(self.bidders)
+        
         self.bidders.pop(self.currentBidder)
-        self.currentBidder = nextBidder
-        self.currentBidderText.set_text("Offerta di "+ self.bidders[nextBidder].get_name())
+        #the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
+        if(self.currentBidder == len(self.bidders) - 1):                        
+            self.currentBidder = 0
+
+        self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
         maxBidIndex = self.find_max_bid()
         self.currentHighestBid.set_text("L'offerta più alta è di "+ self.bidders[maxBidIndex].get_name())
         if len(self.bidders) == 1:
             self.finished = True
+            self.winner = self.bidders[0]
     
     def find_max_bid(self):
         max_value = self.bids[0]
