@@ -34,8 +34,9 @@ class Game:
         self.__test = test # used to input the dice value in the test
         self.__test_dice = (0,0) # used when the game is running in test mode
         self.dice_overlay = DiceOverlay(self)
-        self.auction = None
+        self.__auctions = []
         self.showStockUI = None
+        self.listShowStockToAuction = []
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -173,7 +174,7 @@ class Game:
                 self.dice_overlay.launch_but_pressed()
             elif self.auction is not None: 
                 self.manage_auction_events(event)
-            elif self.showStockUI is not None:
+            elif self.showStockUI is not None or len(self.listShowStockToAuction) > 0:
                 self.showStockUI.manage_stock_events(event, self.get_players(), curr_player)
             else: # pragma: no cover
                 print("Evento non gestito")
@@ -253,14 +254,21 @@ class Game:
             stock_prize_logic(player)
         elif cell.cellType == QUOTATION_TYPE:
             quotation_logic(self.get_players(), self.board, self.new_quotation, self)
-            self.auction = Auction(self.gameUI.manager, self.screen)
-            players = self.get_players()
-            self.auction.start_auction(100, players, players[0].get_stocks()[0])
+            
+            #create one showStockToAuction for every player that has a stock
+            for player in self.get_players():
+                #if they have stock I have to create panel to show stock
+                if len(player.get_stocks()) > 0:
+                    self.listShowStockToAuction.append(ShowStockUI(self, self.gameUI, self.screen, player))                    
+
+            showStock = self.listShowStockToAuction.pop(0)
+            self.showStockUI = showStock
+            showStock.show_choose_stock_to_auction()            
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.board.get_availble_stocks()
             self.gameUI.disableActions()
             self.showStockUI = ShowStockUI(self, self.gameUI, self.screen)
-            self.showStockUI.show_move_to_stock(stocks, 'Scegli su quale cedola vuoi spostarti')            
+            self.showStockUI.show_move_to_stock(stocks, 'Scegli su quale cedola vuoi spostarti')
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.board.get_purchasable_stocks(player.get_balance())
             self.gameUI.disableActions()
@@ -385,6 +393,14 @@ class Game:
             player.change_balance(effectData['get'])
 
         player.set_position(effectData['destination'])
+
+    def add_auction(self, player, stock):
+        players = filter(lambda obj: obj.get_name() == player.get_name(), players)
+        self.__auctions.append(Auction(self.gameUI.manager, self.screen, players, stock))
+
+    def start_first_auction(self):
+        auction = self.__auctions.pop(0)
+        auction.start_auction()
 
     def set_square_balance(self, new_balance): # pragma: no cover
         self.__squareBalance += new_balance

@@ -4,7 +4,7 @@ from .constants import *
 
 class Auction:
 
-    def __init__(self, manager, screen):
+    def __init__(self, manager, screen, bidders, stock):
         self.startPrice = 0
         self.endPrice = 0
         self.currentBid = 0
@@ -18,16 +18,15 @@ class Auction:
         self.raiseBid = None
         self.lowerBid = None        
         self.bids = None
-        self.stock = None
-        self.__finished = False
-
-    def start_auction(self, start_price, bidders, stock):
-        self.startPrice = start_price
-        self.currentBid = start_price
-        self.bidders = bidders
-        self.currentBidder = 0
-        self.bids = [0] * len(bidders)
         self.stock = stock
+        self.__finished = False
+        self.bidders = bidders
+
+    def start_auction(self):
+        self.startPrice = self.stock.get_new_value()
+        self.currentBid = self.stock.get_new_value()
+        self.currentBidder = 0
+        self.bids = [0] * len(self.bidders)
 
         self.draw_auction()
 

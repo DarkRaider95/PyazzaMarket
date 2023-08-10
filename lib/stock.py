@@ -88,3 +88,6 @@ class Stock:
     
     def get_color(self): # pragma: no cover
         return self.color
+    
+    def get_new_value(self): # pragma: no cover
+        return self.__new_value

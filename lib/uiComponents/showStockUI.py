@@ -1,11 +1,12 @@
 import pygame
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIImage
+from lib.auction import Auction
 
 from lib.gameLogic import transfer_stock
 from ..constants import *
 
 class ShowStockUI:
-    def __init__(self, game, gameUI, screen):
+    def __init__(self, game, gameUI, screen, player = None):
         self.game = game
         self.gameUI = gameUI
         self.screen = screen
@@ -17,7 +18,8 @@ class ShowStockUI:
         self.nextStock = None
         self.previousStock = None
         self.stockToAuction = None
-        self.stocks = None        
+        self.stocks = None
+        self.player = player
 
     def show_stocks_ui(self, stocks, title):
         self.stocks = stocks
@@ -36,10 +38,10 @@ class ShowStockUI:
                                 object_id = 'BUY_ANYTHING',
                                 manager=self.manager)
         
-    def show_choose_stock_to_auction(self, stocks, title):
-        self.stocks = stocks
+    def show_choose_stock_to_auction(self):
+        self.stocks = self.player.get_stocks()
         self.showedStock = 0
-        self.draw_stock_ui(title, False)
+        self.draw_stock_ui("Cedole di" + self.get_name()+ "cosa vuoi mettere all'asta", False)
         stockRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.stockToAuction = UIButton(relative_rect=stockRect,
@@ -157,8 +159,23 @@ class ShowStockUI:
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
             self.gameUI.renableActions()
-        elif event.ui_element == self.gameUI.buyAnyBut: # pragma: no cover
+        elif event.ui_element == self.buyAnyBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             transfer_stock(self.game.board, currPlayer, chosen_stock)
             self.gameUI.updateAllPlayerLables(players)
             self.gameUI.renableActions()
+        elif event.ui_element == self.stockToAuction:
+            #if there are still some showStockToAuction I have to show another one and create the auction object
+            if len(self.game.listShowStockToAuction) > 0:
+                self.game.add_auction(self.player, self.get_showed_stock())                
+                self.close_stock_ui()
+                self.screen.fill(BLACK)
+                showStock = self.game.listShowStockToAuction.pop(0)
+                self.game.showStockUI = showStock
+                showStock.show_choose_stock_to_auction()
+            else: # I have to start the auctions if the showStockToAuction are finished
+                self.game.add_auction(self.player, self.get_showed_stock())                
+                self.close_stock_ui()
+                self.screen.fill(BLACK)                
+                self.game.showStockUI = None
+                self.game.start_first_auction()                
