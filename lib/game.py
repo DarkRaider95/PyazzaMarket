@@ -460,7 +460,7 @@ class Game:
     def set_square_balance(self, new_balance):  # pragma: no cover
         self.__square_balance += new_balance
         if self.__square_balance < 0:
-            self.__square_balance == 0
+            self.__square_balance = 0
         self.__gameUI.updateSquareBalanceLabel(self.__square_balance)
 
     def get_players(self):  # pragma: no cover

@@ -1,6 +1,9 @@
-from .constants import INITIAL_BALANCE
-from .car import Car
+from lib.constants import INITIAL_BALANCE
+from lib.car import Car
 import time
+from typing import Optional
+from lib.stock import Stock
+
 class Player:
     last_stock_update = None
 
@@ -63,7 +66,7 @@ class Player:
                     return choosen_stock.get_penalty()[1]
         return choosen_stock.get_penalty()[0] # this will return if the stock of the company is only one
     
-    def get_stock_by_pos(self, stock_pos):
+    def get_stock_by_pos(self, stock_pos) -> Optional[Stock]:
         for stock in self.__stocks:
             if stock.get_position() == stock_pos:
                 return stock
