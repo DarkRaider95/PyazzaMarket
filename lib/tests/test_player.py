@@ -11,11 +11,11 @@ def board() -> Board:
 
 @pytest.fixture
 def player() -> Player:
-    return Player('test', CAR_RED)
+    return Player('test', CAR_RED, False)
 
 @pytest.fixture
 def player_with_same_stocks() -> Player:
-    player = Player('test', CAR_RED)
+    player = Player('test', CAR_RED, False)
     player.move(1)
     board = Board(enableGraphics = False)
     cells = board.get_cells()
@@ -26,7 +26,7 @@ def player_with_same_stocks() -> Player:
 
 @pytest.fixture
 def player_with_different_stocks() -> Player:
-    player = Player('test', CAR_RED)
+    player = Player('test', CAR_RED, False)
     player.move(1)
     board = Board(enableGraphics = False)
     cells = board.get_cells()

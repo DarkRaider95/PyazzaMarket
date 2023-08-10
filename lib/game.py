@@ -33,7 +33,7 @@ class Game:
         self.__test = test  # used to input the dice value in the test
         self.__test_dice = (0, 0)  # used when the game is running in test mode
         self.__gui = gui
-        self.__current_player_index = 0 
+        self.__current_player_index = 0
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -46,7 +46,7 @@ class Game:
 
         Player.last_stock_update = time.time()
         for player in players:
-            self.__players.append(Player(player["name"], player["color"]))
+            self.__players.append(Player(player["name"], player["color"], player["bot"]))
 
 
     def start(self):  # pragma: no cover
@@ -69,7 +69,7 @@ class Game:
         while self.running:
             self.clock.tick(FPS)
 
-            if self.__current_player_index == 1:
+            if self.__players[self.__current_player_index].get_is_bot():
                 self.__bot.play()
 
             for event in pygame.event.get():
@@ -124,7 +124,7 @@ class Game:
         # case cell with stock
         if cell.cellType == STOCKS_TYPE:
             # curr_player.move(10)
-            self.enableBuyButton(cell, curr_player)
+            self.enable_buy_button(cell, curr_player)
             # we need to create a copy of the list in order to perform some edit of the list later
             check_for_penalty(self.board.get_cells(), self.get_players(), self.__current_player_index)
         # case special cell
@@ -154,7 +154,7 @@ class Game:
                 buy_stock(self.board.get_cells(), curr_player)
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.__actions_status.set_buy_property(False)
-                self.__gameUI.enableShowStockButton(self.__players[self.__current_player_index])
+                self.__actions_status.enable_show_stock(self.__players[self.__current_player_index])
             elif event.ui_element == self.__gameUI.passButton:
                 self.__current_player_index = (self.__current_player_index + 1) % len(self.get_players())
                 self.set_skip_turn()
@@ -162,7 +162,7 @@ class Game:
                 self.__actions_status.set_throw_dices(True)
                 self.__actions_status.set_pass_turn(False)
                 self.__actions_status.set_buy_property(False)
-                self.__gameUI.enableShowStockButton(self.__players[self.__current_player_index])
+                self.__actions_status.enable_show_stock(self.__players[self.__current_player_index])
             elif event.ui_element == self.__gameUI.showStocks:  # pragma: no cover
                 curr_player = self.__players[self.__current_player_index]
                 self.disable_actions()
@@ -194,7 +194,7 @@ class Game:
                 chosen_stock = self.__gameUI.getShowedStock()
                 curr_cell = self.board.get_cell(chosen_stock.get_position())
                 curr_player.set_position(chosen_stock.get_position())
-                self.enableBuyButton(curr_cell, curr_player)
+                self.enable_buy_button(curr_cell, curr_player)
                 self.__gameUI.closeStockUi()
                 self.screen.fill(BLACK)
                 self.__gameUI.draw_dices()
@@ -288,7 +288,7 @@ class Game:
             self.__test_dice = (self.__test_dice[0], value)
             self.__gameUI.update_dice(self.__test_dice)
 
-    def enableBuyButton(self, cell, player):  # pragma: no cover
+    def enable_buy_button(self, cell, player):  # pragma: no cover
         if check_if_can_buy_stock(cell, player):
             self.__actions_status.set_buy_property(True)
         else:

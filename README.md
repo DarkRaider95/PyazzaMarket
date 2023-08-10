@@ -50,7 +50,7 @@ To do list codice:
 - sistemtare la grafica
     - responsive
     - usare valori negativi dove possibile
-- unit test
+- ~~ unit test ~~
 
 To do extra:
 - funzionalità di rete

@@ -19,7 +19,7 @@ class FakeEvent:
 # check if we can remove drawdices, drawleaderboard and drawstockboard
 @pytest.fixture
 def game() -> Game:
-    players = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
+    players = [{"name":"Player1", "color": CAR_RED, "bot": False}, {"name":"Player2", "color": CAR_BLACK, "bot": False}]
     game = Game(WIDTH, HEIGHT, clock, players)
     game.get_gameUI().draw_dices()
     game.get_gameUI().draw_actions_ui()
@@ -30,7 +30,7 @@ def game() -> Game:
 
 @pytest.fixture
 def game_after_launch_dice(monkeypatch: MonkeyPatch) -> Game:
-    players = [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}]
+    players = [{"name":"Player1", "color": CAR_RED, "bot": False}, {"name":"Player2", "color": CAR_BLACK, "bot": False}]
     game = Game(WIDTH, HEIGHT, clock, players)
     game.get_gameUI().draw_dices()
     game.get_gameUI().draw_actions_ui()
@@ -64,10 +64,10 @@ def test_launch_dice(game: Game, monkeypatch: MonkeyPatch):
     game.manage_events(fakeEvent)     
 
     assert player.get_position() == 6
-    assert game.get_gameUI().launchDice.is_enabled == False
-    assert game.get_gameUI().passButton.is_enabled == True
-    assert game.get_gameUI().buyButton.is_enabled == True
-    assert game.get_gameUI().showStocks.is_enabled == False
+    assert game.get_actions_status().get_throw_dices() == False
+    assert game.get_actions_status().get_pass_turn() == True
+    assert game.get_actions_status().get_buy_property() == True
+    assert game.get_actions_status().get_show_stock() == False
 
 # later we will need to test turn
 def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):    
@@ -79,28 +79,28 @@ def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):
     game.manage_events(fakeEvent)     
 
     assert player.get_position() == 2
-    assert game.get_gameUI().launchDice.is_enabled == False
-    assert game.get_gameUI().passButton.is_enabled == False
-    assert game.get_gameUI().buyButton.is_enabled == True
-    assert game.get_gameUI().showStocks.is_enabled == False
+    assert game.get_actions_status().get_throw_dices() == True
+    assert game.get_actions_status().get_pass_turn() == False
+    assert game.get_actions_status().get_buy_property() == True
+    assert game.get_actions_status().get_show_stock() == False
 
 def test_buy_button(game_after_launch_dice: Game):
-    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.__gameUI.buyButton)
+    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.get_gameUI().buyButton)
 
     game_after_launch_dice.manage_events(fakeEvent)     
 
-    assert game_after_launch_dice.__gameUI.launchDice.is_enabled == False
-    assert game_after_launch_dice.__gameUI.passButton.is_enabled == True
-    assert game_after_launch_dice.__gameUI.buyButton.is_enabled == False
-    assert game_after_launch_dice.__gameUI.showStocks.is_enabled == True
+    assert game_after_launch_dice.get_actions_status().get_throw_dices() == False
+    assert game_after_launch_dice.get_actions_status().get_pass_turn() == True
+    assert game_after_launch_dice.get_actions_status().get_buy_property() == False
+    assert game_after_launch_dice.get_actions_status().get_show_stock() == True
 
 def test_pass_button(game_after_launch_dice: Game):
-    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.__gameUI.passButton)
+    fakeEvent = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game_after_launch_dice.get_gameUI().passButton)
 
     game_after_launch_dice.manage_events(fakeEvent)     
 
-    assert game_after_launch_dice.__gameUI.launchDice.is_enabled == True
-    assert game_after_launch_dice.__gameUI.passButton.is_enabled == False
-    assert game_after_launch_dice.__gameUI.buyButton.is_enabled == False
-    assert game_after_launch_dice.__gameUI.showStocks.is_enabled == False
+    assert game_after_launch_dice.get_actions_status().get_throw_dices() == True
+    assert game_after_launch_dice.get_actions_status().get_pass_turn() == False
+    assert game_after_launch_dice.get_actions_status().get_buy_property() == False
+    assert game_after_launch_dice.get_actions_status().get_show_stock() == False
     assert game_after_launch_dice.get_current_player_index() == 1

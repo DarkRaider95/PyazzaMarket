@@ -12,7 +12,7 @@ clock = pygame.time.Clock()
 
 @pytest.fixture
 def game() -> Game:
-    game = Game(WIDTH, HEIGHT, clock, [{"name":"Player1", "color": CAR_RED}, {"name":"Player2", "color": CAR_BLACK}])
+    game = Game(WIDTH, HEIGHT, clock, [{"name":"Player1", "color": CAR_RED, "bot":False}, {"name":"Player2", "color": CAR_BLACK, "bot":False}])
     game.get_gameUI().draw_dices()
     game.get_gameUI().draw_actions_ui()
     game.get_gameUI().drawDiceOverlay(game.get_current_player().get_name() + ' tira dadi', 'Decisione turni')

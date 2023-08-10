@@ -4,7 +4,7 @@ import time
 class Player:
     last_stock_update = None
 
-    def __init__(self, playerName, car):
+    def __init__(self, playerName, car, bot):
         self.__playerName = playerName
         self.__balance = INITIAL_BALANCE
         self.__position = 0
@@ -14,6 +14,7 @@ class Player:
         self.__set_skip_turn = False
         self.__freePenalty = False
         self.__free_martini = False
+        self.__is_bot = bot
 
     def move(self, step):
         self.__old_position = self.__position
@@ -43,6 +44,8 @@ class Player:
         return count
 
     def compute_penalty(self, choosen_stock):
+        stock_to_remove_index = None
+
         same_color_cells = self.same_color_count(choosen_stock.color)
         if same_color_cells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
             return choosen_stock.get_penalty()[same_color_cells - 1]
@@ -52,7 +55,8 @@ class Player:
             for i, stock in enumerate(stocks): # cycle for pop choosen_stock
                 if stock.get_position() == choosen_stock.get_position():
                     stock_to_remove_index = i
-            stocks.pop(stock_to_remove_index)
+            if stock_to_remove_index is not None:
+                stocks.pop(stock_to_remove_index)
 
             for stock in stocks: # if the stock is the same return the right penalty
                 if stock.get_name() == choosen_stock.get_name():
@@ -72,8 +76,8 @@ class Player:
         for i, stock in enumerate(self.__stocks):
             if stock.get_position() == chosen_stock.get_position():
                 stock_to_remove_index = i
-
-        self.__stocks.pop(stock_to_remove_index)
+        if stock_to_remove_index is not None:
+            self.__stocks.pop(stock_to_remove_index)
 
     # all the getters and setters are below
 
@@ -115,3 +119,6 @@ class Player:
     
     def get_car(self): # pragma: no cover
         return self.__car
+    
+    def get_is_bot(self): # pragma: no cover
+        return self.__is_bot

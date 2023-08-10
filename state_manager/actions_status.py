@@ -48,6 +48,12 @@ class ActionsStatus:
         # Iterate over the boolean attributes and return the values
         return [value for value in attributes.values() if isinstance(value, bool)]
 
+    def enable_show_stock(self, player):
+        if len(player.get_stocks()) > 0:
+            self.__show_stock = True
+        else:
+            self.__show_stock = False
+
     def set_throw_dices(self, value: bool) -> None:
         """Set the value of the throw_dices_turn boolean"""
         self.__throw_dices = value

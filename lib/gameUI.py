@@ -300,12 +300,6 @@ class GameUI:
     def closeStockUi(self):
         self.stocksUi.kill()
 
-    def enableShowStockButton(self, player):
-        if len(player.get_stocks()) > 0:
-            self.showStocks.enable()
-        else:
-            self.showStocks.disable()
-
     def disableActions(self):
         """Disable all the actions button"""
         for action in self.actions:
