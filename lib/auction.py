@@ -13,18 +13,18 @@ class Auction:
         self.__owner = owner
         self.__stock = stock
         self.__finished = False
-        self.bidders = bidders
+        self.__bidders = bidders
 
     def start_auction(self):
         self.startPrice = self.stock.get_new_value()
         self.currentBid = self.stock.get_new_value()
         self.currentBidder = 0
-        self.bids = [0] * len(self.bidders)
+        self.bids = [0] * len(self.__bidders)
 
         self.draw_auction()
 
     def draw_auction(self):
-        currBidderName = self.bidders[self.currentBidder].get_name()
+        currBidderName = self.__bidders[self.currentBidder].get_name()
 
         panel_rect = pygame.Rect((WIDTH // 2 - AUCTION_UI_WIDTH // 2, 20), (AUCTION_UI_WIDTH, AUCTION_UI_HEIGHT))
         self.auctionUI = UIPanel(panel_rect, starting_height= 2, manager=self.manager)
@@ -111,29 +111,29 @@ class Auction:
         self.currentBidText.set_text(str(self.currentBid))
 
     def bid_but(self):
-        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.bidders[self.currentBidder].get_name())
+        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[self.currentBidder].get_name())
         self.round_text_bid()
         self.bids[self.currentBidder] = self.currentBid
-        self.currentBidder = (self.currentBidder +  1) % len(self.bidders)
-        self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
+        self.currentBidder = (self.currentBidder +  1) % len(self.__bidders)
+        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.currentBidder].get_name())
         
     def pass_bid(self):
-        self.currentBidder = (self.currentBidder +  1) % len(self.bidders)
-        self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
+        self.currentBidder = (self.currentBidder +  1) % len(self.__bidders)
+        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.currentBidder].get_name())
     
     def retire_auction(self):
         
-        self.bidders.pop(self.currentBidder)
+        self.__bidders.pop(self.currentBidder)
         #the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
-        if(self.currentBidder == len(self.bidders) - 1):                        
+        if(self.currentBidder == len(self.__bidders) - 1):                        
             self.currentBidder = 0
 
-        self.currentBidderText.set_text("Offerta di "+ self.bidders[self.currentBidder].get_name())
+        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.currentBidder].get_name())
         maxBidIndex = self.find_max_bid()
-        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.bidders[maxBidIndex].get_name())
-        if len(self.bidders) == 1:
+        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[maxBidIndex].get_name())
+        if len(self.__bidders) == 1:
             self.finished = True
-            self.winner = self.bidders[0]
+            self.winner = self.__bidders[0]
     
     def find_max_bid(self):
         max_value = self.bids[0]
@@ -153,3 +153,6 @@ class Auction:
     
     def get_stock(self):
         return self.__stock
+    
+    def get_bidders(self):
+        return self.__bidders

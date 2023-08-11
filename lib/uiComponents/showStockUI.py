@@ -51,9 +51,9 @@ class ShowStockUI:
                                 object_id = 'CHOOSE_STOCK',
                                 manager=self.manager)
         
-    def show_buy_auctioned_stock(self, title):
+    def show_buy_auctioned_stock(self):
         self.showedStock = 0
-        self.draw_stock_ui(title, True)
+        self.draw_stock_ui("Sei l'unico partecipante all'asta vuoi comprare o lasciare alla banca?", True)
         buyAuctRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.buyAuctStock = UIButton(relative_rect=buyAuctRect,
