@@ -141,15 +141,29 @@ def who_owns_stock_by_name(players, stock_name):
     return owners
 
 
-def transfer_stock(board, current_player, chosen_stock):
+def transfer_stock(board, current_player, chosen_stock, withMoney = False):
     if chosen_stock.get_owner() is not None:
         chosen_stock.get_owner().remove_stock(chosen_stock)
+        if withMoney:
+            stockValue = chosen_stock.get_new_value()
+            chosen_stock.get_owner.change_balance(stockValue)
+            current_player.change_balance(-stockValue)
     else:
         board.remove_stock(chosen_stock)
+        if withMoney:
+            stockValue = chosen_stock.get_new_value()
+            current_player.change_balance(-stockValue)         
 
     chosen_stock.set_owner(current_player)
     current_player.add_stock(chosen_stock)
 
+def sell_stock_to_bank(board, chosen_stock):
+    if chosen_stock.get_owner() is not None:
+        chosen_stock.get_owner().remove_stock(chosen_stock)
+        chosen_stock.get_owner().change_balance(chosen_stock.get_new_value())
+        cell = board.get_cell(chosen_stock.get_position())
+        cell.add_stock(chosen_stock)
+        chosen_stock.set_owner(None)
 
 def get_money_from_others(players, player_number, amount):
     current_player = players[player_number]

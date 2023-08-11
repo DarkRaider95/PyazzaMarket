@@ -1,24 +1,23 @@
 import pygame
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIImage
-from lib.gameLogic import transfer_stock, check_if_can_buy_stock, buy_stock_from_cell
+from lib.gameLogic import transfer_stock, check_if_can_buy_stock, buy_stock_from_cell, sell_stock_to_bank
 from lib.constants import *
 
 class ShowStockUI:
-    def __init__(self, game, player = None):
+    def __init__(self, game, stocks, player = None):
         self.game = game
         self.gameUI = game.get_gameUI()
         self.screen = self.gameUI.get_screen()
         self.manager = self.gameUI.get_manager()
         self.player = player
         self.action_status = game.get_actions_status()
-
-    def show_stocks_ui(self, stocks, title):
         self.stocks = stocks
+
+    def show_stocks_ui(self, title):
         self.showedStock = 0
         self.draw_stock_ui(title, True)
 
-    def show_buy_anything_stock(self, stocks, title):
-        self.stocks = stocks
+    def show_buy_anything_stock(self, title):
         self.showedStock = 0
         self.draw_stock_ui(title, False)
         buyRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
@@ -31,7 +30,6 @@ class ShowStockUI:
         
     def show_choose_stock_to_auction(self):
         if self.player is not None:
-            self.stocks = self.player.get_stocks()
             self.showedStock = 0
             self.draw_stock_ui("Cedole di" + self.player.get_name()+ "cosa vuoi mettere all'asta", False)
             stockRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
@@ -42,8 +40,7 @@ class ShowStockUI:
                                     object_id = 'STOCK_TO_AUCTION',
                                     manager=self.manager)
         
-    def show_choose_stock(self, stocks, title):
-        self.stocks = stocks
+    def show_choose_stock(self, title):
         self.showedStock = 0
         self.draw_stock_ui(title, True)
         chooseRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
@@ -54,8 +51,26 @@ class ShowStockUI:
                                 object_id = 'CHOOSE_STOCK',
                                 manager=self.manager)
         
-    def show_move_to_stock(self, stocks, title):
-        self.stocks = stocks
+    def show_buy_auctioned_stock(self, title):
+        self.showedStock = 0
+        self.draw_stock_ui(title, True)
+        buyAuctRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+
+        self.buyAuctStock = UIButton(relative_rect=buyAuctRect,
+                                text="Compra",
+                                container=self.stocksUi,
+                                object_id = 'BUY_AUCT_STOCK',
+                                manager=self.manager)
+        
+        leaveBankRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+
+        self.leaveToBank = UIButton(relative_rect=leaveBankRect,
+                                text="Lascia",
+                                container=self.stocksUi,
+                                object_id = 'LEAVE_AUCT_STOCK',
+                                manager=self.manager)
+        
+    def show_move_to_stock(self, title):
         self.showedStock = 0
         self.draw_stock_ui(title, False)
         chooseRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
@@ -171,4 +186,33 @@ class ShowStockUI:
                 self.close_stock_ui()
                 self.screen.fill(BLACK)                
                 self.game.showStockUI = None
-                self.game.start_first_auction()                
+                self.game.start_first_auction()
+        #case only one bidder bought stock
+        elif hasattr(self, "buyAuctStock") and event.ui_element == self.stockToAuction:
+            
+            transfer_stock(self.game.get_board(), self.player, self.get_showed_stock(), True)
+            self.gameUI.updateAllPlayerLables(players)
+            self.close_stock_ui()
+            self.screen.fill(BLACK)
+
+            if len(self.game.listShowStockToAuction) > 0:                                                
+                showStock = self.game.listShowStockToAuction.pop(0)
+                self.game.showStockUI = showStock
+                showStock.show_buy_auctioned_stock()
+            else:
+                self.action_status.renable_actions()                
+                self.game.showStockUI = None
+        #case only one bidder left stock
+        elif hasattr(self, "leaveToBank") and event.ui_element == self.stockToAuction:
+            sell_stock_to_bank(self.game.get_board(), self.get_showed_stock())
+            self.gameUI.updateAllPlayerLables(players)
+            self.close_stock_ui()
+            self.screen.fill(BLACK)
+
+            if len(self.game.listShowStockToAuction) > 0:                                                
+                showStock = self.game.listShowStockToAuction.pop(0)
+                self.game.showStockUI = showStock
+                showStock.show_buy_auctioned_stock()
+            else:
+                self.action_status.renable_actions()                
+                self.game.showStockUI = None

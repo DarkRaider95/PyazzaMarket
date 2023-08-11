@@ -98,3 +98,7 @@ class Cell:
         if self.__stocks is None:
             return None
         return self.__stocks.pop()
+    
+    def add_stock(self, stock):
+        if self.__stocks is not None:
+            self.__stocks.append(stock)

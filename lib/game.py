@@ -198,10 +198,8 @@ class Game:
                 and event.ui_element == self.__gameUI.showStocks
             ):
                 self.disable_actions()
-                self.showStockUI = ShowStockUI(self)
-                self.showStockUI.show_stocks_ui(
-                    curr_player.get_stocks(), "Le cedole di " + curr_player.get_name()
-                )
+                self.showStockUI = ShowStockUI(self, curr_player.get_stocks())
+                self.showStockUI.show_stocks_ui("Le cedole di " + curr_player.get_name())
             elif (
                 hasattr(self, "showStockUI")
                 and hasattr(self.__gameUI, "eventBut")
@@ -303,8 +301,8 @@ class Game:
                 and event.ui_element == self.__gameUI.launchOverlayDiceBut
             ):
                 self.dice_overlay.launch_but_pressed()
-            # elif self.currentAuction is not None:
-            # self.manage_auction_events(event)
+            elif self.currentAuction is not None:
+                self.manage_auction_events(event)
             elif self.showStockUI is not None:
                 self.showStockUI.manage_stock_events(
                     event, self.get_players(), curr_player
@@ -347,7 +345,16 @@ class Game:
 
     def start_first_auction(self):
         self.currentAuction = self.__auctions.pop(0)
-        self.currentAuction.start_auction()
+        # if there are more than two players I can start the auction
+        if len(self.currentAuction.get_bidders()) > 2:
+            self.currentAuction.start_auction()
+        else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
+            stock = self.currentAuction.get_stock()
+            self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
+            self.currentAuction = self.__auctions.pop(0)
+            stock = self.currentAuction.get_stock()
+            self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
+
 
     def manage_auction_events(self, event):
         if (
@@ -418,7 +425,7 @@ class Game:
             for player in self.get_players():
                 # if they have stock I have to create panel to show stock
                 if len(player.get_stocks()) > 0:
-                    self.listShowStockToAuction.append(ShowStockUI(self, player))
+                    self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), player))
 
             showStock = self.listShowStockToAuction.pop(0)
             self.showStockUI = showStock
@@ -426,15 +433,13 @@ class Game:
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.__board.get_availble_stocks()
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self)
-            self.showStockUI.show_move_to_stock(
-                stocks, "Scegli su quale cedola vuoi spostarti"
-            )
+            self.showStockUI = ShowStockUI(self, stocks)
+            self.showStockUI.show_move_to_stock("Scegli su quale cedola vuoi spostarti")
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self)
-            self.showStockUI.show_choose_stock(stocks, "Scegli quale vuoi comprare")
+            self.showStockUI = ShowStockUI(self, stocks)
+            self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
         elif cell.cellType == SIX_HUNDRED_TYPE:
             six_hundred_logic(player)
         elif cell.cellType == CHANCE_TYPE:
@@ -455,10 +460,8 @@ class Game:
                 if p != player:
                     stocks.extend(player.get_stocks())
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self)
-            self.showStockUI.show_buy_anything_stock(
-                stocks, "Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)"
-            )
+            self.showStockUI = ShowStockUI(self, stocks)
+            self.showStockUI.show_buy_anything_stock("Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)")
         elif event.evenType == STOP_1:
             player.set_skip_turn(True)
         elif event.evenType == FREE_PENALTY:
@@ -585,9 +588,9 @@ class Game:
         player.set_position(effectData["destination"])
 
     def add_auction(self, player, stock):
-        players = filter(
+        players = list(filter(
             lambda obj: obj.get_name() == player.get_name(), self.get_players()
-        )
+        ))
         self.__auctions.append(
             Auction(self.__gameUI.manager, self.screen, player, players, stock)
         )

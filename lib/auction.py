@@ -10,8 +10,8 @@ class Auction:
         self.currentBid = 0
         self.manager = manager
         self.screen = screen
-        self.owner = owner
-        self.stock = stock
+        self.__owner = owner
+        self.__stock = stock
         self.__finished = False
         self.bidders = bidders
 
@@ -147,3 +147,9 @@ class Auction:
     
     def is_finished(self):
         return self.__finished
+    
+    def get_owner(self):
+        return self.__owner
+    
+    def get_stock(self):
+        return self.__stock
