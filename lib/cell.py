@@ -95,4 +95,6 @@ class Cell:
         return self.__stockIndex
     
     def sell_stock(self):
+        if self.__stocks is None:
+            return None
         return self.__stocks.pop()

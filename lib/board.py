@@ -2,7 +2,6 @@ import pygame
 import pytest
 from lib.constants import *
 from lib.cell import Cell
-
 class Board:
     
     def __init__(self, enableGraphics = True):
@@ -81,7 +80,8 @@ class Board:
 
         return x, y, position + 1
     
-    def compute_next_coord(x, y, side):
+    @classmethod
+    def compute_next_coord(cls, x: int, y: int, side: str) -> tuple[int, int]:
         if side == 'BOT':
             x = x - CELL_WIDTH
             y = y
@@ -103,7 +103,8 @@ class Board:
 
     def draw_player_car(self, screen, player, playerNumber, totalPlayers):  # pragma: no cover
         cell = self.__cells[player.get_position()]
-        #old_cell = self.__cells[player.old_position]
+        car_x = 0
+        car_y = 0
 
         if (cell.angle == 0):
             car_x = cell.cell_x + 5

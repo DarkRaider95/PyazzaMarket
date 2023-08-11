@@ -10,7 +10,7 @@ def board() -> Board:
 
 @pytest.fixture
 def player() -> Player:
-    player = Player("test", CAR_RED)
+    player = Player("test", CAR_RED, False)
     player.move(1)
     return player
 
@@ -19,17 +19,17 @@ def test_compute_next_coord_bot():
     assert x == -CELL_WIDTH
     assert y == 0
 
-def test_compute_next_coord_bot():    
+def test_compute_next_coord_left():    
     x,y = Board.compute_next_coord(0,0, 'LEFT')
     assert x == 0
     assert y == -CELL_WIDTH
 
-def test_compute_next_coord_bot():    
+def test_compute_next_coord_top():    
     x,y = Board.compute_next_coord(0,0, 'TOP')
     assert x == CELL_WIDTH
     assert y == 0
 
-def test_compute_next_coord_bot():    
+def test_compute_next_coord_right():    
     x,y = Board.compute_next_coord(0,0, 'RIGHT')
     assert x == 0
     assert y == CELL_WIDTH        

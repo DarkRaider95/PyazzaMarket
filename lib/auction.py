@@ -1,5 +1,5 @@
 import pygame
-from pygame_gui.elements import UIButton, UIPanel, UILabel, UITextEntryLine
+from pygame_gui.elements import UIButton, UIPanel, UILabel
 from .constants import *
 
 class Auction:
@@ -8,21 +8,12 @@ class Auction:
         self.startPrice = 0
         self.endPrice = 0
         self.currentBid = 0
-        self.currentBidder = None
-        self.bidders = None
         self.manager = manager
         self.screen = screen
-        self.nextBidder = None
         self.owner = owner
-        self.retireAuction = None
-        self.bidBut = None
-        self.raiseBid = None
-        self.lowerBid = None        
-        self.bids = None
         self.stock = stock
         self.__finished = False
         self.bidders = bidders
-        self.winner = None
 
     def start_auction(self):
         self.startPrice = self.stock.get_new_value()
