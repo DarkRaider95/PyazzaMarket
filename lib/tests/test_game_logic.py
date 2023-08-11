@@ -35,7 +35,7 @@ def player_with_cell(board: Board) -> Player:
     player = Player("test", CAR_RED, False)
     player.move(1)
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     return player
 
 @pytest.fixture
@@ -43,18 +43,18 @@ def board_witout_one_cell(player: Player) -> Board:
     board = Board(enableGraphics = False)
     player.move(1)
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     return board
 
 def test_buy_stock(player: Player, board: Board):
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     assert len(player.get_stocks()) == 1
     assert player.get_stocks()[0].get_name() == 'gled'
     assert len(cells[1].get_stocks()) == 1
 
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     assert (len(player.get_stocks()) == 2)
     assert player.get_stocks()[1].get_name() == 'gled'
     assert len(cells[1].get_stocks()) == 0
@@ -76,7 +76,7 @@ def test_check_for_penalty():
     players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     # first player buy a stock
     players[0].move(1)
-    buy_stock(cells, players[0])
+    buy_stock_from_cell(cells, players[0])
     # moving the player to the first cell
     players[1].move(1)
     cells = board.get_cells()
@@ -86,7 +86,7 @@ def test_check_for_penalty():
     assert players[1].get_balance() == INITIAL_BALANCE - CELLS_DEF["ORANGE"]["penalty"][0]
     assert players[0].get_balance() == INITIAL_BALANCE + CELLS_DEF["ORANGE"]["penalty"][0] - stock_value
     # test when the player own the stock
-    buy_stock(cells, players[1])
+    buy_stock_from_cell(cells, players[1])
     cells = board.get_cells()
     check_for_penalty(cells, players, 1)
     assert players[1].get_balance() == INITIAL_BALANCE - CELLS_DEF["ORANGE"]["penalty"][0] - stock_value
@@ -100,9 +100,9 @@ def test_check_for_penalty_owning_both_stokcs_in_the_cell(board: Board):
     stock_value = cells[1].get_stocks()[0].get_stock_value()
     # first player buy the first stock twice
     players[0].move(1)
-    buy_stock(cells, players[0])
+    buy_stock_from_cell(cells, players[0])
     cells = board.get_cells()
-    buy_stock(cells, players[0])
+    buy_stock_from_cell(cells, players[0])
     # moving the player to the first cell
     players[1].move(1)
     cells = board.get_cells()
@@ -253,14 +253,14 @@ def test_update_owner_balance_one_cell_each_true(player_with_cell: Player):
 
 def test_update_owner_balance_two_cells(player_with_cell: Player, board_witout_one_cell: Board):
     cells = board_witout_one_cell.get_cells()
-    buy_stock(cells, player_with_cell)
+    buy_stock_from_cell(cells, player_with_cell)
     prev_balance = player_with_cell.get_balance()
     update_owner_balance(player_with_cell, 'gled', 100, False)
     assert player_with_cell.get_balance() == prev_balance + 100
 
 def test_update_owner_balance_two_cells_each_true(player_with_cell: Player, board_witout_one_cell: Board):
     cells = board_witout_one_cell.get_cells()
-    buy_stock(cells, player_with_cell)
+    buy_stock_from_cell(cells, player_with_cell)
     prev_balance = player_with_cell.get_balance()
     update_owner_balance(player_with_cell, 'gled', 100, True)
     assert player_with_cell.get_balance() == prev_balance + 200

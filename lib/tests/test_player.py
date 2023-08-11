@@ -19,9 +19,9 @@ def player_with_same_stocks() -> Player:
     player.move(1)
     board = Board(enableGraphics = False)
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     return player
 
 @pytest.fixture
@@ -30,10 +30,10 @@ def player_with_different_stocks() -> Player:
     player.move(1)
     board = Board(enableGraphics = False)
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     player.move(1)
     cells = board.get_cells()
-    buy_stock(cells, player)
+    buy_stock_from_cell(cells, player)
     return player
 
 @pytest.fixture

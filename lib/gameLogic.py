@@ -17,7 +17,7 @@ def is_double(dice):
     return dice[0] == dice[1]
 
 
-def buy_stock(cells, player):
+def buy_stock_from_cell(cells, player):
     curr_pos = player.get_position()
     stock_value = cells[curr_pos].get_stocks()[0].get_stock_value()
     if len(cells[curr_pos].get_stocks()) > 0:
@@ -26,7 +26,6 @@ def buy_stock(cells, player):
             stock.set_owner(player)
             player.change_balance(-stock_value)
             player.add_stock(stock)
-
 
 def check_if_can_buy_stock(cell, player):
     if cell.cellType != STOCKS_TYPE or len(cell.get_stocks()) == 0:

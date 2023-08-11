@@ -38,7 +38,7 @@ class Game:
         events = Event.initialize_events()
         self.events = deque(events)
         random.shuffle(self.events)
-        self.__squareBalance = 2000
+        self.__square_balance = 2000
         random.shuffle(QUOTATION)  # this function do an inplace shuffle to QUOTATION
         self.new_quotation = deque(
             QUOTATION
@@ -56,7 +56,7 @@ class Game:
             # when we run the ai we don't need to initialize the gui
             self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
             pygame.display.set_caption("PyazzaMarket")
-            self.board = Board()
+            self.__board = Board()
             self.__gameUI = GameUI(self.screen, self.clock, self.__actions_status)
             self.dice_overlay = DiceOverlay(self)
         self.__bot = Bot(self)
@@ -68,7 +68,7 @@ class Game:
             )
 
     def start(self):  # pragma: no cover
-        self.board.draw(self.screen)
+        self.__board.draw(self.screen)
         self.__gameUI.draw_dices()
         self.__gameUI.draw_actions_ui()
         self.__gameUI.draw_leaderboard(
@@ -85,7 +85,7 @@ class Game:
         # we will handle the next players in the while loop
 
         for index, player in enumerate(self.get_players()):
-            self.board.draw_player_car(self.screen, player, index, len(self.__players))
+            self.__board.draw_player_car(self.screen, player, index, len(self.__players))
 
         while self.running:
             self.clock.tick(FPS)
@@ -101,10 +101,10 @@ class Game:
             self.__gameUI.updateStockboard(
                 self.get_players(), Player.last_stock_update, self.__gameUI
             )
-            self.board.draw(self.screen)
+            self.__board.draw(self.screen)
             self.__gameUI.renable_actions()
             for i, player in enumerate(self.get_players()):
-                self.board.draw_player_car(
+                self.__board.draw_player_car(
                     self.screen, player, i, len(self.get_players())
                 )
 
@@ -136,7 +136,7 @@ class Game:
 
         curr_player = self.__players[self.__current_player_index]
         curr_player.move(score[0] + score[1])
-        cell = self.board.get_cells()[curr_player.get_position()]
+        cell = self.__board.get_cells()[curr_player.get_position()]
         # check turn and crash before any other events or effect of the cells
         check_turn(curr_player)
         crash = check_crash(self.get_players(), self.__current_player_index)
@@ -152,7 +152,7 @@ class Game:
             self.enable_buy_button(cell, curr_player)
             # we need to create a copy of the list in order to perform some edit of the list later
             check_for_penalty(
-                self.board.get_cells(), self.get_players(), self.__current_player_index
+                self.__board.get_cells(), self.get_players(), self.__current_player_index
             )
         # case special cell
         else:
@@ -176,7 +176,7 @@ class Game:
                 hasattr(self.__gameUI, "buyButton")
                 and event.ui_element == self.__gameUI.buyButton
             ):
-                buy_stock(self.board.get_cells(), curr_player)
+                buy_stock_from_cell(self.__board.get_cells(), curr_player)
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.__actions_status.set_buy_property(False)
                 self.__actions_status.enable_show_stock(curr_player)
@@ -243,7 +243,7 @@ class Game:
                 chosen_stock = self.showStockUI.get_showed_stock()
                 curr_player.add_stock(chosen_stock)
                 curr_player.change_balance(-chosen_stock.get_stock_value())
-                self.board.remove_stock(chosen_stock)
+                self.__board.remove_stock(chosen_stock)
                 self.showStockUI.close_stock_ui()
                 self.screen.fill(BLACK)
                 self.__gameUI.draw_dices()
@@ -255,7 +255,7 @@ class Game:
                 and event.ui_element == self.showStockUI.chooseMoveBut
             ):
                 chosen_stock = self.showStockUI.get_showed_stock()
-                curr_cell = self.board.get_cell(chosen_stock.get_position())
+                curr_cell = self.__board.get_cell(chosen_stock.get_position())
                 curr_player.set_position(chosen_stock.get_position())
                 self.enable_buy_button(curr_cell, curr_player)
                 self.showStockUI.close_stock_ui()
@@ -279,7 +279,7 @@ class Game:
             ):
                 chosen_stock = self.showStockUI.get_showed_stock()
                 curr_player = self.__players[self.__current_player_index]
-                transfer_stock(self.board, curr_player, chosen_stock)
+                transfer_stock(self.__board, curr_player, chosen_stock)
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.renable_actions()
             elif (
@@ -409,9 +409,10 @@ class Game:
             self.disable_actions()
             self.__gameUI.showEventUi(self.events[0])
         elif cell.cellType == STOCKS_PRIZE_TYPE:
-            stock_prize_logic(player)
+            if len(player.get_stocks()) > 0:
+                stock_prize_logic(player)
         elif cell.cellType == QUOTATION_TYPE:
-            quotation_logic(self.get_players(), self.board, self.new_quotation, self)
+            quotation_logic(self.get_players(), self.__board, self.new_quotation, self)
 
             # create one showStockToAuction for every player that has a stock
             for player in self.get_players():
@@ -423,14 +424,14 @@ class Game:
             self.showStockUI = showStock
             showStock.show_choose_stock_to_auction()
         elif cell.cellType == CHOOSE_STOCK_TYPE:
-            stocks = self.board.get_availble_stocks()
+            stocks = self.__board.get_availble_stocks()
             self.disable_actions()
             self.showStockUI = ShowStockUI(self)
             self.showStockUI.show_move_to_stock(
                 stocks, "Scegli su quale cedola vuoi spostarti"
             )
         elif cell.cellType == FREE_STOP_TYPE:
-            stocks = self.board.get_purchasable_stocks(player.get_balance())
+            stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             self.showStockUI = ShowStockUI(self)
             self.showStockUI.show_choose_stock(stocks, "Scegli quale vuoi comprare")
@@ -449,7 +450,7 @@ class Game:
         if event.evenType == COLOR_EVENT:
             pass
         elif event.evenType == BUY_ANTHING_EVENT:
-            stocks = self.board.get_availble_stocks()
+            stocks = self.__board.get_availble_stocks()
             for p in self.__players:
                 if p != player:
                     stocks.extend(player.get_stocks())
@@ -484,7 +485,7 @@ class Game:
             nextPlayer.change_balance(-200)
         elif event.evenType == GIFT_EVENT:
             effectData = event.effectData
-            stock = self.board.get_stock_if_available(effectData["stockIndex"])
+            stock = self.__board.get_stock_if_available(effectData["stockIndex"])
             if stock is not None:
                 player.add_stock(stock)
             else:
@@ -537,7 +538,7 @@ class Game:
                 )
 
         elif event.evenType == BUY_EVENT:
-            stock = self.board.get_stock_if_available(effectData["stockIndex"])
+            stock = self.__board.get_stock_if_available(effectData["stockIndex"])
             if stock is not None:
                 player.add_stock(stock)
                 player.change_balance(-stock.get_original_value())
@@ -570,7 +571,7 @@ class Game:
             pass
 
         if effectData["buy"]:
-            stock = self.board.get_stock_if_available(effectData["destination"])
+            stock = self.__board.get_stock_if_available(effectData["destination"])
             if stock is not None:
                 player.add_stock(stock)
                 player.change_balance(-stock.get_original_value())
@@ -635,3 +636,6 @@ class Game:
 
     def get_actions_status(self):  # pragma: no cover
         return self.__actions_status
+    
+    def get_board(self): # pragma: no cover
+        return self.__board
