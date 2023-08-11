@@ -146,7 +146,7 @@ def transfer_stock(board, current_player, chosen_stock, withMoney = False):
         chosen_stock.get_owner().remove_stock(chosen_stock)
         if withMoney:
             stockValue = chosen_stock.get_new_value()
-            chosen_stock.get_owner.change_balance(stockValue)
+            chosen_stock.get_owner().change_balance(stockValue)
             current_player.change_balance(-stockValue)
     else:
         board.remove_stock(chosen_stock)

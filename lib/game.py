@@ -51,6 +51,7 @@ class Game:
         self.__gui = gui
         self.__current_player_index = 0
         self.__square_balance = SQUARE_BALANCE
+        self.showStockUI: Optional[ShowStockUI] = None
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -304,6 +305,7 @@ class Game:
             elif self.currentAuction is not None:
                 self.manage_auction_events(event)
             elif self.showStockUI is not None:
+                print(self.showStockUI.stocks[0].get_name())
                 self.showStockUI.manage_stock_events(
                     event, self.get_players(), curr_player
                 )
@@ -351,10 +353,12 @@ class Game:
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
             self.showStockUI = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
+            self.showStockUI.show_buy_auctioned_stock()
             self.currentAuction = self.__auctions.pop(0)
             stock = self.currentAuction.get_stock()
             self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
-            self.showStockUI.show_buy_auctioned_stock()
+            self.currentAuction = None
+            
 
 
     def manage_auction_events(self, event):

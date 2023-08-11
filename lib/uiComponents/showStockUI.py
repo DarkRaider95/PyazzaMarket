@@ -136,7 +136,7 @@ class ShowStockUI:
         self.game.showStockUI = None
 
     def manage_stock_events(self, event, players, currPlayer):
-        
+        print("STOCK EVENTS")
         if hasattr(self, "nextStock") and event.ui_element == self.nextStock: # pragma: no cover            
             self.show_next_stock()
         elif hasattr(self, "previousStock") and event.ui_element == self.previousStock: # pragma: no cover            
