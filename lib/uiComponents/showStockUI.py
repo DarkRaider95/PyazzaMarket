@@ -120,7 +120,6 @@ class ShowStockUI:
         self.stocksUi.kill()
         self.game.showStockUI = None
 
-
     def manage_stock_events(self, event, players, currPlayer):
         
         if event.ui_element == self.nextStock: # pragma: no cover            
