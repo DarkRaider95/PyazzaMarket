@@ -31,16 +31,17 @@ To do list funzionalità:
 - controllare cella lancio dadi per perdere o vincere sulla piazza
 - ~~ fare la ui per incidenti, tiri doppi, penalità ecc ~~
     - ~~ bloccare altri tasti fino a quando non si fa kill o fare kill nel caso si usi un altro bottone ~~
-- interfaccia per tiro dadi per celle speciali, inizio partita ecc
-    - tiro dadi a inizio partita
-        - gestire tiro pari
+- ~~ interfaccia per tiro dadi per celle speciali, inizio partita ecc ~~
+    - ~~ tiro dadi a inizio partita ~~
+        - ~~ gestire tiro pari ~~
 - aggiungere lunghezza massima nome giocatore
 - add requirements.txt
 - aggiungere un logger
+- aggiungere aggiornamento bottoni basato su timestamp
 
 To fix:
-- fix the two line to draw in stock
-- fix doppio prima di casella combi
+- ~~ fix the two line to draw in stock ~~
+- ~~ fix doppio prima di casella combi ~~
 - asta no offerte per il giocatore che vende
 
 To do list codice:
@@ -49,7 +50,7 @@ To do list codice:
 - sistemtare la grafica
     - responsive
     - usare valori negativi dove possibile
-- unit test
+- ~~ unit test ~~
 
 To do extra:
 - funzionalità di rete

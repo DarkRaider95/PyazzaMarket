@@ -22,7 +22,7 @@ def test_is_double():
 
 @pytest.fixture
 def player() -> Player:
-    player = Player("test", CAR_RED)
+    player = Player("test", CAR_RED, False)
     player.move(1)
     return player
 
@@ -32,7 +32,7 @@ def board() -> Board:
 
 @pytest.fixture
 def player_with_cell(board: Board) -> Player:
-    player = Player("test", CAR_RED)
+    player = Player("test", CAR_RED, False)
     player.move(1)
     cells = board.get_cells()
     buy_stock(cells, player)
@@ -73,7 +73,7 @@ def test_check_for_penalty():
     # creating board and players
     board = Board(enableGraphics = False)
     cells = board.get_cells()
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     # first player buy a stock
     players[0].move(1)
     buy_stock(cells, players[0])
@@ -95,7 +95,7 @@ def test_check_for_penalty():
 def test_check_for_penalty_owning_both_stokcs_in_the_cell(board: Board):
     # creating board and players
     cells = board.get_cells()
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     # saving the price of the stock
     stock_value = cells[1].get_stocks()[0].get_stock_value()
     # first player buy the first stock twice
@@ -111,7 +111,7 @@ def test_check_for_penalty_owning_both_stokcs_in_the_cell(board: Board):
     assert players[0].get_balance() == INITIAL_BALANCE + CELLS_DEF["ORANGE"]["penalty"][1] - (stock_value * 2) 
 
 def test_check_crash():
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     players[0].set_position(1)
     players[1].set_position(1)
     assert check_crash(players, 1) == 1
@@ -150,7 +150,7 @@ class fakeGame:
         self.square_balance = balance
 
 def test_quotation_logic(board_witout_one_cell: Board, player_with_cell: Player):
-    players = [player_with_cell, Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [player_with_cell, Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     quotation = deque(QUOTATION)
     new_quotation = quotation[0]
     # first test all the stocks are in the board
@@ -184,7 +184,7 @@ def test_start_logic(player: Player):
     assert player.get_balance() == INITIAL_BALANCE + (TURN_FEE * 2)
 
 def test_every_one_fifty():
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     every_one_fifty(players)
     for player in players:
         assert player.get_balance() == INITIAL_BALANCE + 50
@@ -210,7 +210,7 @@ def test_transfer_stock(board_witout_one_cell: Board, player_with_cell: Player, 
     assert player.get_stocks()[1].get_position() == stock.get_position()
 
 def test_get_money_from_others():
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     get_money_from_others(players, 0, 100)
     assert players[0].get_balance() == INITIAL_BALANCE + 200
     assert players[1].get_balance() == INITIAL_BALANCE - 100
@@ -222,7 +222,7 @@ def test_check_start_pass(player: Player):
     assert check_start_pass(player, 6) == False
 
 def test_compute_pass_amount():
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False)]
     assert compute_pass_amount(players, 0, 100, 0) == 0 # false, false, false, false, false
     players[1].set_position(1)
     assert compute_pass_amount(players, 0, 100, 0) == 0 # true, false, false, true, false
@@ -235,7 +235,7 @@ def test_compute_pass_amount():
     assert compute_pass_amount(players, 0, 100, 1) == 100 # true, false, true, true, false
 
 def test_pay_money_to_others():
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     pay_money_to_others(players, 0, 100)
     assert players[0].get_balance() == INITIAL_BALANCE - 200
     assert players[1].get_balance() == INITIAL_BALANCE + 100
@@ -271,7 +271,7 @@ def test_update_owner_balance_no_cell(player: Player):
     assert player.get_balance() == prev_balance
 
 def test_update_others_balance():
-    players = [Player("player1", CAR_BLACK), Player("player2", CAR_BLUE), Player("player3", CAR_RED)]
+    players = [Player("player1", CAR_BLACK, False), Player("player2", CAR_BLUE, False), Player("player3", CAR_RED, False)]
     owners = [players[0]]
     update_others_balance(players, owners, 100)
     assert players[0].get_balance() == INITIAL_BALANCE
