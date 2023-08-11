@@ -350,11 +350,11 @@ class Game:
             self.currentAuction.start_auction()
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
-            showStock = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
+            self.showStockUI = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
             self.currentAuction = self.__auctions.pop(0)
             stock = self.currentAuction.get_stock()
             self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
-            showStock.show_buy_auctioned_stock()
+            self.showStockUI.show_buy_auctioned_stock()
 
 
     def manage_auction_events(self, event):

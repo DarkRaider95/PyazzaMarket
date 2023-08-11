@@ -188,7 +188,7 @@ class ShowStockUI:
                 self.game.showStockUI = None
                 self.game.start_first_auction()
         #case only one bidder bought stock
-        elif hasattr(self, "buyAuctStock") and event.ui_element == self.stockToAuction:
+        elif hasattr(self, "buyAuctStock") and event.ui_element == self.buyAuctStock:
             
             transfer_stock(self.game.get_board(), self.player, self.get_showed_stock(), True)
             self.gameUI.updateAllPlayerLables(players)
@@ -203,7 +203,7 @@ class ShowStockUI:
                 self.action_status.renable_actions()                
                 self.game.showStockUI = None
         #case only one bidder left stock
-        elif hasattr(self, "leaveToBank") and event.ui_element == self.stockToAuction:
+        elif hasattr(self, "leaveToBank") and event.ui_element == self.leaveToBank:
             sell_stock_to_bank(self.game.get_board(), self.get_showed_stock())
             self.gameUI.updateAllPlayerLables(players)
             self.close_stock_ui()
