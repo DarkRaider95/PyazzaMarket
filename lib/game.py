@@ -111,6 +111,7 @@ class Game:
 
             time_delta = self.clock.tick(FPS) / 1000.0
             self.__gameUI.manager.update(time_delta)
+            #self.__gameUI.updateTurnLabel(self.__players[self.__current_player_index])
             self.__gameUI.manager.draw_ui(self.screen)
             pygame.display.update()
 
@@ -202,66 +203,6 @@ class Game:
                 self.showStockUI = ShowStockUI(self, curr_player.get_stocks())
                 self.showStockUI.show_stocks_ui("Le cedole di " + curr_player.get_name())
             elif (
-                self.showStockUI is not None
-                and hasattr(self.__gameUI, "eventBut")
-                and event.ui_element == self.__gameUI.eventBut
-            ):
-                self.__gameUI.updateTurnLabel(
-                    self.__players[self.__current_player_index]
-                )
-                self.__actions_status.set_throw_dices(True)
-                self.__actions_status.set_pass_turn(False)
-                self.__actions_status.set_buy_property(False)
-                self.__actions_status.enable_show_stock(curr_player)
-            elif (
-                self.showStockUI is not None
-                and hasattr(self.showStockUI, "nextStock")
-                and event.ui_element == self.showStockUI.nextStock
-            ):
-                self.showStockUI.show_next_stock()
-            elif (
-                self.showStockUI is not None
-                and hasattr(self.showStockUI, "previousStock")
-                and event.ui_element == self.showStockUI.previousStock
-            ):
-                self.showStockUI.show_previous_stock()
-            elif (
-                self.showStockUI is not None
-                and hasattr(self.showStockUI, "closeStock")
-                and event.ui_element == self.showStockUI.closeStock
-            ):
-                self.showStockUI.close_stock_ui()
-                self.screen.fill(BLACK)
-                self.__gameUI.draw_dices()
-                self.renable_actions()
-            elif (
-                self.showStockUI is not None
-                and hasattr(self.showStockUI, "chooseBut")
-                and event.ui_element == self.showStockUI.chooseBut
-            ):
-                chosen_stock = self.showStockUI.get_showed_stock()
-                curr_player.add_stock(chosen_stock)
-                curr_player.change_balance(-chosen_stock.get_stock_value())
-                self.__board.remove_stock(chosen_stock)
-                self.showStockUI.close_stock_ui()
-                self.screen.fill(BLACK)
-                self.__gameUI.draw_dices()
-                self.__gameUI.updateAllPlayerLables(self.get_players())
-                self.renable_actions()
-            elif (
-                self.showStockUI is not None
-                and hasattr(self.showStockUI, "chooseMoveBut")
-                and event.ui_element == self.showStockUI.chooseMoveBut
-            ):
-                chosen_stock = self.showStockUI.get_showed_stock()
-                curr_cell = self.__board.get_cell(chosen_stock.get_position())
-                curr_player.set_position(chosen_stock.get_position())
-                self.enable_buy_button(curr_cell, curr_player)
-                self.showStockUI.close_stock_ui()
-                self.screen.fill(BLACK)
-                self.__gameUI.draw_dices()
-                self.renable_actions()
-            elif (
                 hasattr(self.__gameUI, "eventBut")
                 and event.ui_element == self.__gameUI.eventBut
             ):
@@ -269,16 +210,6 @@ class Game:
                 self.__gameUI.closeEventUi()
                 self.screen.fill(BLACK)
                 self.__gameUI.draw_dices()
-                self.__gameUI.updateAllPlayerLables(self.get_players())
-                self.renable_actions()
-            elif (
-                self.showStockUI is not None
-                and hasattr(self.showStockUI, "buyAnyBut")
-                and event.ui_element == self.showStockUI.buyAnyBut
-            ):
-                chosen_stock = self.showStockUI.get_showed_stock()
-                curr_player = self.__players[self.__current_player_index]
-                transfer_stock(self.__board, curr_player, chosen_stock)
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.renable_actions()
             elif (
@@ -293,10 +224,10 @@ class Game:
                 self.dice_overlay.close_dice_overlay()
                 if not self.dice_overlay.overlay_on():
                     self.__current_player_index = self.dice_overlay.get_who_will_start()
-                    self.__gameUI.updateTurnLabel(
-                        self.__players[self.__current_player_index]
-                    )
                     self.__actions_status.set_throw_dices(True)
+                self.__gameUI.updateTurnLabel(
+                    self.__players[self.__current_player_index]
+                )
             elif (
                 hasattr(self.__gameUI, "launchOverlayDiceBut")
                 and event.ui_element == self.__gameUI.launchOverlayDiceBut
@@ -358,8 +289,6 @@ class Game:
             stock = self.currentAuction.get_stock()
             self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
             self.currentAuction = None
-            
-
 
     def manage_auction_events(self, event):
         if self.currentAuction is not None:
@@ -605,13 +534,9 @@ class Game:
     def disable_actions(self):  # pragma: no cover
         """This function disable the action in the status manager and in the ui"""
         self.__actions_status.disable_actions()
-        if self.__gui:
-            self.__gameUI.disableActions()
 
     def renable_actions(self):  # pragma: no cover
-        """This function reenable the action in the status manager and in the ui"""
-        if self.__gui:
-            self.__gameUI.renable_actions()
+        """This function reenable the action in the status manager and in the ui"""        
         self.__actions_status.renable_actions()
 
     def set_square_balance(self, new_balance):  # pragma: no cover

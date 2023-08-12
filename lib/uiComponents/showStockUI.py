@@ -135,8 +135,7 @@ class ShowStockUI:
         self.stocksUi.kill()
         self.game.showStockUI = None
 
-    def manage_stock_events(self, event, players, currPlayer):
-        print("STOCK EVENTS")
+    def manage_stock_events(self, event, players, curr_player):
         if hasattr(self, "nextStock") and event.ui_element == self.nextStock: # pragma: no cover            
             self.show_next_stock()
         elif hasattr(self, "previousStock") and event.ui_element == self.previousStock: # pragma: no cover            
@@ -145,33 +144,31 @@ class ShowStockUI:
             self.close_stock_ui()
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
-            self.action_status.renable_actions()
         elif hasattr(self, "chooseBut") and event.ui_element == self.chooseBut: # pragma: no cover            
             chosen_stock = self.get_showed_stock()
-            board = self.game.get_board()
-            buy_stock_from_cell(board.get_cells, currPlayer)
+            curr_player.add_stock(chosen_stock)
+            curr_player.change_balance(-chosen_stock.get_stock_value())
+            self.game.get_board().remove_stock(chosen_stock)
             self.close_stock_ui()
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
-            self.action_status.renable_actions()
-        elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover            
+        elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()
             curr_cell = board.get_cell(chosen_stock.get_position())
-            currPlayer.set_position(chosen_stock.get_position())            
+            curr_player.set_position(chosen_stock.get_position())            
             self.close_stock_ui()
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
-            if check_if_can_buy_stock(curr_cell, currPlayer):
+            self.action_status.renable_actions()
+            if check_if_can_buy_stock(curr_cell, curr_player):
                 self.action_status.set_buy_property(True)
-            self.action_status.renable_actions()            
         elif hasattr(self, "buyAnyBut") and event.ui_element == self.buyAnyBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()
-            transfer_stock(board, currPlayer, chosen_stock)
+            transfer_stock(board, curr_player, chosen_stock)
             self.gameUI.updateAllPlayerLables(players)
-            self.action_status.renable_actions()
         elif hasattr(self, "stockToAuction") and event.ui_element == self.stockToAuction:
             #if there are still some showStockToAuction I have to show another one and create the auction object
             if len(self.game.listShowStockToAuction) > 0:

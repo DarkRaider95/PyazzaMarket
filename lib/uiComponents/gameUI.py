@@ -275,11 +275,6 @@ class GameUI:
                 + str(player.stock_value())
             )
 
-    def disableActions(self):
-        """Disable all the actions button"""
-        for action in self.actions:
-            action.disable()
-
     def renable_actions(self):
         """This function get the action status from the status manager and enable or disable the actions accordingly"""
         actions_status = self.__actions_status.get_actions_status()
@@ -368,7 +363,7 @@ class GameUI:
             manager=self.manager,
         )
 
-        self.disableActions()
+        self.__actions_status.disable_actions()
 
     def closeAlert(self, players, dice):
         # since screen.fill(BLACK) is already on updateStockboard and
@@ -430,7 +425,7 @@ class GameUI:
         )
         self.closeDiceOverlayBut.disable()
 
-        self.disableActions()
+        self.__actions_status.disable_actions()
 
         throw_rect = pygame.Rect(
             (20, DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10),
