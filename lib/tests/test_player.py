@@ -86,7 +86,8 @@ def test_compute_penalty_three_stocks(player_with_same_stocks: Player, stock_gle
     assert player_with_same_stocks.compute_penalty(stock_gled) == 160
 
 def test_get_stock_by_pos_with_stock(player_with_same_stocks: Player):
-    assert player_with_same_stocks.get_stock_by_pos(1).get_name() == 'gled'
+    stock = player_with_same_stocks.get_stock_by_pos(1) 
+    assert stock is not None and stock.get_name() == 'gled'
 
 def test_get_stock_by_pos_without_stock(player_with_same_stocks: Player):
     assert player_with_same_stocks.get_stock_by_pos(2) == None

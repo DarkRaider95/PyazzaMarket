@@ -1,5 +1,5 @@
 import pygame
-from .constants import *
+from lib.constants import *
 
 class Car:
     def __init__(self, car):

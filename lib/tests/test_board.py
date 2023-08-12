@@ -52,13 +52,13 @@ def test_get_purchasable_stocks_200_balance(board: Board):
 
 def test_get_stock_if_available(board: Board):
     stock = board.get_stock_if_available(1)
-    assert stock.get_name() == 'gled'
+    assert stock is not None and stock.get_name() == 'gled'
     stock = board.get_stock_if_available(1)
-    assert stock.get_name() == 'gled'
+    assert stock is not None and stock.get_name() == 'gled'
     stock = board.get_stock_if_available(1)
     assert stock is None
     stock = board.get_stock_if_available(2)
-    assert stock.get_name() == 'friskies'
+    assert stock is not None and stock.get_name() == 'friskies'
 
 def test_board_init(board: Board):
     cells = board.get_cells()

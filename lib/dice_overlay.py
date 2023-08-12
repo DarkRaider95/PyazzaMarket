@@ -1,4 +1,4 @@
-from .gameLogic import *
+from lib.gameLogic import *
 
 class DiceOverlay:
     def __init__(self, __game) -> None:

@@ -1,5 +1,4 @@
 import pygame
-import pytest
 from lib.constants import *
 from lib.cell import Cell
 class Board:

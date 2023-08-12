@@ -1,6 +1,6 @@
 import pygame
 from pygame_gui.elements import UIButton, UIPanel, UILabel
-from .constants import *
+from lib.constants import *
 
 class Auction:
 
@@ -16,8 +16,8 @@ class Auction:
         self.__bidders = bidders
 
     def start_auction(self):
-        self.startPrice = self.stock.get_new_value()
-        self.currentBid = self.stock.get_new_value()
+        self.startPrice = self.__stock.get_new_value()
+        self.currentBid = self.__stock.get_new_value()
         self.currentBidder = 0
         self.bids = [0] * len(self.__bidders)
 
@@ -33,7 +33,7 @@ class Auction:
         self.auctionTitle = UILabel(title_rect, "ASTA", manager=self.manager, container=self.auctionUI)
 
         highest_bid_rect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH // 2, 30), (AUCTION_UI_TITLE_WIDTH, AUCTION_UI_TITLE_HEIGHT))
-        self.stockInAuction = UILabel(highest_bid_rect, "Quanto offri per: "+ self.stock.get_name() + "?", manager=self.manager, container=self.auctionUI)
+        self.stockInAuction = UILabel(highest_bid_rect, "Quanto offri per: "+ self.__stock.get_name() + "?", manager=self.manager, container=self.auctionUI)
 
         highest_bid_rect = pygame.Rect((AUCTION_UI_WIDTH // 2 - AUCTION_UI_TITLE_WIDTH // 2, 50), (AUCTION_UI_TITLE_WIDTH, AUCTION_UI_TITLE_HEIGHT))
         self.currentHighestBid = UILabel(highest_bid_rect, "L'offerta più alta è di "+ currBidderName, manager=self.manager, container=self.auctionUI)

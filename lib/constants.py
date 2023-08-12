@@ -61,7 +61,7 @@ DICE_5 = ASSET_PATH + 'dice5.png'
 DICE_6 = ASSET_PATH + 'dice6.png'
 
 #PATH OF THE EVENTS IMAGES
-EVENTS_DIR = 'assets/events/'
+EVENTS_DIR = "assets/events/"
 
 #EVENT DIMENSIONS
 EVENT_WIDTH = 500

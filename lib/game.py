@@ -202,7 +202,7 @@ class Game:
                 self.showStockUI = ShowStockUI(self, curr_player.get_stocks())
                 self.showStockUI.show_stocks_ui("Le cedole di " + curr_player.get_name())
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.__gameUI, "eventBut")
                 and event.ui_element == self.__gameUI.eventBut
             ):
@@ -214,19 +214,19 @@ class Game:
                 self.__actions_status.set_buy_property(False)
                 self.__actions_status.enable_show_stock(curr_player)
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.showStockUI, "nextStock")
                 and event.ui_element == self.showStockUI.nextStock
             ):
                 self.showStockUI.show_next_stock()
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.showStockUI, "previousStock")
                 and event.ui_element == self.showStockUI.previousStock
             ):
                 self.showStockUI.show_previous_stock()
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.showStockUI, "closeStock")
                 and event.ui_element == self.showStockUI.closeStock
             ):
@@ -235,7 +235,7 @@ class Game:
                 self.__gameUI.draw_dices()
                 self.renable_actions()
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.showStockUI, "chooseBut")
                 and event.ui_element == self.showStockUI.chooseBut
             ):
@@ -249,7 +249,7 @@ class Game:
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.renable_actions()
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.showStockUI, "chooseMoveBut")
                 and event.ui_element == self.showStockUI.chooseMoveBut
             ):
@@ -272,7 +272,7 @@ class Game:
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.renable_actions()
             elif (
-                hasattr(self, "showStockUI")
+                self.showStockUI is not None
                 and hasattr(self.showStockUI, "buyAnyBut")
                 and event.ui_element == self.showStockUI.buyAnyBut
             ):
@@ -362,44 +362,45 @@ class Game:
 
 
     def manage_auction_events(self, event):
-        if (
-            hasattr(self.currentAuction, "raiseBid")
-            and event.ui_element == self.currentAuction.raiseBid
-        ):
-            self.currentAuction.raise_bid()
-        elif (
-            hasattr(self.currentAuction, "lowerBid")
-            and event.ui_element == self.currentAuction.lowerBid
-        ):
-            self.currentAuction.lower_bid()
-        elif (
-            hasattr(self.currentAuction, "bidBut")
-            and event.ui_element == self.currentAuction.bidBut
-        ):
-            self.currentAuction.bid_but()
-        elif (
-            hasattr(self.currentAuction, "newtBidder")
-            and event.ui_element == self.currentAuction.nextBidder
-        ):
-            self.currentAuction.pass_bid()
-        elif (
-            hasattr(self.currentAuction, "retireAuction")
-            and event.ui_element == self.currentAuction.retireAuction
-        ):
-            self.currentAuction.retire_auction()
-            if self.currentAuction.is_finished():
-                # if there are other auctions open next otherwise close it
-                if len(self.__auctions) > 0:
-                    self.currentAuction.auctionUI.kill()
-                    self.screen.fill(BLACK)
-                    self.currentAuction = self.__auctions.pop(0)
-                    self.currentAuction.start_auction()
-                else:
-                    self.currentAuction.auctionUI.kill()
-                    self.currentAuction = None
-                    self.screen.fill(BLACK)
-                    self.__gameUI.updateAllPlayerLables(self.get_players())
-                    self.renable_actions()
+        if self.currentAuction is not None:
+            if (
+                hasattr(self.currentAuction, "raiseBid")
+                and event.ui_element == self.currentAuction.raiseBid
+            ):
+                self.currentAuction.raise_bid()
+            elif (
+                hasattr(self.currentAuction, "lowerBid")
+                and event.ui_element == self.currentAuction.lowerBid
+            ):
+                self.currentAuction.lower_bid()
+            elif (
+                hasattr(self.currentAuction, "bidBut")
+                and event.ui_element == self.currentAuction.bidBut
+            ):
+                self.currentAuction.bid_but()
+            elif (
+                hasattr(self.currentAuction, "newtBidder")
+                and event.ui_element == self.currentAuction.nextBidder
+            ):
+                self.currentAuction.pass_bid()
+            elif (
+                hasattr(self.currentAuction, "retireAuction")
+                and event.ui_element == self.currentAuction.retireAuction
+            ):
+                self.currentAuction.retire_auction()
+                if self.currentAuction.is_finished():
+                    # if there are other auctions open next otherwise close it
+                    if len(self.__auctions) > 0:
+                        self.currentAuction.auctionUI.kill()
+                        self.screen.fill(BLACK)
+                        self.currentAuction = self.__auctions.pop(0)
+                        self.currentAuction.start_auction()
+                    else:
+                        self.currentAuction.auctionUI.kill()
+                        self.currentAuction = None
+                        self.screen.fill(BLACK)
+                        self.__gameUI.updateAllPlayerLables(self.get_players())
+                        self.renable_actions()
 
     def set_test_dice(self, value):
         if self.__test_dice[0] == 0:
@@ -546,6 +547,7 @@ class Game:
                 )
 
         elif event.evenType == BUY_EVENT:
+            effectData = event.effectData
             stock = self.__board.get_stock_if_available(effectData["stockIndex"])
             if stock is not None:
                 player.add_stock(stock)

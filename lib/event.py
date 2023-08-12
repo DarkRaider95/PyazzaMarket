@@ -111,7 +111,8 @@ class Event:
             name = actionsAndValues[1]
             each = False
             payValue = None
-            
+            getValue = None
+
             if 'get' in actionsAndValues:
                 get_index = actionsAndValues.index('get')
                 getValue = int(actionsAndValues[get_index+1])
