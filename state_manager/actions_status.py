@@ -1,5 +1,5 @@
 """This module is used to store the status of the game and the status of the player"""
-
+import inspect
 
 class ActionsStatus:
     """This class is used to store the status of the game and the status of the player"""
@@ -20,12 +20,18 @@ class ActionsStatus:
         attributes = vars(self)
 
         # Check if the action are already saved
-        if not self.__saved_actions:
+        if len(self.__saved_actions) == 0:
             # Iterate over the boolean attributes
             for attribute_name, value in attributes.items():
                 if isinstance(value, bool):
                     self.__saved_actions.append(value)
                     setattr(self, attribute_name, False)
+        else:
+            print("Disable action chiamato due volte")
+
+        curframe = inspect.currentframe()
+        calframe = inspect.getouterframes(curframe, 2)
+        print('caller name:', calframe[1][3])
 
     def renable_actions(self) -> None:
         "This function restore all the actions saved in the saved_actions list"
@@ -33,11 +39,14 @@ class ActionsStatus:
         # Get the dictionary of instance variables using vars()
         attributes = vars(self)
 
-        # Iterate over the boolean attributes
-        for attribute_name, value in attributes.items():
-            if isinstance(value, bool):
-                # Leave the saved actions empty in order to know when the actions are already saved
-                setattr(self, attribute_name, self.__saved_actions.pop(0))
+        if self.__saved_actions == []:
+            print("Renable action due volte")
+        else:
+            # Iterate over the boolean attributes
+            for attribute_name, value in attributes.items():
+                if isinstance(value, bool):
+                    # Leave the saved actions empty in order to know when the actions are already saved
+                    setattr(self, attribute_name, self.__saved_actions.pop(0))
 
     def get_actions_status(self) -> list:
         """Return the list of the boolean values of the actions"""
@@ -85,3 +94,7 @@ class ActionsStatus:
     def get_pass_turn(self) -> bool:
         """Return the value of the pass_turn boolean"""
         return self.__pass_turn
+    
+    def get_saved_actions(self) -> list:
+        """Return the list of the saved actions"""
+        return self.__saved_actions.copy()
