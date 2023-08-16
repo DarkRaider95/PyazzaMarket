@@ -7,24 +7,23 @@ class Auction:
     def __init__(self, manager, screen, owner, bidders, stock):
         self.startPrice = 0
         self.endPrice = 0
-        self.currentBid = 0
+        self.current_bid = 0
         self.manager = manager
         self.screen = screen
         self.__owner = owner
         self.__stock = stock
         self.__finished = False
         self.__bidders = bidders
+        self.current_bidder = 0
+        self.bids = [0] * len(self.__bidders)
+        self.startPrice = self.__stock.get_new_value()
+        self.current_bid = self.__stock.get_new_value()
 
     def start_auction(self):
-        self.startPrice = self.__stock.get_new_value()
-        self.currentBid = self.__stock.get_new_value()
-        self.currentBidder = 0
-        self.bids = [0] * len(self.__bidders)
-
         self.draw_auction()
 
     def draw_auction(self):
-        currBidderName = self.__bidders[self.currentBidder].get_name()
+        currBidderName = self.__bidders[self.current_bidder].get_name()
 
         panel_rect = pygame.Rect((WIDTH // 2 - AUCTION_UI_WIDTH // 2, 20), (AUCTION_UI_WIDTH, AUCTION_UI_HEIGHT))
         self.auctionUI = UIPanel(panel_rect, starting_height= 2, manager=self.manager)
@@ -90,51 +89,68 @@ class Auction:
                                 manager=self.manager)
         
     def round_text_bid(self):
-        remainder = self.currentBid % 10
+        remainder = self.current_bid % 10
         if remainder < 5:
-            rounded_number = self.currentBid - remainder
+            rounded_number = self.current_bid - remainder
         else:
-            rounded_number = self.currentBid + (10 - remainder)
+            rounded_number = self.current_bid + (10 - remainder)
 
-        #self.currentBidText.text = str(rounded_number)
         self.currentBidText.set_text(str(rounded_number))
-        self.currentBid = rounded_number
+        self.current_bid = rounded_number
 
     def raise_bid(self):
-        self.currentBid += 10
-        #self.currentBidText.text = str(self.currentBid)
-        self.currentBidText.set_text(str(self.currentBid))
+        current_bidder_balance = self.current_bidder.get_balance()
+        maxBidIndex = self.find_max_bid()
+        
+        if self.current_bid + 10 > current_bidder_balance:
+            if current_bidder_balance > self.bids[maxBidIndex]:
+                self.current_bid = current_bidder_balance
+            else:
+                self.current_bid = self.bids[maxBidIndex]
+        else:
+            self.current_bid += 10
+        
+        self.currentBidText.set_text(str(self.current_bid))
         
     def lower_bid(self):
-        self.currentBid -= 10
-        #self.currentBidText.text = str(self.currentBid)
-        self.currentBidText.set_text(str(self.currentBid))
+        maxBidIndex = self.find_max_bid()
+        if self.current_bid - 10 > max(self.startPrice, self.bids[maxBidIndex]):
+            self.current_bid -= 10
+        else:            
+            self.current_bid = max(self.startPrice, self.bids[maxBidIndex])
+        self.currentBidText.set_text(str(self.current_bid))
 
     def bid_but(self):
-        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[self.currentBidder].get_name())
+        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[self.current_bidder].get_name())
         self.round_text_bid()
-        self.bids[self.currentBidder] = self.currentBid
-        self.currentBidder = (self.currentBidder +  1) % len(self.__bidders)
-        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.currentBidder].get_name())
+        self.bids[self.current_bidder] = self.current_bid
+
+        if len(self.__bidders) > 1:
+            self.current_bidder = (self.current_bidder +  1) % len(self.__bidders)
+            self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.current_bidder].get_name())
+        else:# if there is only one bidder and he has bidded it means he has won the auction
+            self.winner = self.__bidders[0]
+            self.finished = True
         
     def pass_bid(self):
-        self.currentBidder = (self.currentBidder +  1) % len(self.__bidders)
-        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.currentBidder].get_name())
+        self.current_bidder = (self.current_bidder +  1) % len(self.__bidders)
+        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.current_bidder].get_name())
     
     def retire_auction(self):
-        
-        self.__bidders.pop(self.currentBidder)
-        #the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
-        if(self.currentBidder == len(self.__bidders) - 1):                        
-            self.currentBidder = 0
 
-        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.currentBidder].get_name())
+        self.__bidders.pop(self.current_bidder)
+        self.bids.pop(self.current_bidder)
+        #the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
+        if(self.current_bidder == len(self.__bidders) - 1):                        
+            self.current_bidder = 0
+
+        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.current_bidder].get_name())
         maxBidIndex = self.find_max_bid()
         self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[maxBidIndex].get_name())
-        if len(self.__bidders) == 1:
+        if len(self.__bidders) == 1: # if there is only one bidder and he has retired it means no one won so the stock will be sold to the bank
             self.finished = True
-            self.winner = self.__bidders[0]
-    
+            self.winner = None
+
     def find_max_bid(self):
         max_value = self.bids[0]
         max_index = 0
