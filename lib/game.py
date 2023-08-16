@@ -181,7 +181,7 @@ class Game:
                 buy_stock_from_cell(self.__board.get_cells(), curr_player)
                 self.__gameUI.updateAllPlayerLables(self.get_players())
                 self.__actions_status.set_buy_property(False)
-                self.__actions_status.enable_show_stock(curr_player)
+                self.__actions_status.set_show_stock(True)                
             elif (
                 hasattr(self.__gameUI, "passButton")
                 and event.ui_element == self.__gameUI.passButton
@@ -189,11 +189,13 @@ class Game:
                 self.__current_player_index = (self.__current_player_index + 1) % len(
                     self.get_players()
                 )
+                curr_player = self.__players[self.__current_player_index]
                 self.set_skip_turn()
                 self.__gameUI.updateTurnLabel(curr_player)
                 self.__actions_status.set_throw_dices(True)
                 self.__actions_status.set_pass_turn(False)
                 self.__actions_status.set_buy_property(False)
+                print("stocks ", len(curr_player.get_stocks()))
                 self.__actions_status.enable_show_stock(curr_player)
             elif (
                 hasattr(self.__gameUI, "showStocks")
@@ -211,7 +213,7 @@ class Game:
                 self.screen.fill(BLACK)
                 self.__gameUI.draw_dices()
                 self.__gameUI.updateAllPlayerLables(self.get_players())
-                self.renable_actions()
+                #self.renable_actions()
             elif (
                 hasattr(self.__gameUI, "closeAlertBut")
                 and event.ui_element == self.__gameUI.closeAlertBut
@@ -277,7 +279,7 @@ class Game:
                     self.__gameUI.update_dice((1, 1))
 
     def start_first_auction(self):
-        self.currentAuction = self.__auctions.pop(0)
+        self.currentAuction = self.__auctions.pop(0)        
         # if there are more than two players I can start the auction
         if len(self.currentAuction.get_bidders()) > 2:
             self.currentAuction.start_auction()
@@ -285,10 +287,11 @@ class Game:
             stock = self.currentAuction.get_stock()
             self.showStockUI = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
             self.showStockUI.show_buy_auctioned_stock()
-            self.currentAuction = self.__auctions.pop(0)
-            stock = self.currentAuction.get_stock()
-            self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
-            self.currentAuction = None
+            if len(self.__auctions) > 0: #if the second player has at least one stock
+                self.currentAuction = self.__auctions.pop(0)
+                stock = self.currentAuction.get_stock()
+                self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
+                self.currentAuction = None
 
     def manage_auction_events(self, event):
         if self.currentAuction is not None:
@@ -362,9 +365,11 @@ class Game:
                 if len(player.get_stocks()) > 0:
                     self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), player))
 
-            showStock = self.listShowStockToAuction.pop(0)
-            self.showStockUI = showStock
-            showStock.show_choose_stock_to_auction()
+            if(len(self.listShowStockToAuction) > 0):
+                self.disable_actions()
+                showStock = self.listShowStockToAuction.pop(0)
+                self.showStockUI = showStock
+                showStock.show_choose_stock_to_auction()
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.__board.get_availble_stocks()
             self.disable_actions()

@@ -153,6 +153,7 @@ class ShowStockUI:
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
+            self.action_status.set_show_stock(True)
         elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()
@@ -197,7 +198,7 @@ class ShowStockUI:
                 self.game.showStockUI = showStock
                 showStock.show_buy_auctioned_stock()
             else:
-                self.action_status.renable_actions()                
+                self.action_status.renable_actions()
                 self.game.showStockUI = None
         #case only one bidder left stock
         elif hasattr(self, "leaveToBank") and event.ui_element == self.leaveToBank:
@@ -211,5 +212,5 @@ class ShowStockUI:
                 self.game.showStockUI = showStock
                 showStock.show_buy_auctioned_stock()
             else:
-                self.action_status.renable_actions()                
+                self.action_status.renable_actions()
                 self.game.showStockUI = None
