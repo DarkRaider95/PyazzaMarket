@@ -227,3 +227,7 @@ def update_others_balance(players, owners, amount):
     for player in players:
         if player not in owners:
             player.change_balance(-amount)
+
+
+def finished_auction_logic(players, auction):
+    pass

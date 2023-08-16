@@ -310,6 +310,20 @@ class Game:
                 and event.ui_element == self.currentAuction.bidBut
             ):
                 self.currentAuction.bid_but()
+                if self.currentAuction.is_finished():
+                    finished_auction_logic(self.get_players, self.currentAuction)
+                    # if there are other auctions open next otherwise close it
+                    if len(self.__auctions) > 0:
+                        self.currentAuction.auctionUI.kill()
+                        self.screen.fill(BLACK)
+                        self.currentAuction = self.__auctions.pop(0)
+                        self.currentAuction.start_auction()
+                    else:
+                        self.currentAuction.auctionUI.kill()
+                        self.currentAuction = None
+                        self.screen.fill(BLACK)
+                        self.__gameUI.updateAllPlayerLables(self.get_players())
+                        self.renable_actions()
             elif (
                 hasattr(self.currentAuction, "newtBidder")
                 and event.ui_element == self.currentAuction.nextBidder
@@ -321,6 +335,7 @@ class Game:
             ):
                 self.currentAuction.retire_auction()
                 if self.currentAuction.is_finished():
+                    finished_auction_logic(self.get_players, self.currentAuction)
                     # if there are other auctions open next otherwise close it
                     if len(self.__auctions) > 0:
                         self.currentAuction.auctionUI.kill()
