@@ -228,6 +228,21 @@ def update_others_balance(players, owners, amount):
         if player not in owners:
             player.change_balance(-amount)
 
+# transfer stock from player1 to player2 with amount of money
+def transfer_stock_between_players(player1, player2, amount, stock):
+    player1.change_balance(amount)
+    player2.change_balance(-amount)
+    player1.remove_stock(stock)
+    player2.add_stock(stock)
+    stock.set_owner(player2)
 
-def finished_auction_logic(players, auction):
-    pass
+def finished_auction_logic(board, auction):
+    winner =  auction.get_winner() 
+    owner = auction.get_owner()
+    stock = auction.get_stock()
+
+    if auction.get_winner() is not None:
+        winner_bid = auction.get_winner_bid()
+        transfer_stock_between_players(owner, winner, winner_bid, stock)
+    else:
+        sell_stock_to_bank(board, stock)

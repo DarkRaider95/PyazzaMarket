@@ -18,6 +18,7 @@ class Auction:
         self.bids = [0] * len(self.__bidders)
         self.startPrice = self.__stock.get_new_value()
         self.current_bid = self.__stock.get_new_value()
+        self.__winner = None
 
     def start_auction(self):
         self.draw_auction()
@@ -99,7 +100,8 @@ class Auction:
         self.current_bid = rounded_number
 
     def raise_bid(self):
-        current_bidder_balance = self.current_bidder.get_balance()
+        curr_bidder = self.__bidders[self.current_bidder]
+        current_bidder_balance = curr_bidder.get_balance()
         maxBidIndex = self.find_max_bid()
         
         if self.current_bid + 10 > current_bidder_balance:
@@ -125,12 +127,15 @@ class Auction:
         self.round_text_bid()
         self.bids[self.current_bidder] = self.current_bid
 
+        #remove the bidders that haven't enough balance
+        self.remove_bidders_who_cant_afford()
+
         if len(self.__bidders) > 1:
             self.current_bidder = (self.current_bidder +  1) % len(self.__bidders)
             self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.current_bidder].get_name())
         else:# if there is only one bidder and he has bidded it means he has won the auction
-            self.winner = self.__bidders[0]
-            self.finished = True
+            self.__winner = self.__bidders[0]
+            self.__finished = True
         
     def pass_bid(self):
         self.current_bidder = (self.current_bidder +  1) % len(self.__bidders)
@@ -140,16 +145,19 @@ class Auction:
 
         self.__bidders.pop(self.current_bidder)
         self.bids.pop(self.current_bidder)
-        #the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
-        if(self.current_bidder == len(self.__bidders) - 1):                        
-            self.current_bidder = 0
+        
+        if len(self.__bidders) == 0: # if there aren't any bidders and it means no one won so the stock will be sold to the bank
+            self.__finished = True
+            self.__winner = None
+        else:
+            #the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
+            if(self.current_bidder == len(self.__bidders) - 1 or len(self.__bidders) == 1):                        
+                self.current_bidder = 0
 
-        self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.current_bidder].get_name())
-        maxBidIndex = self.find_max_bid()
-        self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[maxBidIndex].get_name())
-        if len(self.__bidders) == 1: # if there is only one bidder and he has retired it means no one won so the stock will be sold to the bank
-            self.finished = True
-            self.winner = None
+            self.currentBidderText.set_text("Offerta di "+ self.__bidders[self.current_bidder].get_name())
+            maxBidIndex = self.find_max_bid()
+            self.currentHighestBid.set_text("L'offerta più alta è di "+ self.__bidders[maxBidIndex].get_name())
+        
 
     def find_max_bid(self):
         max_value = self.bids[0]
@@ -161,6 +169,22 @@ class Auction:
 
         return max_index
     
+    def remove_bidders_who_cant_afford(self):
+        bidders_to_remove = []
+        bidders_length = len(self.__bidders)
+
+        for index, bidder in enumerate(self.__bidders):
+            if bidder.get_balance() < self.current_bid:
+                bidders_to_remove.append(index)
+
+        for remove_index in bidders_to_remove:
+            self.__bidders.pop(remove_index)
+            self.bids.pop(remove_index)
+            
+            if remove_index == bidders_length - 1 or len(self.__bidders) == 1:
+                self.current_bidder = 0    
+        
+
     def is_finished(self):
         return self.__finished
     
@@ -172,3 +196,9 @@ class Auction:
     
     def get_bidders(self):
         return self.__bidders
+    
+    def get_winner_bid(self):
+        return self.bids[0]
+    
+    def get_winner(self):
+        return self.__winner

@@ -281,7 +281,7 @@ class Game:
     def start_first_auction(self):
         self.currentAuction = self.__auctions.pop(0)        
         # if there are more than two players I can start the auction
-        if len(self.currentAuction.get_bidders()) > 2:
+        if len(self.currentAuction.get_bidders()) >= 2:
             self.currentAuction.start_auction()
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
@@ -311,7 +311,7 @@ class Game:
             ):
                 self.currentAuction.bid_but()
                 if self.currentAuction.is_finished():
-                    finished_auction_logic(self.get_players, self.currentAuction)
+                    finished_auction_logic(self.__board, self.currentAuction)
                     # if there are other auctions open next otherwise close it
                     if len(self.__auctions) > 0:
                         self.currentAuction.auctionUI.kill()
@@ -325,7 +325,7 @@ class Game:
                         self.__gameUI.updateAllPlayerLables(self.get_players())
                         self.renable_actions()
             elif (
-                hasattr(self.currentAuction, "newtBidder")
+                hasattr(self.currentAuction, "nextBidder")
                 and event.ui_element == self.currentAuction.nextBidder
             ):
                 self.currentAuction.pass_bid()
@@ -335,7 +335,7 @@ class Game:
             ):
                 self.currentAuction.retire_auction()
                 if self.currentAuction.is_finished():
-                    finished_auction_logic(self.get_players, self.currentAuction)
+                    finished_auction_logic(self.__board, self.currentAuction)
                     # if there are other auctions open next otherwise close it
                     if len(self.__auctions) > 0:
                         self.currentAuction.auctionUI.kill()
@@ -545,7 +545,7 @@ class Game:
 
     def add_auction(self, player, stock):
         players = list(filter(
-            lambda obj: obj.get_name() == player.get_name(), self.get_players()
+            lambda obj: obj.get_name() != player.get_name(), self.get_players()
         ))
         self.__auctions.append(
             Auction(self.__gameUI.manager, self.screen, player, players, stock)

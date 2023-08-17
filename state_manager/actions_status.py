@@ -12,44 +12,48 @@ class ActionsStatus:
         self.__show_stock = False
         self.__pass_turn = False
         self.__saved_actions = []
-        self.disabled = False
+        self.disabled = 0
 
     def disable_actions(self) -> None:
         "This function save all istances of the class and then set them to false"
 
-        if not self.disabled:
+        if self.disabled == 0:
             # Get the dictionary of instance variables using vars()
             attributes = vars(self)
 
             # Check if the action are already saved
-            if len(self.__saved_actions) == 0:
-                # Iterate over the boolean attributes
-                for attribute_name, value in attributes.items():
-                    if isinstance(value, bool):
-                        self.__saved_actions.append(value)
-                        setattr(self, attribute_name, False)
-            else:
-                print("Disable action chiamato due volte")
+            #if len(self.__saved_actions) == 0:
+            # Iterate over the boolean attributes
+            for attribute_name, value in attributes.items():
+                if isinstance(value, bool):
+                    self.__saved_actions.append(value)
+                    setattr(self, attribute_name, False)
 
-            curframe = inspect.currentframe()
-            calframe = inspect.getouterframes(curframe, 2)
-            print('caller name:', calframe[1][3])
+            self.disabled = 1
+            #else:
+            #    print("Disable action chiamato due volte")
+
+            #curframe = inspect.currentframe()
+            #calframe = inspect.getouterframes(curframe, 2)
+            #print('caller name:', calframe[1][3])
 
     def renable_actions(self) -> None:
         "This function restore all the actions saved in the saved_actions list"
 
-        if self.disabled:
+        if self.disabled == 1:
             # Get the dictionary of instance variables using vars()
             attributes = vars(self)
 
-            if self.__saved_actions == []:
-                print("Renable action due volte")
-            else:
-                # Iterate over the boolean attributes
-                for attribute_name, value in attributes.items():
-                    if isinstance(value, bool):
-                        # Leave the saved actions empty in order to know when the actions are already saved
-                        setattr(self, attribute_name, self.__saved_actions.pop(0))
+            #if self.__saved_actions == []:
+            #    print("Renable action due volte")
+            #else:
+            # Iterate over the boolean attributes
+            for attribute_name, value in attributes.items():
+                if isinstance(value, bool):
+                    # Leave the saved actions empty in order to know when the actions are already saved
+                    setattr(self, attribute_name, self.__saved_actions.pop(0))
+            
+            self.disabled = 0
 
     def get_actions_status(self) -> list:
         """Return the list of the boolean values of the actions"""

@@ -153,7 +153,8 @@ class ShowStockUI:
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
-            self.action_status.set_show_stock(True)
+            self.action_status.renable_actions()
+            self.action_status.set_show_stock(True)            
         elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()
@@ -170,6 +171,7 @@ class ShowStockUI:
             board = self.game.get_board()
             transfer_stock(board, curr_player, chosen_stock)
             self.gameUI.updateAllPlayerLables(players)
+            self.action_status.renable_actions()
         elif hasattr(self, "stockToAuction") and event.ui_element == self.stockToAuction:
             #if there are still some showStockToAuction I have to show another one and create the auction object
             if len(self.game.listShowStockToAuction) > 0:

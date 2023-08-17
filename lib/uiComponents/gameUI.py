@@ -370,7 +370,7 @@ class GameUI:
         # dice.draw also we directly call that function
         self.alertUi.kill()
         self.updateStockboard(players, time.time(), dice)
-        self.renable_actions()
+        self.__actions_status.renable_actions()
 
     def drawDiceOverlay(self, message, title, twoDices=True):
         surface = pygame.Rect(
@@ -462,7 +462,7 @@ class GameUI:
         # dice.draw also we directly call that function
         self.diceOverlay.kill()
         self.updateStockboard(players, time.time(), dice)
-        self.renable_actions()
+        self.__actions_status.renable_actions()
 
     def draw_dices(self):
         surface = self.createDiceSurface()
