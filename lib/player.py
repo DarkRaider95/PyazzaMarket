@@ -18,6 +18,8 @@ class Player:
         self.__freePenalty = False
         self.__free_martini = False
         self.__is_bot = bot
+        self.__in_debt_with = None
+        self.__debt = 0
 
     def move(self, step):
         self.__old_position = self.__position
@@ -125,3 +127,18 @@ class Player:
     
     def get_is_bot(self): # pragma: no cover
         return self.__is_bot
+    
+    def get_debt(self):
+        return self.__debt
+    
+    def set_debt(self, debt):
+        self.__debt = debt
+    
+    def set_in_debt_with(self, creditor):
+        self.__in_debt_with = creditor
+        
+    def solve_debt(self):
+        self.__debt = 0
+
+    def get_in_debt_with(self):
+        return self.__in_debt_with

@@ -54,20 +54,39 @@ class ShowStockUI:
     def show_buy_auctioned_stock(self):
         self.showedStock = 0
         self.draw_stock_ui("Sei l'unico partecipante all'asta vuoi comprare o lasciare alla banca?", True)
-        buyAuctRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+        buy_auct_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
-        self.buyAuctStock = UIButton(relative_rect=buyAuctRect,
+        self.buy_auct_stock = UIButton(relative_rect=buy_auct_rect,
                                 text="Compra",
                                 container=self.stocksUi,
                                 object_id = 'BUY_AUCT_STOCK',
                                 manager=self.manager)
         
-        leaveBankRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+        leave_bank_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
-        self.leaveToBank = UIButton(relative_rect=leaveBankRect,
+        self.leave_to_bank_auct = UIButton(relative_rect=leave_bank_rect,
                                 text="Lascia",
                                 container=self.stocksUi,
                                 object_id = 'LEAVE_AUCT_STOCK',
+                                manager=self.manager)
+        
+    def show_bankrupt_stock(self):
+        self.showedStock = 0
+        self.draw_stock_ui("Sei in banca rotta a vendi o metti all'asta?", False)
+        bankrupt_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+
+        self.auction_bankrupt = UIButton(relative_rect=bankrupt_rect,
+                                text="Compra",
+                                container=self.stocksUi,
+                                object_id = 'BANKRUPT_AUCT',
+                                manager=self.manager)
+        
+        leave_bank_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
+
+        self.leave_to_bank_bankrupt = UIButton(relative_rect=leave_bank_rect,
+                                text="Lascia",
+                                container=self.stocksUi,
+                                object_id = 'LEAVE_BANK_BANKRUPT',
                                 manager=self.manager)
         
     def show_move_to_stock(self, title):
@@ -188,7 +207,7 @@ class ShowStockUI:
                 self.game.showStockUI = None
                 self.game.start_first_auction()
         #case only one bidder bought stock
-        elif hasattr(self, "buyAuctStock") and event.ui_element == self.buyAuctStock:
+        elif hasattr(self, "buy_auct_stock") and event.ui_element == self.buy_auct_stock:
             
             transfer_stock(self.game.get_board(), self.player, self.get_showed_stock(), True)
             self.gameUI.updateAllPlayerLables(players)
@@ -203,16 +222,31 @@ class ShowStockUI:
                 self.action_status.renable_actions()
                 self.game.showStockUI = None
         #case only one bidder left stock
-        elif hasattr(self, "leaveToBank") and event.ui_element == self.leaveToBank:
+        elif hasattr(self, "leave_to_bank_auct") and event.ui_element == self.leave_to_bank_auct:
             sell_stock_to_bank(self.game.get_board(), self.get_showed_stock())
             self.gameUI.updateAllPlayerLables(players)
             self.close_stock_ui()
             self.screen.fill(BLACK)
 
-            if len(self.game.listShowStockToAuction) > 0:                                                
+            if len(self.game.listShowStockToAuction) > 0:
                 showStock = self.game.listShowStockToAuction.pop(0)
                 self.game.showStockUI = showStock
                 showStock.show_buy_auctioned_stock()
             else:
                 self.action_status.renable_actions()
                 self.game.showStockUI = None
+        #sell to bank in case of bankrupt
+        elif hasattr(self, "leave_to_bank_bankrupt") and event.ui_element == self.leave_to_bank_bankrupt:
+            sell_stock_to_bank(self.game.get_board(), self.get_showed_stock())
+            self.gameUI.updateAllPlayerLables(players)
+            self.close_stock_ui()
+            self.screen.fill(BLACK)
+            self.action_status.renable_actions()
+            self.game.showStockUI = None
+        #start an auction in case of bankrupt
+        elif hasattr(self, "auction_bankrupt") and event.ui_element == self.auction_bankrupt:            
+            self.game.add_auction(self.player, self.get_showed_stock())                
+            self.close_stock_ui()
+            self.screen.fill(BLACK)                
+            self.game.showStockUI = None
+            self.game.start_first_auction()
