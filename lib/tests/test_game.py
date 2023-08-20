@@ -76,7 +76,10 @@ def test_launch_dice_double(game: Game, monkeypatch: MonkeyPatch):
 
     monkeypatch.setattr('lib.game.roll', lambda x,y: (1, 1))
 
-    game.manage_events(fakeEvent)     
+    game.manage_events(fakeEvent)
+
+    fakeEventCloseAlert = FakeEvent(pygame_gui.UI_BUTTON_PRESSED, game.get_gameUI().closeAlertBut)
+    game.manage_events(fakeEventCloseAlert)
 
     assert player.get_position() == 2
     assert game.get_actions_status().get_throw_dices() == True

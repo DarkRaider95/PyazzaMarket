@@ -142,12 +142,7 @@ class Game:
         # check turn and crash before any other events or effect of the cells
         check_turn(curr_player)
         crash = check_crash(self.get_players(), self.__current_player_index)
-        if tiro_doppio and crash:
-            self.__gameUI.drawAlert("Doppio e incidente!")
-        elif tiro_doppio:
-            self.__gameUI.drawAlert("Tiro doppio!")
-        elif crash:
-            self.__gameUI.drawAlert("Incidente!")
+        
         # case cell with stock
         if cell.cellType == STOCKS_TYPE:
             # curr_player.move(10)
@@ -159,6 +154,13 @@ class Game:
         # case special cell
         else:
             self.special_cell_logic(cell, curr_player)
+
+        if tiro_doppio and crash:
+            self.__gameUI.drawAlert("Doppio e incidente!")
+        elif tiro_doppio:
+            self.__gameUI.drawAlert("Tiro doppio!")
+        elif crash:
+            self.__gameUI.drawAlert("Incidente!")
 
         self.__gameUI.updateAllPlayerLables(self.get_players())
 

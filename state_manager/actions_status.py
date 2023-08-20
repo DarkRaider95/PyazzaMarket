@@ -1,5 +1,4 @@
 """This module is used to store the status of the game and the status of the player"""
-import inspect
 
 class ActionsStatus:
     """This class is used to store the status of the game and the status of the player"""
