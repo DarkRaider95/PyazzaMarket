@@ -21,7 +21,9 @@ To do list funzionalità:
     - in showStockUi devo controllare se ci sono 0 cedole da mostrare per qualsiasi ragione essa sia e mostrare che non ci sono cedole
     - asta
 - bancarotta
-    - vendita, dopo asta
+    ~~ vendita, dopo asta
+    - gestire gli indici dopo la rimozione dei giocatori
+    - gestire bancarotte multiple
 - macchine
     - due nuove macchine
     - messaggio in caso di doppia selezione della stessa macchina
