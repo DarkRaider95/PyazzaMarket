@@ -19,7 +19,7 @@ class Player:
         self.__free_martini = False
         self.__is_bot = bot
         self.__in_debt_with = None
-        self.__debt = 0
+        self.__debts = []
 
     def move(self, step):
         self.__old_position = self.__position
@@ -84,6 +84,9 @@ class Player:
         if stock_to_remove_index is not None:
             self.__stocks.pop(stock_to_remove_index)
 
+    def is_in_debt(self):
+        return self.__balance < sum(self.__debts)
+
     # all the getters and setters are below
 
     def get_stocks(self): # pragma: no cover
@@ -129,16 +132,23 @@ class Player:
         return self.__is_bot
     
     def get_debt(self):
-        return self.__debt
+        return self.__debts
     
-    def set_debt(self, debt):
-        self.__debt = debt
+    def add_debt(self, debt):
+        self.__debts.append(debt)
+
+    def erase_debts(self):
+        self.__debts = []
+        self.__in_debt_with = None
     
     def set_in_debt_with(self, creditor):
-        self.__in_debt_with = creditor
+        if self.__in_debt_with is None:
+            self.__in_debt_with = []
+
+        self.__in_debt_with.append(creditor)
         
     def solve_debt(self):
-        self.__debt = 0
+        self.__debts = 0
 
     def get_in_debt_with(self):
         return self.__in_debt_with

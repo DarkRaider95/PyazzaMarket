@@ -1,6 +1,6 @@
 import pygame
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIImage
-from lib.gameLogic import transfer_stock, check_if_can_buy_stock, buy_stock_from_cell, sell_stock_to_bank
+from lib.gameLogic import transfer_stock, check_if_can_buy_stock, sell_stock_to_bank, solve_bankrupt
 from lib.constants import *
 
 class ShowStockUI:
@@ -214,13 +214,7 @@ class ShowStockUI:
             self.close_stock_ui()
             self.screen.fill(BLACK)
 
-            if len(self.game.listShowStockToAuction) > 0:                                                
-                showStock = self.game.listShowStockToAuction.pop(0)
-                self.game.showStockUI = showStock
-                showStock.show_buy_auctioned_stock()
-            else:
-                self.action_status.renable_actions()
-                self.game.showStockUI = None
+            self.start_or_end_the_auctions()
         #case only one bidder left stock
         elif hasattr(self, "leave_to_bank_auct") and event.ui_element == self.leave_to_bank_auct:
             sell_stock_to_bank(self.game.get_board(), self.get_showed_stock())
@@ -228,21 +222,15 @@ class ShowStockUI:
             self.close_stock_ui()
             self.screen.fill(BLACK)
 
-            if len(self.game.listShowStockToAuction) > 0:
-                showStock = self.game.listShowStockToAuction.pop(0)
-                self.game.showStockUI = showStock
-                showStock.show_buy_auctioned_stock()
-            else:
-                self.action_status.renable_actions()
-                self.game.showStockUI = None
+            self.start_or_end_the_auctions()
         #sell to bank in case of bankrupt
         elif hasattr(self, "leave_to_bank_bankrupt") and event.ui_element == self.leave_to_bank_bankrupt:
             sell_stock_to_bank(self.game.get_board(), self.get_showed_stock())
             self.gameUI.updateAllPlayerLables(players)
             self.close_stock_ui()
             self.screen.fill(BLACK)
-            self.action_status.renable_actions()
-            self.game.showStockUI = None
+            self.game.is_debt_solved(self.player)
+            
         #start an auction in case of bankrupt
         elif hasattr(self, "auction_bankrupt") and event.ui_element == self.auction_bankrupt:            
             self.game.add_auction(self.player, self.get_showed_stock())                
@@ -250,3 +238,15 @@ class ShowStockUI:
             self.screen.fill(BLACK)                
             self.game.showStockUI = None
             self.game.start_first_auction()
+
+    #logic to start or end the auctions
+    def start_or_end_the_auctions(self):
+        if len(self.game.listShowStockToAuction) > 0:#the auction is one started with the quotation logic
+            showStock = self.game.listShowStockToAuction.pop(0)
+            self.game.showStockUI = showStock
+            showStock.show_buy_auctioned_stock()
+        elif self.player.is_in_debt():#the auction is one started with a bankrupt
+            self.game.is_debt_solved(self.player)
+        else:
+            self.action_status.renable_actions()
+            self.game.showStockUI = None

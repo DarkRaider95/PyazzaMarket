@@ -54,18 +54,27 @@ def check_for_penalty(cells, players, player_number):  # testare per vedere se r
                     #if current_player doesn't have enough money he will be put in debt
                     if current_player.get_balance() < penality:
                         current_player.set_in_debt_with(player)
-                        current_player.set_debt(penality)
+                        current_player.add_debt(penality)
                     else:                        
                         current_player.change_balance(-penality)
                         player.change_balance(penality)
                     break  # we break in order to pay only once the fee if the player have more than one card in the same cell
 
+#function to solve the debt
 def solve_bankrupt(debtor, game):
-    if debtor.get_balance() < 0:
-        creditor = debtor.get_in_debt_with()
+    
+    for creditor, debt in zip(debtor.get_in_debt_with(), debtor.get_debts()):
+
         if creditor == "BANK":
-            pass
-            #debtor.change_balance(-
+            debtor.change_balance(-debt)
+        elif creditor == "SQUARE":
+            debtor.change_balance(-debt)
+            game.set_square_balance(debt)
+        else:
+            debtor.change_balance(-debt)
+            creditor.change_balance(debt)
+    
+    debtor.erase_debts(None)
 
 def check_crash(
     players, player_number
@@ -76,8 +85,13 @@ def check_crash(
     crash = 0
     for player in players:
         if player.get_position() == current_player.get_position():
-            current_player.change_balance(-CRASH_FEE)   #TODO handle bankrupt
-            player.change_balance(CRASH_FEE)
+            #if current_player doesn't have enough money he will be put in debt
+            if current_player.get_balance() < CRASH_FEE:
+                current_player.set_in_debt_with(player)
+                current_player.add_debt(CRASH_FEE)
+            else:                        
+                current_player.change_balance(-CRASH_FEE)
+                player.change_balance(CRASH_FEE)
             crash = 1
     return crash
 
@@ -91,13 +105,20 @@ def stock_prize_logic(player):
     player.change_balance(len(player.get_stocks()) * 100)
 
 
-def quotation_logic(players, board, quotation, game):   #TODO handle bankrupt
+def quotation_logic(players, board, quotation, game):
     new_quotation = quotation[0]
     for player in players:
         for stock in player.get_stocks():
             difference = stock.update_value(new_quotation[stock.get_index()])
-            player.change_balance(difference)
-            game.set_square_balance(difference)
+
+            #handling bankrupt saving debts if the difference is negative and the player doesn't have enough money
+            #he is in bankrupt
+            if difference < 0 and player.get_balance() < -difference: 
+                player.set_in_debt_with("SQUARE")
+                player.add_debt(-difference)
+            else:
+                player.change_balance(difference)
+                game.set_square_balance(difference)
     for cell in board.get_cells():
         if cell.get_stocks() is not None:
             cell.updateCellValue(new_quotation[cell.get_index()])
@@ -114,9 +135,9 @@ def chance_logic(player, squareBalance):
         player.change_balance(amount)
     else:
         amount = -squareBalance // 2
-        if player.get_balance() < amount:
+        if player.get_balance() < -amount:
             player.set_in_debt_with("SQUARE")
-            player.set_debt(-amount)
+            player.add_debt(-amount)
         else:
             player.change_balance(amount)
 
@@ -187,11 +208,12 @@ def get_money_from_others(players, player_number, amount):
 
     players_not_in_debt = len(players)
     for player in players:
-        player.change_balance(-amount)
         if player.get_balance() < amount:
             player.set_in_debt_with(current_player)
-            player.set_debt(amount)
+            player.add_debt(amount)
             players_not_in_debt -= 1
+        else:
+            player.change_balance(-amount)
 
     current_player.change_balance(players_not_in_debt * amount)
 
@@ -226,14 +248,12 @@ def pay_money_to_others(players, player_number, amount):
     players.pop(player_number)
 
     for player in players:
-        player.change_balance(+amount)
-
-    current_player.change_balance(len(players) * (-amount))
-
-    if current_player.get_balance() < amount: # TODO  handle debt with a list of players
-        player.set_in_debt_with(current_player)
-        player.set_debt(amount)
-
+        if current_player.get_balance() < amount:
+            current_player.set_in_debt_with(player)
+            current_player.add_debt(amount)
+        else:
+            player.change_balance(amount)
+            current_player.change_balance(-amount)
 
 # this method is executed when an event with own some stock occurs
 def update_owner_balance(owner, stock_name, amount, each):
@@ -250,7 +270,11 @@ def update_owner_balance(owner, stock_name, amount, each):
 def update_others_balance(players, owners, amount):
     for player in players:
         if player not in owners:
-            player.change_balance(-amount) # TODO handle bankrupt
+            if player.get_balance() < amount:
+                player.set_in_debt_with("BANK")
+                player.add_debt(amount)
+            else:
+                player.change_balance(-amount)
 
 # transfer stock from player1 to player2 with amount of money
 def transfer_stock_between_players(player1, player2, amount, stock):

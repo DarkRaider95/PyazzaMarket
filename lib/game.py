@@ -155,6 +155,10 @@ class Game:
         else:
             self.special_cell_logic(cell, curr_player)
 
+        if curr_player.get_in_debt_with() is not None:
+            self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), curr_player)
+            self.showStockUI.show_bankrupt_stock()
+
         if tiro_doppio and crash:
             self.__gameUI.drawAlert("Doppio e incidente!")
         elif tiro_doppio:
@@ -552,6 +556,35 @@ class Game:
         self.__auctions.append(
             Auction(self.__gameUI.manager, self.screen, player, players, stock)
         )
+
+    def is_debt_solved(self, player):
+        if player.is_in_debt():
+            if len(player.get_stocks()) > 0:
+                self.showStockUI = ShowStockUI(self, player.get_stocks(), player)
+                self.showStockUI.show_bankrupt_stock()
+            else:
+                self.renable_actions()
+                self.showStockUI = None
+                #solve_larger_debts(self.player, self.game) TODO make a function to sort the debts and solve the larger ones if possible
+                self.kill_player(player)
+        else:
+            self.renable_actions()
+            self.showStockUI = None
+            solve_bankrupt(self.player, self.game)
+
+    #removing the player from the list of players the GUI should update automatically
+    def kill_player(self, player):
+        if len(self.get_players()) > 2:
+            self.__gameUI.drawAlert(player.get_name() + " è andato in banca rotta!")
+
+        players = list(filter(
+            lambda obj: obj.get_name() != player.get_name(), self.get_players()
+        ))
+        self.__players = players
+        self.__gameUI.updateAllPlayerLables(self.get_players())
+
+        if len(self.get_players()) == 1:
+            self.__gameUI.drawAlert(self.get_players()[0].get_name() + " ha vinto la partita!")
 
     def disable_actions(self):  # pragma: no cover
         """This function disable the action in the status manager and in the ui"""
