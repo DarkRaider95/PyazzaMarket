@@ -84,6 +84,8 @@ class Player:
         if stock_to_remove_index is not None:
             self.__stocks.pop(stock_to_remove_index)
 
+        Player.last_stock_update = time.time()
+
     def is_in_debt(self):
         return self.__balance < sum(self.__debts)
 
@@ -131,7 +133,7 @@ class Player:
     def get_is_bot(self): # pragma: no cover
         return self.__is_bot
     
-    def get_debt(self):
+    def get_debts(self):
         return self.__debts
     
     def add_debt(self, debt):

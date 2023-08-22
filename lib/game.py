@@ -155,9 +155,13 @@ class Game:
         else:
             self.special_cell_logic(cell, curr_player)
 
+        #bankrupt logic
         if curr_player.get_in_debt_with() is not None:
-            self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), curr_player)
-            self.showStockUI.show_bankrupt_stock()
+            if len(curr_player.get_stocks()) > 0:
+                self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), curr_player)
+                self.showStockUI.show_bankrupt_stock()
+            else:
+                self.is_debt_solved(curr_player)
 
         if tiro_doppio and crash:
             self.__gameUI.drawAlert("Doppio e incidente!")
@@ -219,7 +223,7 @@ class Game:
                 self.screen.fill(BLACK)
                 self.__gameUI.draw_dices()
                 self.__gameUI.updateAllPlayerLables(self.get_players())
-                #self.renable_actions()
+                self.renable_actions()
             elif (
                 hasattr(self.__gameUI, "closeAlertBut")
                 and event.ui_element == self.__gameUI.closeAlertBut
@@ -292,6 +296,7 @@ class Game:
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
             self.showStockUI = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
+            self.currentAuction = None
             self.showStockUI.show_buy_auctioned_stock()
             if len(self.__auctions) > 0: #if the second player has at least one stock
                 self.currentAuction = self.__auctions.pop(0)
@@ -399,11 +404,15 @@ class Game:
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self, stocks)
-            self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
+            if len(stocks) > 0:                
+                self.showStockUI = ShowStockUI(self, stocks)
+                self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
+            else:
+                self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
         elif cell.cellType == SIX_HUNDRED_TYPE:
             six_hundred_logic(player)
         elif cell.cellType == CHANCE_TYPE:
+            self.disable_actions()
             self.__gameUI.drawDiceOverlay(
                 self.__players[self.__current_player_index].get_name() + " tira dadi",
                 "Riserva monetaria",
@@ -536,7 +545,7 @@ class Game:
             pass
 
         if effectData["buy"]:
-            stock = self.__board.get_stock_if_available(effectData["destination"])
+            stock = self.__board.get_stock_if_available(effectData["destination"])  #TODO call buy stock logic in this way the bankrupt and everything should be already implemented
             if stock is not None:
                 player.add_stock(stock)
                 player.change_balance(-stock.get_original_value())
@@ -570,7 +579,7 @@ class Game:
         else:
             self.renable_actions()
             self.showStockUI = None
-            solve_bankrupt(self.player, self.game)
+            solve_bankrupt(player, self)
 
     #removing the player from the list of players the GUI should update automatically
     def kill_player(self, player):
@@ -582,6 +591,10 @@ class Game:
         ))
         self.__players = players
         self.__gameUI.updateAllPlayerLables(self.get_players())
+
+        #fix index of current player
+        if(self.__current_player_index == len(self.__players) - 1 or len(self.__players) == 1):                        
+            self.__current_player_index = 0
 
         if len(self.get_players()) == 1:
             self.__gameUI.drawAlert(self.get_players()[0].get_name() + " ha vinto la partita!")

@@ -62,6 +62,9 @@ class ShowStockUI:
                                 object_id = 'BUY_AUCT_STOCK',
                                 manager=self.manager)
         
+        if self.player.get_balance() < self.stocks[0].get_stock_value():
+            self.buy_auct_stock.disable()
+        
         leave_bank_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.leave_to_bank_auct = UIButton(relative_rect=leave_bank_rect,
@@ -76,7 +79,7 @@ class ShowStockUI:
         bankrupt_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.auction_bankrupt = UIButton(relative_rect=bankrupt_rect,
-                                text="Compra",
+                                text="Metti all'asta",
                                 container=self.stocksUi,
                                 object_id = 'BANKRUPT_AUCT',
                                 manager=self.manager)
@@ -84,7 +87,7 @@ class ShowStockUI:
         leave_bank_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.leave_to_bank_bankrupt = UIButton(relative_rect=leave_bank_rect,
-                                text="Lascia",
+                                text="Lascia alla banca",
                                 container=self.stocksUi,
                                 object_id = 'LEAVE_BANK_BANKRUPT',
                                 manager=self.manager)

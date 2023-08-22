@@ -22,7 +22,7 @@ To do list funzionalità:
     - asta
 - bancarotta
     ~~ vendita, dopo asta
-    - gestire gli indici dopo la rimozione dei giocatori
+    ~~ gestire gli indici dopo la rimozione dei giocatori
     - gestire bancarotte multiple
 - macchine
     - due nuove macchine
@@ -44,7 +44,15 @@ To do list funzionalità:
 To fix:
 - ~~ fix the two line to draw in stock ~~
 - ~~ fix doppio prima di casella combi ~~
-- asta no offerte per il giocatore che vende
+- ~~ asta no offerte per il giocatore che vende
+- alert e showStockUI da mettere a parte nel loop principale in questo modo fixo le sovrapposizioni una volta per tutte
+    - voglio mettere prima l'oggetto in una variabile globale invece di disegnare subito l'alert
+    - voglio creare anche la lista degli alert
+    - voglio mettere una variabile tipo in show stock ui e in base al tipo chiamo il metodo corretto che disegna in maniera diversa la gui
+      attualmente invece non posso aspettare di disegnare perché poi non so il tipo di gui da mostrare
+    - in questo modo nel loop principale controllo se ci sono alert o gui da mostrare
+    - se ci sono le disegno una alla volta
+    - decidiamo poi la priorità delle gui e degli alert
 
 To do list codice:
 - fare getters and setters

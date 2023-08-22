@@ -74,7 +74,7 @@ def solve_bankrupt(debtor, game):
             debtor.change_balance(-debt)
             creditor.change_balance(debt)
     
-    debtor.erase_debts(None)
+    debtor.erase_debts()
 
 def check_crash(
     players, player_number
