@@ -156,12 +156,14 @@ class Game:
             self.special_cell_logic(cell, curr_player)
 
         #bankrupt logic
-        if curr_player.get_in_debt_with() is not None:
+        if curr_player.is_in_debt():
             if len(curr_player.get_stocks()) > 0:
                 self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), curr_player)
                 self.showStockUI.show_bankrupt_stock()
             else:
                 self.is_debt_solved(curr_player)
+        else:#check if others are in debt after our turn due to some event
+            self.is_there_some_player_in_bankrupt()
 
         if tiro_doppio and crash:
             self.__gameUI.drawAlert("Doppio e incidente!")
@@ -576,10 +578,18 @@ class Game:
                 self.showStockUI = None
                 #solve_larger_debts(self.player, self.game) TODO make a function to sort the debts and solve the larger ones if possible
                 self.kill_player(player)
+                self.is_there_other_player_in_bankrupt()
         else:
             self.renable_actions()
             self.showStockUI = None
             solve_bankrupt(player, self)
+            self.is_there_other_player_in_bankrupt()
+
+    def is_there_some_player_in_bankrupt(self):
+        for player in self.get_players():
+            if player.is_in_debt():
+                self.is_debt_solved(self, player)
+                break #handle one bankrupt at a time
 
     #removing the player from the list of players the GUI should update automatically
     def kill_player(self, player):
