@@ -561,9 +561,7 @@ class Game:
         player.set_position(effectData["destination"])
 
     def add_auction(self, player, stock):
-        players = list(filter(
-            lambda obj: obj.get_name() != player.get_name(), self.get_players()
-        ))
+        players = self.get_other_players(player)
         self.__auctions.append(
             Auction(self.__gameUI.manager, self.screen, player, players, stock)
         )
@@ -576,7 +574,7 @@ class Game:
             else:
                 self.renable_actions()
                 self.showStockUI = None
-                #solve_larger_debts(self.player, self.game) TODO make a function to sort the debts and solve the larger ones if possible
+                solve_larger_debts(player, self)
                 self.kill_player(player)
                 self.is_there_other_player_in_bankrupt()
         else:
@@ -596,9 +594,7 @@ class Game:
         if len(self.get_players()) > 2:
             self.__gameUI.drawAlert(player.get_name() + " è andato in banca rotta!")
 
-        players = list(filter(
-            lambda obj: obj.get_name() != player.get_name(), self.get_players()
-        ))
+        players = self.get_other_players(player)
         self.__players = players
         self.__gameUI.updateAllPlayerLables(self.get_players())
 
@@ -652,3 +648,8 @@ class Game:
     
     def get_board(self): # pragma: no cover
         return self.__board
+    
+    def get_other_players(self, player): # pragma: no cover
+        return list(filter(
+            lambda obj: obj.get_name() != player.get_name(), self.get_players()
+        ))
