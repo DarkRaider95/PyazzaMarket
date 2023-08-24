@@ -236,13 +236,17 @@ class Game:
                 and event.ui_element == self.__gameUI.closeDiceOverlayBut
             ):
                 self.dice_overlay.close_dice_overlay()
-                if self.dice_overlay.overlay_on():
-                    self.__actions_status.set_throw_dices(True)
-                else:
+                if not self.dice_overlay.overlay_on():
                     self.__current_player_index = self.dice_overlay.get_who_will_start()
+                    self.__actions_status.set_throw_dices(True)
                 self.__gameUI.updateTurnLabel(
                     self.__players[self.__current_player_index]
                 )
+            elif (
+                hasattr(self.__gameUI, "close_die_overlay_but")
+                and event.ui_element == self.__gameUI.close_die_overlay_but
+            ):
+                self.dice_overlay.close_dice_overlay()
             elif (
                 hasattr(self.__gameUI, "launchOverlayDiceBut")
                 and event.ui_element == self.__gameUI.launchOverlayDiceBut

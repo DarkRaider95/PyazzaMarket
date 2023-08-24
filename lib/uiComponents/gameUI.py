@@ -391,6 +391,14 @@ class GameUI:
         )
         UILabel(message_rect, message, manager=self.manager, container=self.diceOverlay)
 
+        close_rect = pygame.Rect(
+            (
+                DICE_OVERLAY_WIDTH - ALERT_BUT_WIDTH - 20,
+                DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10,
+            ),
+            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
+        )
+
         if twoDices:
             imgRect = pygame.Rect(
                 (DICE_OVERLAY_WIDTH // 2 - DICE_WIDTH, 65),
@@ -400,6 +408,15 @@ class GameUI:
             self.diceOverlayImg = UIImage(
                 imgRect, diceSurface, manager=self.manager, container=self.diceOverlay
             )
+
+            self.closeDiceOverlayBut = UIButton(
+                relative_rect=close_rect,
+                text="Chiudi",
+                container=self.diceOverlay,
+                object_id="CLOSE_DICE_OVERLAY",
+                manager=self.manager,
+            )
+            self.closeDiceOverlayBut.disable()
         else:
             imgRect = pygame.Rect(
                 ((DICE_OVERLAY_WIDTH - DICE_WIDTH) // 2, 65), (DICE_WIDTH, DICE_HEIGHT)
@@ -408,22 +425,15 @@ class GameUI:
             self.diceOverlayImg = UIImage(
                 imgRect, diceSurface, manager=self.manager, container=self.diceOverlay
             )
+            self.close_die_overlay_but = UIButton(
+                relative_rect=close_rect,
+                text="Chiudi",
+                container=self.diceOverlay,
+                object_id="CLOSE_DICE_OVERLAY",
+                manager=self.manager,
+            )
+            self.close_die_overlay_but.disable()
 
-        close_rect = pygame.Rect(
-            (
-                DICE_OVERLAY_WIDTH - ALERT_BUT_WIDTH - 20,
-                DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10,
-            ),
-            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
-        )
-        self.closeDiceOverlayBut = UIButton(
-            relative_rect=close_rect,
-            text="Chiudi",
-            container=self.diceOverlay,
-            object_id="CLOSE_DICE_OVERLAY",
-            manager=self.manager,
-        )
-        self.closeDiceOverlayBut.disable()
 
         self.__actions_status.disable_actions()
 
@@ -455,7 +465,10 @@ class GameUI:
         self.update_dice(score)
         self.diceOverlayImg.set_image(self.createDiceSurface(self.twoDices))
         self.launchOverlayDiceBut.disable()
-        self.closeDiceOverlayBut.enable()
+        if hasattr(self, "close_die_overlay_but"):
+            self.close_die_overlay_but.enable()
+        if hasattr(self, "closeDiceOverlayBut"):
+            self.closeDiceOverlayBut.enable()
 
     def closeDiceOverlay(self, players, dice):
         # since screen.fill(BLACK) is already on updateStockboard and
