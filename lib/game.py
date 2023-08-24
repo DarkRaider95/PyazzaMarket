@@ -1,6 +1,7 @@
 import pygame
 
 from lib.auction import Auction
+from lib.uiComponents.bargainUI import BargainUI
 from lib.uiComponents.showStockUI import ShowStockUI
 from lib.uiComponents.gameUI import GameUI
 from lib.constants import (
@@ -52,6 +53,7 @@ class Game:
         self.__current_player_index = 0
         self.__square_balance = SQUARE_BALANCE
         self.showStockUI: Optional[ShowStockUI] = None
+        self.bargain_ui: Optional[BargainUI] = None
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -250,12 +252,16 @@ class Game:
             elif self.currentAuction is not None:
                 self.manage_auction_events(event)
             elif self.showStockUI is not None:
-                print(self.showStockUI.stocks[0].get_name())
                 self.showStockUI.manage_stock_events(
                     event, self.get_players(), curr_player
                 )
+            elif self.bargain_ui is not None:
+                self.bargain_ui.manage_bargain_events(event)
             else:  # pragma: no cover
                 print("Evento non gestito")
+        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+            if self.bargain_ui is not None:
+                self.bargain_ui.manage_bargain_events(event)
         elif event.type == pygame.KEYDOWN and self.__test:
             if event.key == pygame.K_0:  # or pygame.K_KP0:
                 self.set_test_dice(0)
@@ -407,7 +413,7 @@ class Game:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             if len(stocks) > 0:                
-                self.showStockUI = ShowStockUI(self, stocks)
+                self.showStockUI = ShowStockUI(self, stocks, player)
                 self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
             else:
                 self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
@@ -576,12 +582,12 @@ class Game:
                 self.showStockUI = None
                 solve_larger_debts(player, self)
                 self.kill_player(player)
-                self.is_there_other_player_in_bankrupt()
+                self.is_there_some_player_in_bankrupt()
         else:
             self.renable_actions()
             self.showStockUI = None
             solve_bankrupt(player, self)
-            self.is_there_other_player_in_bankrupt()
+            self.is_there_some_player_in_bankrupt()
 
     def is_there_some_player_in_bankrupt(self):
         for player in self.get_players():
@@ -599,7 +605,7 @@ class Game:
         self.__gameUI.updateAllPlayerLables(self.get_players())
 
         #fix index of current player
-        if(self.__current_player_index == len(self.__players) - 1 or len(self.__players) == 1):                        
+        if(self.__current_player_index == len(self.__players) - 1):                        
             self.__current_player_index = 0
 
         if len(self.get_players()) == 1:

@@ -2,6 +2,7 @@ import pygame
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIImage
 from lib.gameLogic import transfer_stock, check_if_can_buy_stock, sell_stock_to_bank, solve_bankrupt
 from lib.constants import *
+from lib.uiComponents.bargainUI import BargainUI
 
 class ShowStockUI:
     def __init__(self, game, stocks, player = None):
@@ -175,8 +176,10 @@ class ShowStockUI:
             self.screen.fill(BLACK)
             self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
-            self.action_status.renable_actions()
-            self.action_status.set_show_stock(True)            
+            self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, self.game.get_other_players(self.player), self.game)
+            self.game.bargain_ui.draw()
+            #self.action_status.renable_actions()
+            #self.action_status.set_show_stock(True)            
         elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()

@@ -12,7 +12,7 @@ To do list funzionalità:
     - ~~ calcolo penalità ~~
     - ~~ calcolo differenza da dare ai giocatori ~~
 - eventi
-    - eventi colorati
+    ~~ eventi colorati ~~
     - grafica per scegliere accompagnatore
     - grafica per avviare trattative
 - loghi
@@ -21,9 +21,11 @@ To do list funzionalità:
     - in showStockUi devo controllare se ci sono 0 cedole da mostrare per qualsiasi ragione essa sia e mostrare che non ci sono cedole
     - asta
 - bancarotta
-    ~~ vendita, dopo asta
-    ~~ gestire gli indici dopo la rimozione dei giocatori
-    - gestire bancarotte multiple
+    ~~ vendita, dopo asta ~~
+    ~~ gestire gli indici dopo la rimozione dei giocatori ~~
+    ~~ gestire bancarotte multiple ~~
+- trattative
+    - aggiungere i soldi alle trattative
 - macchine
     - due nuove macchine
     - messaggio in caso di doppia selezione della stessa macchina
@@ -44,7 +46,7 @@ To do list funzionalità:
 To fix:
 - ~~ fix the two line to draw in stock ~~
 - ~~ fix doppio prima di casella combi ~~
-- ~~ asta no offerte per il giocatore che vende
+- ~~ asta no offerte per il giocatore che vende ~~
 - alert e showStockUI da mettere a parte nel loop principale in questo modo fixo le sovrapposizioni una volta per tutte
     - voglio mettere prima l'oggetto in una variabile globale invece di disegnare subito l'alert
     - voglio creare anche la lista degli alert
@@ -53,6 +55,10 @@ To fix:
     - in questo modo nel loop principale controllo se ci sono alert o gui da mostrare
     - se ci sono le disegno una alla volta
     - decidiamo poi la priorità delle gui e degli alert
+- aste
+    - se rimane un solo giocatore che ha fatto l'offerta è costretto a comprare la cedola
+    - se nessuno ha offerto allora si possono ritirare tutti e la cedola va alla banca
+    - salvare i balance all'inizio delle aste per evitare che il primo che riceve i soldi dell'asta sia avvantaggiato sugli altri
 
 To do list codice:
 - fare getters and setters
