@@ -29,6 +29,7 @@ class Cell:
                 self.__stocks.append(Stock(cellDef, position, name, logo, enableGraphics))
             self.__stockIndex = cellDef["index"]
             self.angle = cellDef["angle"]
+            self.__logo = logo
         else:
             self.angle = angle
         self.cell_x = cell_x
@@ -62,12 +63,18 @@ class Cell:
         cell_rect = pygame.Rect(
             0, 0, CELL_WIDTH, CELL_HEIGHT
         )  # pygame.Rect(self.cell_x, self.cell_y, CELL_WIDTH, CELL_HEIGHT)
-        logorect = pygame.Rect(logo_x, logo_y, CELL_LOGO_WIDTH, CELL_LOGO_HEIGHT)
+        #logorect = pygame.Rect(logo_x, logo_y, CELL_LOGO_WIDTH, CELL_LOGO_HEIGHT)
         colorrect = pygame.Rect(
             cell_color_x, cell_color_y, CELL_COLOR_WIDTH, CELL_COLOR_HEIGHT
         )
         pygame.draw.rect(self.surface, WHITE, cell_rect)
-        pygame.draw.rect(self.surface, BLACK, logorect)
+
+        logo_path = LOGOS_DIR + self.__logo
+        logo = pygame.image.load(logo_path) # aggiungere path completo
+        logo = pygame.transform.scale(logo, (CELL_LOGO_WIDTH, CELL_LOGO_HEIGHT))
+        self.surface.blit(logo, (logo_x, logo_y))
+
+        #pygame.draw.rect(self.surface, BLACK, logorect)
         pygame.draw.rect(self.surface, self.color, colorrect)
 
         # Draw stock price

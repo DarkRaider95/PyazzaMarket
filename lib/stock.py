@@ -38,7 +38,6 @@ class Stock:
         pygame.draw.rect(self.surface, self.color, rect)
         logo_path = LOGOS_DIR + self.__logo
 
-
         logo = pygame.image.load(logo_path) # aggiungere path completo
         logo = pygame.transform.scale(logo, (LOGO_WIDTH, LOGO_HEIGHT))
         self.surface.blit(logo, (logo_x, logo_y))
