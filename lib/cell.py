@@ -24,10 +24,9 @@ class Cell:
             self.color = cellDef["color"]
             self.__original_value = cellDef["value"]
             self.__new_value = self.__original_value
-            self.logo = logo
             self.__stocks = []
             for _ in range(0, 2):
-                self.__stocks.append(Stock(cellDef, position, name, enableGraphics))
+                self.__stocks.append(Stock(cellDef, position, name, logo, enableGraphics))
             self.__stockIndex = cellDef["index"]
             self.angle = cellDef["angle"]
         else:

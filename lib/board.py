@@ -58,7 +58,8 @@ class Board:
         y = curr_y
         # saving the names of the __cells following the order of the __cells
         names = CELLS_DEF[colors[0]]['names'] + CELLS_DEF[colors[1]]['names']
-    
+        logos = CELLS_DEF[colors[0]]['logos'] + CELLS_DEF[colors[1]]['logos']
+
         for i in range(0, 9):
             x, y = Board.compute_next_coord(x, y, CELLS_DEF[colors[0]]['side'])
             position += 1
@@ -69,11 +70,11 @@ class Board:
                 cell = Cell(None, centralType, x, y, None, centralImage, position, None, angle = CELLS_DEF[colors[0]]['angle'], enableGraphics = self.enableGraphics)
             elif (i < 4): # check if it is less than 4 that means that it is the first color
                 cellDef = CELLS_DEF[colors[0]]
-                cell = Cell(cellDef, STOCKS_TYPE, x, y, None, None, position, names.pop(0), enableGraphics = self.enableGraphics)
+                cell = Cell(cellDef, STOCKS_TYPE, x, y, logos.pop(0), None, position, names.pop(0), enableGraphics = self.enableGraphics)
             else: # otherwise is the second color
                 # cell def defines the color, x and y are the position, than logo, image if it is a special one and position is the ordered number of the cell
                 cellDef = CELLS_DEF[colors[1]]
-                cell = Cell(cellDef, STOCKS_TYPE, x, y, None, None, position, names.pop(0), enableGraphics = self.enableGraphics) 
+                cell = Cell(cellDef, STOCKS_TYPE, x, y, logos.pop(0), None, position, names.pop(0), enableGraphics = self.enableGraphics) 
                 
             self.__cells.append(cell)
 

@@ -1,4 +1,4 @@
-from .constants import STOCK_HEIGHT, STOCK_WIDTH, LOGO_WIDTH, LOGO_HEIGHT, PRICE_WIDTH, PRICES_HEIGHT, WIDTH, HEIGHT, WHITE, BLACK
+from .constants import STOCK_HEIGHT, STOCK_WIDTH, LOGO_WIDTH, LOGO_HEIGHT, PRICE_WIDTH, PRICES_HEIGHT, WIDTH, HEIGHT, WHITE, BLACK, LOGOS_DIR
 import pygame
 
 class Stock:
@@ -10,10 +10,10 @@ class Stock:
         "5 Cedole della stesso colore",
         "6 Cedole della stesso colore",
     ]
-    def __init__(self, cellDef, position, name, enable_graphics):
+    def __init__(self, cellDef, position, name, logo, enable_graphics):
         self.color = cellDef['color']
         self.__original_value = cellDef['value']
-        self.logo = None # cellDef['logo']
+        self.__logo = logo
         self.__position = position
         self.__name = name
         self.__penalties = cellDef['penalty']
@@ -33,10 +33,17 @@ class Stock:
         price_x = STOCK_WIDTH // 2 - PRICE_WIDTH // 2
         price_y = logo_y + LOGO_HEIGHT + 150
         rect = pygame.Rect(0, 0, STOCK_WIDTH, STOCK_HEIGHT)
-        logorect = pygame.Rect(logo_x, logo_y, LOGO_WIDTH, LOGO_HEIGHT)
+        #logorect = pygame.Rect(logo_x, logo_y, LOGO_WIDTH, LOGO_HEIGHT)
         feesrect = pygame.Rect(price_x, price_y, PRICE_WIDTH, PRICES_HEIGHT)
         pygame.draw.rect(self.surface, self.color, rect)
-        pygame.draw.rect(self.surface, WHITE, logorect)
+        logo_path = LOGOS_DIR + self.__logo
+
+
+        logo = pygame.image.load(logo_path) # aggiungere path completo
+        logo = pygame.transform.scale(logo, (LOGO_WIDTH, LOGO_HEIGHT))
+        self.surface.blit(logo, (logo_x, logo_y))
+
+        #pygame.draw.rect(self.surface, WHITE, logorect)
         pygame.draw.rect(self.surface, WHITE, feesrect)
         #Draw stock price and fees
         stock_price = self.font_stock_value.render(str(self.__new_value) + "  SCUDI", True, WHITE)

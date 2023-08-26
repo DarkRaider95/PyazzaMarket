@@ -53,6 +53,7 @@ To fix:
     - in questo modo nel loop principale controllo se ci sono alert o gui da mostrare
     - se ci sono le disegno una alla volta
     - decidiamo poi la priorità delle gui e degli alert
+- dopo chiusura della compra vendita di azioni nella casella fermata libera senza comprare nulla i tasti rimangono bloccati 
 
 To do list codice:
 - fare getters and setters

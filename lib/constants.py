@@ -23,7 +23,7 @@ PURPLE = (128, 0, 128)
 
 FPS = 30
 
-INITIAL_BALANCE = 300
+INITIAL_BALANCE = 3000
 SQUARE_BALANCE = 2000
 CRASH_FEE = 100
 TURN_FEE = 300
@@ -63,6 +63,9 @@ DICE_6 = ASSET_PATH + 'dice6.png'
 #PATH OF THE EVENTS IMAGES
 EVENTS_DIR = "assets/events/"
 
+#PATH OF STOCK LOGOS
+LOGOS_DIR = "assets/cedole/"
+
 #EVENT DIMENSIONS
 EVENT_WIDTH = 500
 EVENT_HEIGHT = 700
@@ -99,7 +102,7 @@ STOCKBOARD_HEIGHT = 334
 #CELLS OBJECT
 CELLS_DEF = {
     'ORANGE':{
-        'logos': ['gled.png', 'frieskes.png', 'frio.png'],
+        'logos': ['gled.png', 'friskies.png', 'frio.png'],
         'value': 200,
         'color': ORANGE,
         'penalty': [60, 160, 160, 200, 260, 500],
@@ -119,7 +122,7 @@ CELLS_DEF = {
         'index': 1
     },
     'PINK':{
-        'logos': ['zarotti.png', 'ponti.png', 'nostromo.png'],
+        'logos': ['zarotti.png', 'ponti.jpg', 'nostromo.png'],
         'value': 360,
         'color': PINK,
         'penalty': [100, 280, 280, 360, 460, 900],
@@ -139,7 +142,7 @@ CELLS_DEF = {
         'index': 3
     },
     'RED':{
-        'logos': ['lavazza.png', 'mangiaebevi.png', 'stella-artois.png'],
+        'logos': ['lavazza.png', 'mangia-e-bevi.png', 'stella-artois.png'],
         'value': 500,
         'color': RED,
         'penalty': [140, 380, 380, 500, 660, 1200],
@@ -169,7 +172,7 @@ CELLS_DEF = {
         'index': 6
     },
     'PURPLE':{
-        'logos': ['cavicchioli.png', 'martini.png', 'galup.png'],
+        'logos': ['cavicchioli.jpg', 'martini.png', 'galup.png'],
         'value': 800,
         'color': PURPLE,
         'penalty': [200, 600, 600, 800, 1000, 2000],
