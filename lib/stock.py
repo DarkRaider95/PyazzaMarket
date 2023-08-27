@@ -33,16 +33,12 @@ class Stock:
         price_x = STOCK_WIDTH // 2 - PRICE_WIDTH // 2
         price_y = logo_y + LOGO_HEIGHT + 150
         rect = pygame.Rect(0, 0, STOCK_WIDTH, STOCK_HEIGHT)
-        #logorect = pygame.Rect(logo_x, logo_y, LOGO_WIDTH, LOGO_HEIGHT)
         feesrect = pygame.Rect(price_x, price_y, PRICE_WIDTH, PRICES_HEIGHT)
         pygame.draw.rect(self.surface, self.color, rect)
         logo_path = LOGOS_DIR + self.__logo
-
         logo = pygame.image.load(logo_path) # aggiungere path completo
         logo = pygame.transform.scale(logo, (LOGO_WIDTH, LOGO_HEIGHT))
         self.surface.blit(logo, (logo_x, logo_y))
-
-        #pygame.draw.rect(self.surface, WHITE, logorect)
         pygame.draw.rect(self.surface, WHITE, feesrect)
         #Draw stock price and fees
         stock_price = self.font_stock_value.render(str(self.__new_value) + "  SCUDI", True, WHITE)

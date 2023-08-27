@@ -68,13 +68,10 @@ class Cell:
             cell_color_x, cell_color_y, CELL_COLOR_WIDTH, CELL_COLOR_HEIGHT
         )
         pygame.draw.rect(self.surface, WHITE, cell_rect)
-
         logo_path = LOGOS_DIR + self.__logo
         logo = pygame.image.load(logo_path) # aggiungere path completo
         logo = pygame.transform.scale(logo, (CELL_LOGO_WIDTH, CELL_LOGO_HEIGHT))
         self.surface.blit(logo, (logo_x, logo_y))
-
-        #pygame.draw.rect(self.surface, BLACK, logorect)
         pygame.draw.rect(self.surface, self.color, colorrect)
 
         # Draw stock price
