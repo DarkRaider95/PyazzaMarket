@@ -68,6 +68,24 @@ class Game:
                 Player(player["name"], player["color"], player["bot"])
             )
 
+    def update_graphic(self):
+        # Now we update at all turn the stockboard for avoiding
+        self.__gameUI.updateStockboard(
+            self.get_players(), Player.last_stock_update, self.__gameUI
+        )
+        self.__board.draw(self.screen)
+        self.__gameUI.renable_actions()
+        for i, player in enumerate(self.get_players()):
+            self.__board.draw_player_car(
+                self.screen, player, i, len(self.get_players())
+            )
+
+        time_delta = self.clock.tick(FPS) / 1000.0
+        self.__gameUI.manager.update(time_delta)
+        self.__gameUI.manager.draw_ui(self.screen)
+        pygame.display.update()
+
+
     def start(self):  # pragma: no cover
         self.__board.draw(self.screen)
         self.__gameUI.draw_dices()
@@ -88,32 +106,17 @@ class Game:
         for index, player in enumerate(self.get_players()):
             self.__board.draw_player_car(self.screen, player, index, len(self.__players))
 
+        self.update_graphic()
         while self.running:
             self.clock.tick(FPS)
 
             if self.__players[self.__current_player_index].get_is_bot():
                 self.__bot.play()
+                self.update_graphic()
 
             for event in pygame.event.get():
                 self.manage_events(event)
                 self.__gameUI.manager.process_events(event)
-
-            # Now we update at all turn the stockboard for avoiding
-            self.__gameUI.updateStockboard(
-                self.get_players(), Player.last_stock_update, self.__gameUI
-            )
-            self.__board.draw(self.screen)
-            self.__gameUI.renable_actions()
-            for i, player in enumerate(self.get_players()):
-                self.__board.draw_player_car(
-                    self.screen, player, i, len(self.get_players())
-                )
-
-            time_delta = self.clock.tick(FPS) / 1000.0
-            self.__gameUI.manager.update(time_delta)
-            #self.__gameUI.updateTurnLabel(self.__players[self.__current_player_index])
-            self.__gameUI.manager.draw_ui(self.screen)
-            pygame.display.update()
 
     def set_skip_turn(self):  # pragma: no cover
         curr_player = self.__players[self.__current_player_index]
@@ -261,6 +264,7 @@ class Game:
                 )
             else:  # pragma: no cover
                 print("Evento non gestito")
+            self.update_graphic()
         elif event.type == pygame.KEYDOWN and self.__test:
             if event.key == pygame.K_0:  # or pygame.K_KP0:
                 self.set_test_dice(0)
@@ -294,6 +298,7 @@ class Game:
                         self.turn()
                     self.__test_dice = (0, 0)
                     self.__gameUI.update_dice((1, 1))
+            self.update_graphic()
 
     def start_first_auction(self):
         self.currentAuction = self.__auctions.pop(0)        

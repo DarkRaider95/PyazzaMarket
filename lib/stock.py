@@ -10,10 +10,10 @@ class Stock:
         "5 Cedole della stesso colore",
         "6 Cedole della stesso colore",
     ]
-    def __init__(self, cellDef, position, name, logo, enable_graphics):
+    def __init__(self, cellDef, position, name, logo_path, enable_graphics):
         self.color = cellDef['color']
         self.__original_value = cellDef['value']
-        self.__logo = logo
+        self.__logo_path = logo_path
         self.__position = position
         self.__name = name
         self.__penalties = cellDef['penalty']
@@ -25,33 +25,40 @@ class Stock:
             self.surface = pygame.Surface((STOCK_WIDTH, STOCK_HEIGHT))
             self.fees = pygame.font.Font(None, 32)
             self.font_stock_value = pygame.font.Font(None, 100)
-
+            self.__rect = pygame.Rect(0, 0, STOCK_WIDTH, STOCK_HEIGHT)
+            self.__logo_x = STOCK_WIDTH // 2 - LOGO_WIDTH // 2
+            self.__logo_y = 50
+            self.__price_x = STOCK_WIDTH // 2 - PRICE_WIDTH // 2
+            self.__price_y = self.__logo_y + LOGO_HEIGHT + 150
+            self.__feesrect = pygame.Rect(self.__price_x, self.__price_y, PRICE_WIDTH, PRICES_HEIGHT)
+            logo = pygame.image.load(self.__logo_path) # aggiungere path completo
+            self.__logo = pygame.transform.scale(logo, (LOGO_WIDTH, LOGO_HEIGHT))
+            self.__stock_price = self.font_stock_value.render(str(self.__new_value) + "  SCUDI", True, WHITE)
+            self.__string_values_rendered = []
+            for i in range(0,len(self.__new_penalties)):
+                self.__string_values_rendered.append(self.fees.render(Stock.string_values[i], True, BLACK))
+            self.__penalties_updated = True # at the beginning is equal to true in order to do the first render
+            
     def draw(self): # pragma: no cover
         #Draw stock and spaces for logo and fees
-        # spostare roba sul 
-        logo_x = STOCK_WIDTH // 2 - LOGO_WIDTH // 2
-        logo_y = 50 
-        price_x = STOCK_WIDTH // 2 - PRICE_WIDTH // 2
-        price_y = logo_y + LOGO_HEIGHT + 150
-        rect = pygame.Rect(0, 0, STOCK_WIDTH, STOCK_HEIGHT)
-        feesrect = pygame.Rect(price_x, price_y, PRICE_WIDTH, PRICES_HEIGHT)
-        pygame.draw.rect(self.surface, self.color, rect)
-        logo_path = LOGOS_DIR + self.__logo
-        logo = pygame.image.load(logo_path) # aggiungere path completo
-        logo = pygame.transform.scale(logo, (LOGO_WIDTH, LOGO_HEIGHT))
-        self.surface.blit(logo, (logo_x, logo_y))
-        pygame.draw.rect(self.surface, WHITE, feesrect)
+        pygame.draw.rect(self.surface, self.color, self.__rect)
+        self.surface.blit(self.__logo, (self.__logo_x, self.__logo_y))
+        pygame.draw.rect(self.surface, WHITE, self.__feesrect)
         #Draw stock price and fees
-        stock_price = self.font_stock_value.render(str(self.__new_value) + "  SCUDI", True, WHITE)
-        self.surface.blit(stock_price, (STOCK_WIDTH // 2 - stock_price.get_width() // 2, logo_y + LOGO_HEIGHT + 50))
+        self.surface.blit(self.__stock_price, (STOCK_WIDTH // 2 - self.__stock_price.get_width() // 2, self.__logo_y + LOGO_HEIGHT + 50))
 
         for i in range(0,len(self.__new_penalties)):
             #write string value
-            string_value = self.fees.render(Stock.string_values[i], True, BLACK)
-            self.surface.blit(string_value, (price_x + 10, price_y + 30 * i + 1))
+            self.surface.blit(self.__string_values_rendered[i], (self.__price_x + 10, self.__price_y + 30 * i + 1))
             #write fee value for that string
-            fee_price = self.fees.render(str(self.__new_penalties[i]) + " SCUDI", True, BLACK)
-            self.surface.blit(fee_price, (price_x + PRICE_WIDTH - fee_price.get_width() - 10, price_y + 30 * i + 1))
+            if self.__penalties_updated:
+                if i == 0: # when the price is updated we set the array as empty
+                    self.__fee_price_rendered = []
+                fee_price = self.fees.render(str(self.__new_penalties[i]) + " SCUDI", True, BLACK)
+                self.__fee_price_rendered.append(fee_price)
+                self.surface.blit(fee_price, (self.__price_x + PRICE_WIDTH - fee_price.get_width() - 10, self.__price_y + 30 * i + 1))
+            else:
+                self.surface.blit(self.__fee_price_rendered[i], (self.__price_x + PRICE_WIDTH - self.__fee_price_rendered[i].get_width() - 10, self.__price_y + 30 * i + 1))
 
     def update_value(self, new_value):
         self.__new_value = new_value
@@ -60,6 +67,7 @@ class Stock:
 
     def update_penalties(self):
         self.__new_penalties = []
+        self.__penalties_updated = True 
         for penalty in self.__penalties:
             self.__new_penalties.append(int(round((penalty / self.__original_value) * self.__new_value)))
 

@@ -44,7 +44,7 @@ class Cell:
                 self.__scudi_text = self.font_stock_value.render("SCUDI", True, BLACK)
                 self.__scudi_x = (CELL_WIDTH - (CELL_WIDTH // 2)) - (self.__scudi_text.get_width() // 2)
                 self.__scudi_y = self.__cell_color_y - self.__scudi_text.get_height() - 10
-                self.__price_updated = True
+                self.__price_updated = True # at the beginning is equal to true in order to do the first render
         if cellDef is not None:
             self.color = cellDef["color"]
             self.__original_value = cellDef["value"]
@@ -78,7 +78,6 @@ class Cell:
         pygame.draw.rect(self.surface, self.color, self.__color_rect)
 
         # Draw stock price
-        # aggiornare solo quando cambia il valore
         if self.__price_updated:
             self.__stock_price = self.font_stock_value.render(str(self.__new_value), True, BLACK)
             self.__price_x = (CELL_WIDTH - (CELL_WIDTH // 2)) - (self.__stock_price.get_width() // 2)
