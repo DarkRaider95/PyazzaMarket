@@ -28,6 +28,7 @@ class Stock:
 
     def draw(self): # pragma: no cover
         #Draw stock and spaces for logo and fees
+        # spostare roba sul 
         logo_x = STOCK_WIDTH // 2 - LOGO_WIDTH // 2
         logo_y = 50 
         price_x = STOCK_WIDTH // 2 - PRICE_WIDTH // 2
