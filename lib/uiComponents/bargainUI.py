@@ -134,25 +134,26 @@ class BargainUI:
                 indexes = [match.start() for match in matches]
                 stock_name = bargain[indexes[0]+1:indexes[1]]
 
-                if bargain[:2] == "GET":
-                    new_stocks_given = []
-                    for stock_given in self.stocks_given:
-                        if stock_name != stock_given:
-                            new_stocks_given.append(stock_got)
-                    self.stocks_given = new_stocks_given
-                else:
+                if bargain[:3] == "GET":
                     new_stocks_got = []
                     for stock_got in self.stocks_got:
                         if stock_name != stock_got["stock"]:
                             new_stocks_got.append(stock_got)
-
                     self.stocks_got = new_stocks_got
+                else:
+                    new_stocks_given = []
+                    for stock_given in self.stocks_given:
+                        if stock_name != stock_given:
+                            new_stocks_given.append(stock_given)
+
+                    self.stocks_given = new_stocks_given
 
             self.bargains_selection_list.remove_items(bargains_to_remove)
 
     def update_stocks(self):
         player1_stocks = self.__player.get_stocks_names()
         player2_stocks = self.showed_player.get_stocks_names()
+        player2_name = self.showed_player.get_name()
 
         player1_stocks_to_show = []
 
@@ -162,10 +163,14 @@ class BargainUI:
 
         player2_stocks_to_show = []
         if len(self.stocks_got) > 0:
-            for stock_name in player2_stocks:            
+            for stock_name in player2_stocks:
+                ok_to_show = True
                 for stock_got in self.stocks_got:
-                    if stock_name != stock_got["stock"]:
-                        player2_stocks_to_show.append(stock_name)
+                    if player2_name == stock_got["player"] and stock_name == stock_got["stock"]:
+                        ok_to_show = False
+
+                if ok_to_show:
+                    player2_stocks_to_show.append(stock_name)
         else:
             player2_stocks_to_show = player2_stocks
 
