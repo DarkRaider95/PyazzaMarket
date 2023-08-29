@@ -15,7 +15,7 @@ To do list funzionalità:
     - eventi colorati
     - grafica per scegliere accompagnatore
     - grafica per avviare trattative
-- loghi
+- ~~ loghi ~~
 - mostra cedole
     - ~~ fermata libera ~~
     - in showStockUi devo controllare se ci sono 0 cedole da mostrare per qualsiasi ragione essa sia e mostrare che non ci sono cedole
@@ -53,7 +53,8 @@ To fix:
     - in questo modo nel loop principale controllo se ci sono alert o gui da mostrare
     - se ci sono le disegno una alla volta
     - decidiamo poi la priorità delle gui e degli alert
-- dopo chiusura della compra vendita di azioni nella casella fermata libera senza comprare nulla i tasti rimangono bloccati 
+- dopo chiusura della compra vendita di azioni nella casella fermata libera senza comprare nulla i tasti rimangono bloccati
+- fare le cedole uguali a quelle vere
 
 To do list codice:
 - fare getters and setters
