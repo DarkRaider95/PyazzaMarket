@@ -76,6 +76,44 @@ def solve_bankrupt(debtor, game):
     
     debtor.erase_debts()
 
+#function to sort the debts and solve the larger ones if possible
+def solve_larger_debts(debtor, game):
+    # Zip the two lists together
+    zipped_lists = zip(debtor.get_in_debt_with(), debtor.get_debts())
+
+    # Sort the zipped list using the debts
+    sorted_zipped_lists = sorted(zipped_lists, key=lambda x: x[1], reverse=True)
+
+    #with this for we solve all the possible debts starting from the biggest one
+    #if it can't solve some of them it tries to solve the smaller ones
+    for creditor, debt in sorted_zipped_lists:
+        if debtor.get_balance() > debt:
+            if creditor == "BANK":
+                debtor.change_balance(-debt)
+            elif creditor == "SQUARE":
+                debtor.change_balance(-debt)
+                game.set_square_balance(debt)
+            else:
+                debtor.change_balance(-debt)
+                creditor.change_balance(debt)
+            
+            debt = 0
+
+    #after an entire cycle if there is still balance it gives the rest of the money to the bigger debt
+    remaining_balance = debtor.get_balance()
+    if remaining_balance > 0:
+        for creditor, debt in sorted_zipped_lists:
+            if debt > 0 and debt > remaining_balance:
+                if creditor == "BANK":
+                    debtor.change_balance(-remaining_balance)
+                elif creditor == "SQUARE":
+                    debtor.change_balance(-remaining_balance)
+                    game.set_square_balance(remaining_balance)
+                else:
+                    debtor.change_balance(-remaining_balance)
+                    creditor.change_balance(remaining_balance)
+                break   #after giving the remaining balance it makes no sense to keep looping
+
 def check_crash(
     players, player_number
 ):  # since current_player is the one that have done the last move it will be the one that will pay for the crash

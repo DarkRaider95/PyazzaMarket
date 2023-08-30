@@ -1,6 +1,7 @@
 import pygame
 
 from lib.auction import Auction
+from lib.uiComponents.bargainUI import BargainUI
 from lib.uiComponents.showStockUI import ShowStockUI
 from lib.uiComponents.gameUI import GameUI
 from lib.constants import (
@@ -24,7 +25,7 @@ from lib.dice_overlay import DiceOverlay
 from state_manager.actions_status import ActionsStatus
 from ai.bot import Bot
 from typing import Optional
-
+from lib.player import Player
 
 class Game:
     def __init__(self, width, height, clock, players, test=False, gui=True):
@@ -48,10 +49,11 @@ class Game:
         self.__auctions = []
         self.currentAuction: Optional[Auction] = None
         self.listShowStockToAuction = []
-        self.__gui = gui
         self.__current_player_index = 0
         self.__square_balance = SQUARE_BALANCE
         self.showStockUI: Optional[ShowStockUI] = None
+        self.bargain_ui: Optional[BargainUI] = None
+        self.__alert_messages = []
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -169,12 +171,14 @@ class Game:
             self.is_there_some_player_in_bankrupt()
 
         if tiro_doppio and crash:
-            self.__gameUI.drawAlert("Doppio e incidente!")
+            self.__alert_messages.append("Doppio e incidente!")
         elif tiro_doppio:
-            self.__gameUI.drawAlert("Tiro doppio!")
+            self.__alert_messages.append("Tiro doppio!")
         elif crash:
-            self.__gameUI.drawAlert("Incidente!")
+            self.__alert_messages.append("Incidente!")
 
+        if self.__alert_messages:
+            self.__gameUI.drawAlert(self.__alert_messages.pop(0))
         self.__gameUI.updateAllPlayerLables(self.get_players())
 
     def manage_events(self, event):
@@ -234,6 +238,9 @@ class Game:
                 and event.ui_element == self.__gameUI.closeAlertBut
             ):
                 self.__gameUI.closeAlert(self.get_players(), self.__gameUI)
+                # qui bisogna testare se questa funziona o meno, forse bisogna aggiunge un update della leaderboard
+                if self.__alert_messages:
+                    self.__gameUI.drawAlert(self.__alert_messages.pop(0))
             elif (
                 hasattr(self.__gameUI, "closeDiceOverlayBut")
                 and event.ui_element == self.__gameUI.closeDiceOverlayBut
@@ -258,12 +265,17 @@ class Game:
             elif self.currentAuction is not None:
                 self.manage_auction_events(event)
             elif self.showStockUI is not None:
-                print(self.showStockUI.stocks[0].get_name())
                 self.showStockUI.manage_stock_events(
                     event, self.get_players(), curr_player
                 )
+            elif self.bargain_ui is not None:
+                self.bargain_ui.manage_bargain_events(event)
             else:  # pragma: no cover
                 print("Evento non gestito")
+            self.update_graphic()
+        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+            if self.bargain_ui is not None:
+                self.bargain_ui.manage_bargain_events(event)
             self.update_graphic()
         elif event.type == pygame.KEYDOWN and self.__test:
             if event.key == pygame.K_0:  # or pygame.K_KP0:
@@ -417,7 +429,7 @@ class Game:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             if len(stocks) > 0:                
-                self.showStockUI = ShowStockUI(self, stocks)
+                self.showStockUI = ShowStockUI(self, stocks, player)
                 self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
             else:
                 self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
@@ -571,14 +583,12 @@ class Game:
         player.set_position(effectData["destination"])
 
     def add_auction(self, player, stock):
-        players = list(filter(
-            lambda obj: obj.get_name() != player.get_name(), self.get_players()
-        ))
+        players = self.get_other_players(player)
         self.__auctions.append(
             Auction(self.__gameUI.manager, self.screen, player, players, stock)
         )
 
-    def is_debt_solved(self, player):
+    def is_debt_solved(self, player: Player):
         if player.is_in_debt():
             if len(player.get_stocks()) > 0:
                 self.showStockUI = ShowStockUI(self, player.get_stocks(), player)
@@ -586,19 +596,19 @@ class Game:
             else:
                 self.renable_actions()
                 self.showStockUI = None
-                #solve_larger_debts(self.player, self.game) TODO make a function to sort the debts and solve the larger ones if possible
+                solve_larger_debts(player, self)
                 self.kill_player(player)
-                self.is_there_other_player_in_bankrupt()
+                self.is_there_some_player_in_bankrupt()
         else:
             self.renable_actions()
             self.showStockUI = None
             solve_bankrupt(player, self)
-            self.is_there_other_player_in_bankrupt()
+            self.is_there_some_player_in_bankrupt()
 
     def is_there_some_player_in_bankrupt(self):
         for player in self.get_players():
             if player.is_in_debt():
-                self.is_debt_solved(self, player)
+                self.is_debt_solved(player)
                 break #handle one bankrupt at a time
 
     #removing the player from the list of players the GUI should update automatically
@@ -606,14 +616,12 @@ class Game:
         if len(self.get_players()) > 2:
             self.__gameUI.drawAlert(player.get_name() + " è andato in banca rotta!")
 
-        players = list(filter(
-            lambda obj: obj.get_name() != player.get_name(), self.get_players()
-        ))
+        players = self.get_other_players(player)
         self.__players = players
         self.__gameUI.updateAllPlayerLables(self.get_players())
 
         #fix index of current player
-        if(self.__current_player_index == len(self.__players) - 1 or len(self.__players) == 1):                        
+        if(self.__current_player_index == len(self.__players) - 1):                        
             self.__current_player_index = 0
 
         if len(self.get_players()) == 1:
@@ -633,7 +641,7 @@ class Game:
             self.__square_balance = 0
         self.__gameUI.updateSquareBalanceLabel(self.__square_balance)
 
-    def get_players(self):  # pragma: no cover
+    def get_players(self) -> list[Player]:  # pragma: no cover
         return self.__players.copy()
 
     def get_square_balance(self):  # pragma: no cover
@@ -662,3 +670,8 @@ class Game:
     
     def get_board(self): # pragma: no cover
         return self.__board
+    
+    def get_other_players(self, player): # pragma: no cover
+        return list(filter(
+            lambda obj: obj.get_name() != player.get_name(), self.get_players()
+        ))

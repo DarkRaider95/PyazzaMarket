@@ -94,6 +94,9 @@ class Player:
     def get_stocks(self): # pragma: no cover
         return self.__stocks.copy()
     
+    def get_stocks_names(self): # pragma: no cover
+        return [stock.get_name() for stock in self.__stocks]
+    
     def set_skip_turn(self, skip): # pragma: no cover
         self.__set_skip_turn = skip
 
