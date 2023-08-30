@@ -166,8 +166,12 @@ class ShowStockUI:
         elif hasattr(self, "closeStock") and event.ui_element == self.closeStock: # pragma: no cover                     
             self.close_stock_ui()
             self.screen.fill(BLACK)
-            self.action_status.renable_actions()
-            self.gameUI.draw_dices()
+            if curr_player.get_position() == 5: # check if the 
+                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, self.game.get_other_players(self.player), self.game)
+                self.game.bargain_ui.draw()
+            else:
+                self.action_status.renable_actions()
+                self.gameUI.draw_dices()
         elif hasattr(self, "chooseBut") and event.ui_element == self.chooseBut: # pragma: no cover            
             chosen_stock = self.get_showed_stock()
             transfer_stock(self.game.get_board(), curr_player, chosen_stock, True)
@@ -176,9 +180,7 @@ class ShowStockUI:
             self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
             self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, self.game.get_other_players(self.player), self.game)
-            self.game.bargain_ui.draw()
-            #self.action_status.renable_actions()
-            #self.action_status.set_show_stock(True)            
+            self.game.bargain_ui.draw()      
         elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()
