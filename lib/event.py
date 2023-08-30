@@ -12,8 +12,8 @@ class Event:
     def draw(self):
         self.surface.blit(self.image, (0, 0))
 
-    @classmethod
-    def initialize_events(cls):
+    @staticmethod
+    def initialize_events():
         events = []
         # Get the list of all files in the events directory
         files = os.listdir(EVENTS_DIR)
@@ -28,8 +28,8 @@ class Event:
 
         return events
     
-    @classmethod
-    def parse_name(cls, eventName):
+    @staticmethod
+    def parse_name(eventName):
         eventName = eventName[:-4]
         actionsAndValues = eventName.split('_')
         eventType = None

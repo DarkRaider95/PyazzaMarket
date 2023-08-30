@@ -152,8 +152,5 @@ class Player:
 
         self.__in_debt_with.append(creditor)
         
-    def solve_debt(self):
-        self.__debts = 0
-
     def get_in_debt_with(self):
         return self.__in_debt_with

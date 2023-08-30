@@ -3,18 +3,19 @@ from pygame_gui.elements.ui_selection_list import UISelectionList
 from pygame_gui.elements import UIButton, UIPanel, UILabel, UIDropDownMenu
 from lib.constants import *
 import re
+from lib.player import Player
 
 from lib.gameLogic import transfer_stock
 
 class BargainUI:
 
-    def __init__(self, manager, screen, player, other_players, game):        
+    def __init__(self, manager, screen, player, other_players: list[Player], game):        
         self.manager = manager
         self.screen = screen
         self.__player = player
         self.__other_players = other_players
         self.game = game
-        self.showed_player = other_players[0]
+        self.showed_player: Player = other_players[0]
         self.stocks_given = []
         self.stocks_got = []
 
@@ -87,7 +88,7 @@ class BargainUI:
     def manage_bargain_events(self, event):
         if hasattr(self, "player_selector") and event.ui_element == self.player_selector:
             player = self.get_player(event.text)
-            self.showed_player = player            
+            self.showed_player = player # type: ignore
             self.update_stocks()
         elif hasattr(self, "add_bargain_butt") and event.ui_element == self.add_bargain_butt: # pragma: no cover
             self.add_bargains()
@@ -111,7 +112,8 @@ class BargainUI:
         for player in self.__other_players:
             if player.get_name() == player_name:
                 return player
-            
+    
+    @staticmethod
     def get_stock(stock_name, player):
 
         for stock in player.get_stocks():

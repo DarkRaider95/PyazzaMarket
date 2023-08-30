@@ -7,7 +7,7 @@ from lib.stock import Stock
 
 @pytest.fixture
 def stock():
-    return Stock(CELLS_DEF['ORANGE'], 1, 'gled', False)
+    return Stock(CELLS_DEF['ORANGE'], 1, 'gled', None, False)
 
 def test_update_value(stock: Stock):
     old_penalty = stock.get_penalty()

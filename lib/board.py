@@ -80,8 +80,8 @@ class Board:
 
         return x, y, position + 1
     
-    @classmethod
-    def compute_next_coord(cls, x: int, y: int, side: str) -> tuple[int, int]:
+    @staticmethod
+    def compute_next_coord(x: int, y: int, side: str) -> tuple[int, int]:
         if side == 'BOT':
             x = x - CELL_WIDTH
             y = y
