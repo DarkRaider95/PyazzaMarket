@@ -234,7 +234,7 @@ class Game:
                 and event.ui_element == self.__gameUI.closeAlertBut
             ):
                 self.__gameUI.closeAlert(self.get_players(), self.__gameUI)
-                # qui bisogna testare se questa funziona o meno
+                # qui bisogna testare se questa funziona o meno, forse bisogna aggiunge un update della leaderboard
                 if self.__alert_messages:
                     self.__gameUI.drawAlert(self.__alert_messages.pop(0))
             elif (
