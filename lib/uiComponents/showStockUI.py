@@ -63,7 +63,7 @@ class ShowStockUI:
                                 object_id = 'BUY_AUCT_STOCK',
                                 manager=self.manager)
         
-        if self.player.get_balance() < self.stocks[0].get_stock_value():
+        if self.player is not None and self.player.get_balance() < self.stocks[0].get_stock_value():
             self.buy_auct_stock.disable()
         
         leave_bank_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
@@ -250,7 +250,7 @@ class ShowStockUI:
             showStock = self.game.listShowStockToAuction.pop(0)
             self.game.showStockUI = showStock
             showStock.show_buy_auctioned_stock()
-        elif self.player.is_in_debt():#the auction is one started with a bankrupt
+        elif self.player is not None and self.player.is_in_debt():#the auction is one started with a bankrupt
             self.game.is_debt_solved(self.player)
         else:
             self.action_status.renable_actions()

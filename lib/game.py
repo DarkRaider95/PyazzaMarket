@@ -26,7 +26,6 @@ from state_manager.actions_status import ActionsStatus
 from ai.bot import Bot
 from typing import Optional
 
-
 class Game:
     def __init__(self, width, height, clock, players, test=False, gui=True):
         self.clock = clock
@@ -49,11 +48,11 @@ class Game:
         self.__auctions = []
         self.currentAuction: Optional[Auction] = None
         self.listShowStockToAuction = []
-        self.__gui = gui
         self.__current_player_index = 0
         self.__square_balance = SQUARE_BALANCE
         self.showStockUI: Optional[ShowStockUI] = None
         self.bargain_ui: Optional[BargainUI] = None
+        self.__alert_messages = []
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -168,12 +167,14 @@ class Game:
             self.is_there_some_player_in_bankrupt()
 
         if tiro_doppio and crash:
-            self.__gameUI.drawAlert("Doppio e incidente!")
+            self.__alert_messages.append("Doppio e incidente!")
         elif tiro_doppio:
-            self.__gameUI.drawAlert("Tiro doppio!")
+            self.__alert_messages.append("Tiro doppio!")
         elif crash:
-            self.__gameUI.drawAlert("Incidente!")
+            self.__alert_messages.append("Incidente!")
 
+        if self.__alert_messages:
+            self.__gameUI.drawAlert(self.__alert_messages.pop(0))
         self.__gameUI.updateAllPlayerLables(self.get_players())
 
     def manage_events(self, event):
@@ -233,6 +234,9 @@ class Game:
                 and event.ui_element == self.__gameUI.closeAlertBut
             ):
                 self.__gameUI.closeAlert(self.get_players(), self.__gameUI)
+                # qui bisogna testare se questa funziona o meno, forse bisogna aggiunge un update della leaderboard
+                if self.__alert_messages:
+                    self.__gameUI.drawAlert(self.__alert_messages.pop(0))
             elif (
                 hasattr(self.__gameUI, "closeDiceOverlayBut")
                 and event.ui_element == self.__gameUI.closeDiceOverlayBut
