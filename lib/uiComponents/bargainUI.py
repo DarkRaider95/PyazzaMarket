@@ -4,6 +4,8 @@ from pygame_gui.elements import UIButton, UIPanel, UILabel, UIDropDownMenu
 from lib.constants import *
 import re
 
+from lib.gameLogic import transfer_stock
+
 class BargainUI:
 
     def __init__(self, manager, screen, player, other_players, game):        
@@ -93,11 +95,12 @@ class BargainUI:
         elif hasattr(self, "remove_bargain_butt") and event.ui_element == self.remove_bargain_butt: # pragma: no cover
             self.remove_bargains()
             self.update_stocks()
-        elif hasattr(self, "bargain_butt") and event.ui_element == self.bargain_butt: # pragma: no cover
-            pass
-            #open confirmation bargain ui and pass the bargains
-            #self.close_bargain_ui()
-            #self.screen.fill(BLACK)
+        elif hasattr(self, "bargain_butt") and event.ui_element == self.bargain_butt: # pragma: no cover            
+            #process the bargains and close the window
+            self.process_bargains()
+            self.close_bargain_ui()
+            self.screen.fill(BLACK)
+            self.game.renable_actions()
         elif hasattr(self, "close_butt") and event.ui_element == self.close_butt: # pragma: no cover            
             self.close_bargain_ui()
             self.screen.fill(BLACK)
@@ -109,6 +112,12 @@ class BargainUI:
             if player.get_name() == player_name:
                 return player
             
+    def get_stock(stock_name, player):
+
+        for stock in player.get_stocks():
+            if stock.get_name() == stock_name:
+                return stock
+            
     def add_bargains(self):
         stocks_player_1 = self.stocks_player_1.get_multi_selection()
         stocks_player_2 = self.stocks_player_2.get_multi_selection()
@@ -117,7 +126,7 @@ class BargainUI:
             bargains_to_add = []
             for stock_name in stocks_player_1:
                 bargains_to_add.append("GIVE --> :"+ stock_name + ": " + self.showed_player.get_name())
-                self.stocks_given.append(stock_name)
+                self.stocks_given.append({"stock":stock_name, "player":self.showed_player.get_name()})
 
             for stock_name in stocks_player_2:
                 bargains_to_add.append("GET <-- :"+ stock_name + ": " + self.showed_player.get_name())
@@ -143,7 +152,7 @@ class BargainUI:
                 else:
                     new_stocks_given = []
                     for stock_given in self.stocks_given:
-                        if stock_name != stock_given:
+                        if stock_name != stock_given["stock"]:
                             new_stocks_given.append(stock_given)
 
                     self.stocks_given = new_stocks_given
@@ -158,7 +167,12 @@ class BargainUI:
         player1_stocks_to_show = []
 
         for stock_name in player1_stocks:
-            if stock_name not in self.stocks_given:
+            ok_to_show = True
+            for stock_given in self.stocks_given:                
+                if stock_name == stock_given["stock"]:
+                    ok_to_show = False
+            
+            if ok_to_show:
                 player1_stocks_to_show.append(stock_name)
 
         player2_stocks_to_show = []
@@ -176,3 +190,16 @@ class BargainUI:
 
         self.stocks_player_1.set_item_list(player1_stocks_to_show)
         self.stocks_player_2.set_item_list(player2_stocks_to_show)
+
+    def process_bargains(self):
+        #here we transfer the stocks from the self.player to the player in the bargain
+        for stock_given in self.stocks_given:
+            stock = BargainUI.get_stock(stock_given["stock"], self.__player)
+            player = self.get_player(stock_given["player"])
+            transfer_stock(None, player, stock)
+
+        #here we transfer the stocks from the player in the bargain to self.player
+        for stock_got in self.stocks_got:
+            player = self.get_player(stock_got["player"])
+            stock = BargainUI.get_stock(stock_got["stock"], player)            
+            transfer_stock(None, self.__player, stock)
