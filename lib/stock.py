@@ -10,6 +10,8 @@ class Stock:
         "5 Cedole della stesso colore",
         "6 Cedole della stesso colore",
     ]
+
+    __stocks = []
     def __init__(self, cellDef, position, name, logo_path, enable_graphics):
         self.color = cellDef['color']
         self.__original_value = cellDef['value']
@@ -20,7 +22,7 @@ class Stock:
         self.__owner = None
         self.__new_value = self.__original_value
         self.__index = cellDef['index']
-        self.__new_penalties = self.__penalties
+        self.__new_penalties = self.__penalties        
         if enable_graphics:
             self.surface = pygame.Surface((STOCK_WIDTH, STOCK_HEIGHT))
             self.fees = pygame.font.Font(None, 32)
@@ -38,6 +40,7 @@ class Stock:
             for i in range(0,len(self.__new_penalties)):
                 self.__string_values_rendered.append(self.fees.render(Stock.string_values[i], True, BLACK))
             self.__penalties_updated = True # at the beginning is equal to true in order to do the first render
+        Stock.__stocks.append(self)
             
     def draw(self): # pragma: no cover
         #Draw stock and spaces for logo and fees
@@ -102,3 +105,13 @@ class Stock:
     
     def get_new_value(self): # pragma: no cover
         return self.__new_value
+    
+    @staticmethod
+    def get_stock_by_position(position): # pragma: no cover
+        for stock in Stock.__stocks:
+            if stock.__position == position:
+                return stock
+
+    @staticmethod
+    def get_stocks():
+        return Stock.__stocks

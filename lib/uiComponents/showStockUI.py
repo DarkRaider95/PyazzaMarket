@@ -196,6 +196,9 @@ class ShowStockUI:
             chosen_stock = self.get_showed_stock()
             board = self.game.get_board()
             transfer_stock(board, curr_player, chosen_stock)
+            self.close_stock_ui()
+            self.screen.fill(BLACK)
+            self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
             self.action_status.renable_actions()
         elif hasattr(self, "stockToAuction") and event.ui_element == self.stockToAuction:

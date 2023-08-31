@@ -76,6 +76,7 @@ class Event:
             buy = False
             getValue = None
             passValue = None
+            possibleBuy = False
 
             if 'get' in actionsAndValues:
                 get_index = actionsAndValues.index('get')
@@ -94,8 +95,11 @@ class Event:
             if 'buy' in actionsAndValues:
                 buy = True
 
+            if 'possiblebuy' in actionsAndValues:
+                possibleBuy = True
+
             eventType = GO_EVENT
-            effectData = {'destination':goValue, 'get':getValue, 'pass':passValue, 'startCheck':startCheck, 'someone': someone, 'buy': buy}
+            effectData = {'destination':goValue, 'get':getValue, 'pass':passValue, 'startCheck':startCheck, 'someone': someone, 'buy': buy, 'possibleBuy': possibleBuy}
         elif actionsAndValues[0] == 'pay':
             payObject = None
             if 'to' in actionsAndValues:

@@ -1,4 +1,6 @@
 import random
+
+from lib.stock import Stock
 from .constants import *
 
 
@@ -17,8 +19,12 @@ def is_double(dice):
     return dice[0] == dice[1]
 
 
-def buy_stock_from_cell(cells, player):
-    curr_pos = player.get_position()
+def buy_stock_from_cell(cells, player, position = None):
+    if position is None:
+        curr_pos = player.get_position()
+    else:
+        curr_pos = position
+
     stock_value = cells[curr_pos].get_stocks()[0].get_stock_value()
     if len(cells[curr_pos].get_stocks()) > 0:
         if player.get_balance() >= stock_value:
@@ -26,6 +32,9 @@ def buy_stock_from_cell(cells, player):
             stock.set_owner(player)
             player.change_balance(-stock_value)
             player.add_stock(stock)
+        else:#added this case in case this function is called without checking player balance
+            player.set_in_debt_with("BANK")
+            player.add_debt(stock_value)
 
 def check_if_can_buy_stock(cell, player):
     if cell.cellType != STOCKS_TYPE or len(cell.get_stocks()) == 0:
@@ -43,10 +52,21 @@ def check_for_penalty(cells, players, player_number):  # testare per vedere se r
     players = players.copy()  # we copy the list in order to not modify the original one
     players.pop(player_number)  # we drop the current player in order to not check him self in the for loops
     own_by_the_player = False  # then we check if the player own the stock
+    hasOwner = stock_in_position_has_owner(cell.get_position())
+    
     for stock in current_player.get_stocks():
-        if cell.position == stock.get_position():
+        if cell.get_position() == stock.get_position():
             own_by_the_player = True
-    if not own_by_the_player:  # if it is not owned by the player we check if it is owned by another player
+
+    #case free penalty
+    if current_player.get_free_penalty() and hasOwner:
+        current_player.set_free_penalty(False)
+        return "FREE"
+    #case free martini
+    elif current_player.get_free_martini() and current_player.get_position() == 38 and hasOwner:
+        current_player.set_free_martini(False)
+        return "FREE_MARTINI"
+    elif not own_by_the_player:  # if it is not owned by the player we check if it is owned by another player
         for player in players:
             for stock in player.get_stocks():
                 if cell.position == stock.get_position():
@@ -59,6 +79,10 @@ def check_for_penalty(cells, players, player_number):  # testare per vedere se r
                         current_player.change_balance(-penality)
                         player.change_balance(penality)
                     break  # we break in order to pay only once the fee if the player have more than one card in the same cell
+
+def stock_in_position_has_owner(position):
+    stock = Stock.get_stock_by_position(position)
+    return stock.get_owner() is not None
 
 #function to solve the debt
 def solve_bankrupt(debtor, game):

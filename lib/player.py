@@ -103,7 +103,7 @@ class Player:
     def get_skip_turn(self): # pragma: no cover
         return self.__set_skip_turn
     
-    def freePenalty(self, free): # pragma: no cover
+    def set_free_penalty(self, free): # pragma: no cover
         self.__freePenalty = free
 
     def get_free_penalty(self): # pragma: no cover

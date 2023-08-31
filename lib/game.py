@@ -1,6 +1,7 @@
 import pygame
 
 from lib.auction import Auction
+from lib.stock import Stock
 from lib.uiComponents.bargainUI import BargainUI
 from lib.uiComponents.showStockUI import ShowStockUI
 from lib.uiComponents.gameUI import GameUI
@@ -22,6 +23,7 @@ from collections import deque
 import time
 import random
 from lib.dice_overlay import DiceOverlay
+from lib.uiComponents.takeSomeoneWithYouUI import TakeSomeoneWithYouUI
 from state_manager.actions_status import ActionsStatus
 from ai.bot import Bot
 from typing import Optional
@@ -54,6 +56,7 @@ class Game:
         self.showStockUI: Optional[ShowStockUI] = None
         self.bargain_ui: Optional[BargainUI] = None
         self.__alert_messages = []
+        self.current_window = None
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -129,6 +132,8 @@ class Game:
             )
             curr_player = self.__players[self.__current_player_index]
 
+        self.__gameUI.updateTurnLabel(curr_player)
+
     def turn(self):
         tiro_doppio = False
         self.__actions_status.set_throw_dices(False)
@@ -153,9 +158,14 @@ class Game:
             # curr_player.move(10)
             self.enable_buy_button(cell, curr_player)
             # we need to create a copy of the list in order to perform some edit of the list later
-            check_for_penalty(
+            isFree = check_for_penalty(
                 self.__board.get_cells(), self.get_players(), self.__current_player_index
             )
+
+            if isFree == "FREE":
+                self.__alert_messages.append("Non paghi la penalità!")
+            elif isFree == "FREE_MARTINI":
+                self.__alert_messages.append("Non paghi il martini!")
         # case special cell
         else:
             self.special_cell_logic(cell, curr_player)
@@ -270,12 +280,16 @@ class Game:
                 )
             elif self.bargain_ui is not None:
                 self.bargain_ui.manage_bargain_events(event)
+            elif self.current_window is not None:
+                self.current_window.manage_events(event)
             else:  # pragma: no cover
                 print("Evento non gestito")
             self.update_graphic()
         elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
             if self.bargain_ui is not None:
-                self.bargain_ui.manage_bargain_events(event)
+                self.bargain_ui.manage_bargain_events(event)            
+            elif self.current_window is not None:
+                self.current_window.manage_events(event)
             self.update_graphic()
         elif event.type == pygame.KEYDOWN and self.__test:
             if event.key == pygame.K_0:  # or pygame.K_KP0:
@@ -449,17 +463,14 @@ class Game:
         if event.evenType == COLOR_EVENT:
             pass
         elif event.evenType == BUY_ANTHING_EVENT:
-            stocks = self.__board.get_availble_stocks()
-            for p in self.__players:
-                if p != player:
-                    stocks.extend(player.get_stocks())
+            stocks = Stock.get_stocks()
             self.disable_actions()
             self.showStockUI = ShowStockUI(self, stocks)
-            self.showStockUI.show_buy_anything_stock("Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)")
+            self.showStockUI.show_buy_anything_stock("Scegli quale vuoi comprare (Nessuno puo' opporsi alla vendita)")
         elif event.evenType == STOP_1:
             player.set_skip_turn(True)
         elif event.evenType == FREE_PENALTY:
-            player.freePenalty(True)
+            player.set_free_penalty(True)
         elif event.evenType == FREE_PENALTY_MARTINI:
             player.set_free_martini(True)
         elif event.evenType == EVERYONE_FIFTY_EVENT:
@@ -470,12 +481,18 @@ class Game:
             )
             previousPlayer = self.__players[previousPlayerIndex]
             previousPlayer.set_position(39)
-            playerOwnStock = who_owns_stock(self.get_players(), 39)[
-                0
-            ]  # bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
-            stock = playerOwnStock.get_stock_by_pos(39)
-            amount = playerOwnStock.compute_penalty(stock)
-            previousPlayer.change_balance(amount)
+            #get owners of the stocks
+            playersOwnStock = who_owns_stock(self.get_players(), 39)
+
+            if len(playersOwnStock) > 0: #if there are owners I do the logic of the event
+                stock1 = playersOwnStock[0].get_stock_by_pos(39)
+                amount = playersOwnStock[0].compute_penalty(stock1)
+
+                if len(playersOwnStock) > 1:# if there is more than one owner I sum the penalties
+                    stock2 = playersOwnStock[1].get_stock_by_pos(39)
+                    amount += playersOwnStock[1].compute_penalty(stock2)                
+
+                previousPlayer.change_balance(amount)
         elif event.evenType == NEXT_PLAYER_PAY:
             nextPlayerIndex = (self.__current_player_index + 1) % len(self.__players)
             nextPlayer = self.__players[nextPlayerIndex]
@@ -486,7 +503,15 @@ class Game:
             if stock is not None:
                 player.add_stock(stock)
             else:
-                player.change_balance(effectData["amount"])
+                amount = effectData["amount"]
+                square_balance = self.get_square_balance()
+                if amount < self.get_square_balance():
+                    self.set_square_balance(-effectData["amount"])
+                    player.change_balance(effectData["amount"])
+                else:
+                    self.set_square_balance(-square_balance)
+                    player.change_balance(square_balance)
+
         elif event.evenType == GET_EVENT:
             effectData = event.effectData
 
@@ -542,7 +567,10 @@ class Game:
                 player.change_balance(-stock.get_original_value())
             else:
                 print("BUY CASE START NEGOTIATION")
-                pass  # avviare trattativa con proprietario
+                stock = Stock.get_stock_by_position(effectData["stockIndex"])
+                owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
+                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
+                self.game.bargain_ui.draw()
 
         # rotate the events list
         self.events.rotate(-1)
@@ -564,18 +592,24 @@ class Game:
             )
             player.change_balance(passAmount)
 
-        if effectData["someone"]:  # implement interface to choose someone
+        if effectData["someone"]:
             print("GOTO SOMEONE CASE")
-            pass
+            self.current_window = TakeSomeoneWithYouUI(self, self.get_other_players(player), effectData["destination"])
+            self.current_window.draw()            
 
         if effectData["buy"]:
-            stock = self.__board.get_stock_if_available(effectData["destination"])  #TODO call buy stock logic in this way the bankrupt and everything should be already implemented
+            stock = self.__board.get_stock_if_available(effectData["destination"])
             if stock is not None:
-                player.add_stock(stock)
-                player.change_balance(-stock.get_original_value())
+                buy_stock_from_cell(self.__board.get_cells(), player, effectData["destination"])
             else:
                 print("GOTO BUY CASE START NEGOTIATION")
-                pass  # implement gui to start negotiation with owner
+                stock = Stock.get_stock_by_position(effectData["destination"])
+                owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
+                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
+                self.game.bargain_ui.draw()        
+
+        if effectData["possiblebuy"]:#enable buy button if possible buy
+            self.enable_buy_button(self.__board.get_cell(effectData["destination"]), player)            
 
         if effectData["get"] is not None:
             player.change_balance(effectData["get"])
