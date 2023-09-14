@@ -298,12 +298,10 @@ class BargainUI:
         if self.exchange_direction[self.showed_player_index] == "Dai":
             if self.current_player_virtual_balance() < 0:
                 self.exchange_values[self.showed_player_index] += self.current_player_virtual_balance()
-                self.money_excange.set_text(str(self.exchange_values[self.showed_player_index]))
         else:
             if self.showed_player_virtual_balance() < 0:
                 self.exchange_values[self.showed_player_index] += self.showed_player_virtual_balance()
-                self.money_excange.set_text(str(self.exchange_values[self.showed_player_index]))
-
+        self.money_excange.set_text(str(self.exchange_values[self.showed_player_index]))
 
     def current_player_virtual_balance(self):
         virtual_balance = self.__player.get_balance()
@@ -419,3 +417,19 @@ class BargainUI:
             player = self.get_player(stock_got["player"])
             stock = BargainUI.get_stock(stock_got["stock"], player)
             transfer_stock(None, self.__player, stock)
+
+        # update current player balance
+        for  amount, give_or_receive in zip(self.exchange_values, self.exchange_direction):
+            if give_or_receive == "Dai":
+                self.__player.change_balance(-amount)
+            else:
+                self.__player.change_balance(amount)
+
+        # update other players balance
+        for amount, give_or_receive, player in zip(self.exchange_values, self.exchange_direction, self.__other_players):
+            if give_or_receive == "Dai":
+                player.change_balance(amount)
+            else:
+                player.change_balance(-amount)
+
+        self.game.get_gameUI().updateAllPlayerLables(self.game.get_players())
