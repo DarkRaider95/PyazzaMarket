@@ -12,6 +12,7 @@ from lib.constants import (
     CAR_BLUE,
     CAR_RED,
     CAR_YELLOW,
+    FPS
 )
 
 # Inizializzazione della finestra di gioco
@@ -119,7 +120,7 @@ class Menu:
 
     def show_start_menu(self):
         while self.running:
-            time_delta = self.clock.tick(60) / 1000.0
+            time_delta = self.clock.tick(FPS) / 1000.0
 
             for event in pygame.event.get():
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:

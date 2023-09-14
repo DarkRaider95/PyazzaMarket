@@ -32,7 +32,8 @@ To fix:
     - se nessuno ha offerto allora si possono ritirare tutti e la cedola va alla banca
     - salvare i balance all'inizio delle aste per evitare che il primo che riceve i soldi dell'asta sia avvantaggiato sugli altri
 
-- mettere un booleano che attiva nel loop principale il refresh della gui quando è aperto il campo di testo
+- controllare i clock.tick
+- controllare che bargain venga eseguito dopo eventuale incidente siccome il bilancio virtuale viene aggiornato all'apertura della finestra
 
 To do list codice:
 - fare getters and setters

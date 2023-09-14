@@ -120,6 +120,9 @@ class Game:
                 self.manage_events(event)
                 self.__gameUI.manager.process_events(event)
 
+            if self.bargain_ui:
+                self.update_graphic()
+
     def set_skip_turn(self):  # pragma: no cover
         curr_player = self.__players[self.__current_player_index]
         while curr_player.get_skip_turn():
@@ -273,14 +276,13 @@ class Game:
             else:  # pragma: no cover
                 print("Evento non gestito")
             self.update_graphic()
-        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
-            if self.bargain_ui is not None:
-                self.bargain_ui.manage_bargain_events(event)
-            self.update_graphic()
-        elif event.type == pygame.KEYDOWN and self.__test:
+        elif (event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED or event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED) and self.bargain_ui is not None:
+        # here no update graphic is needed since il already active when the bargain ui is active
+            self.bargain_ui.manage_bargain_events(event)
+        elif event.type == pygame.KEYDOWN and self.__test and not self.bargain_ui:
+            print("event key")
             if event.key == pygame.K_0:  # or pygame.K_KP0:
                 self.set_test_dice(0)
-                print("Test dice set to 0")
             elif event.key == pygame.K_1:  # or pygame.K_KP1:
                 self.set_test_dice(1)
             elif event.key == pygame.K_2:  # or pygame.K_KP2:

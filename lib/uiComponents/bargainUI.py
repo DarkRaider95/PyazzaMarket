@@ -1,6 +1,12 @@
 import pygame
 from pygame_gui.elements.ui_selection_list import UISelectionList
-from pygame_gui.elements import UIButton, UIPanel, UILabel, UIDropDownMenu, UITextEntryLine
+from pygame_gui.elements import (
+    UIButton,
+    UIPanel,
+    UILabel,
+    UIDropDownMenu,
+    UITextEntryLine,
+)
 from lib.constants import *
 import re
 from lib.player import Player
@@ -9,15 +15,22 @@ from lib.gameLogic import transfer_stock
 
 
 class BargainUI:
-    def __init__(self, manager, screen, player, other_players: list[Player], game):
+    def __init__(
+        self, manager, screen, current_player: Player, other_players: list[Player], game
+    ):
         self.manager = manager
         self.screen = screen
-        self.__player = player
+        self.__player = current_player
         self.__other_players = other_players
         self.game = game
         self.showed_player: Player = other_players[0]
         self.stocks_given = []
         self.stocks_got = []
+        # initialize the list with the amount of money given or received for each player
+        self.exchange_values = [0] * len(other_players)
+        # since the exchange_values is a list of positive int, we need to keep track of who will receive and who will give
+        self.exchange_direction = ["Dai"] * len(other_players)
+        self.showed_player_index = 0
 
     def draw(self):
         # Create a panel
@@ -171,15 +184,36 @@ class BargainUI:
             manager=self.manager,
         )
 
-        entry_line1 = UITextEntryLine(
+        money_excange_label_rect = pygame.Rect(
+            (
+                BARGAIN_UI_WIDTH // 2 + 130,
+                BARGAIN_UI_HEIGHT
+                - 110
+                - BARGAIN_SELECTION_LIST_HEIGHT
+                - BARGAIN_UI_TITLE_HEIGHT,
+            ),
+            (BARGAIN_UI_TITLE_WIDTH, BARGAIN_UI_TITLE_HEIGHT),
+        )
+
+        self.money_excange_label = UILabel(
+            money_excange_label_rect,
+            "Denaro da scambiare",
+            manager=self.manager,
+            container=self.bargain_ui,
+        )
+
+        self.money_excange = UITextEntryLine(
             relative_rect=pygame.Rect(BARGAIN_UI_WIDTH // 2 + 200, 500, 200, 40),
             manager=self.manager,
             container=self.bargain_ui,
             parent_element=self.bargain_ui,
-            object_id="PLAYER1",
-            initial_text="Player1",
+            object_id="money_excange",
+            initial_text="0",
         )
+        self.money_excange.set_allowed_characters("numbers")
 
+        self.draw_give_or_receive()
+  
     def close_bargain_ui(self):
         self.bargain_ui.kill()
         self.game.bargain_ui = None
@@ -192,6 +226,9 @@ class BargainUI:
             player = self.get_player(event.text)
             self.showed_player = player  # type: ignore
             self.update_stocks()
+            self.money_excange.set_text(str(self.exchange_values[self.showed_player_index]))
+            self.give_or_receive.kill()
+            self.draw_give_or_receive()
         elif (
             hasattr(self, "add_bargain_butt")
             and event.ui_element == self.add_bargain_butt
@@ -218,11 +255,67 @@ class BargainUI:
             self.close_bargain_ui()
             self.screen.fill(BLACK)
             self.game.renable_actions()
+        elif hasattr(self, "money_excange") and event.ui_element == self.money_excange:
+            if event.text == "":
+                self.allow_money_excange(0)
+            else:
+                self.allow_money_excange(int(event.text))
+        elif (
+            hasattr(self, "give_or_receive")
+            and event.ui_element == self.give_or_receive
+        ):
+            self.exchange_direction[self.showed_player_index] = event.text
+            self.allow_money_excange(self.exchange_values[self.showed_player_index])
 
     def get_player(self, player_name):
-        for player in self.__other_players:
+        for i, player in enumerate(self.__other_players):
             if player.get_name() == player_name:
+                self.showed_player_index = i
                 return player
+
+    def draw_give_or_receive(self):
+        self.give_or_receive = UIDropDownMenu(
+            options_list=["Dai", "Ricevi"],
+            starting_option=self.exchange_direction[self.showed_player_index],
+            relative_rect=pygame.Rect(
+                BARGAIN_UI_WIDTH // 2 + 200,
+                550,
+                BARGAIN_DROPDOWN_WIDTH,
+                BARGAIN_DROPDOWN_HEIGHT,
+            ),
+            manager=self.manager,
+            container=self.bargain_ui,
+        )
+
+    def allow_money_excange(self, amount):
+        """
+        With dai the current player give money to the selected player
+        which is named showed_player. So if the current player has enough 
+        money there is no problem, otherwise we set the number to the maximum
+        possibile. The opposite apply when we have setted Ricevi.
+        """
+        self.exchange_values[self.showed_player_index] = amount
+        if self.exchange_direction[self.showed_player_index] == "Dai":
+            if self.current_player_virtual_balance() < 0:
+                self.exchange_values[self.showed_player_index] += self.current_player_virtual_balance()
+                self.money_excange.set_text(str(self.exchange_values[self.showed_player_index]))
+        else:
+            if self.showed_player_virtual_balance() < 0:
+                self.exchange_values[self.showed_player_index] += self.showed_player_virtual_balance()
+                self.money_excange.set_text(str(self.exchange_values[self.showed_player_index]))
+
+
+    def current_player_virtual_balance(self):
+        virtual_balance = self.__player.get_balance()
+        for i, amount in enumerate(self.exchange_values):
+            if self.exchange_direction[i] == "Dai":
+                virtual_balance -= amount
+            else:
+                virtual_balance += amount
+        return virtual_balance
+
+    def showed_player_virtual_balance(self):
+        return self.showed_player.get_balance() - self.exchange_values[self.showed_player_index]
 
     @staticmethod
     def get_stock(stock_name, player):
