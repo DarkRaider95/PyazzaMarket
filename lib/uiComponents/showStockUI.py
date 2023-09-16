@@ -5,7 +5,7 @@ from lib.constants import *
 from lib.uiComponents.bargainUI import BargainUI
 
 class ShowStockUI:
-    def __init__(self, game, stocks, player = None):
+    def __init__(self, game, stocks, panel_type, player = None, title = None):
         self.game = game
         self.gameUI = game.get_gameUI()
         self.screen = self.gameUI.get_screen()
@@ -13,14 +13,31 @@ class ShowStockUI:
         self.player = player
         self.action_status = game.get_actions_status()
         self.stocks = stocks
-
-    def show_stocks_ui(self, title):
         self.showedStock = 0
-        self.draw_stock_ui(title, True)
+        self.title = title
+        self.type = panel_type
 
-    def show_buy_anything_stock(self, title):
-        self.showedStock = 0
-        self.draw_stock_ui(title, False)
+    def draw(self):
+        if self.type == "SHOW_STOCKS":
+            self.draw_stock_ui(True)
+        elif self.type == "BUY_ANYTHING":
+            self.show_buy_anything_stock()
+        elif self.type == "STOCK_TO_AUCTION":
+            self.show_choose_stock_to_auction()
+        elif self.type == "SHOW_CHOOSE_STOCK":
+            self.show_choose_stock()
+        elif self.type == "BUY_AUCTIONED_STOCK":
+            self.show_buy_auctioned_stock()
+        elif self.type == "BANKRUPT_STOCK":
+            self.show_bankrupt_stock()
+        elif self.type == "MOVE_TO_STOCK":
+            self.show_move_to_stock()
+
+    def show_stocks_ui(self):        
+        self.draw_stock_ui(True)
+
+    def show_buy_anything_stock(self):        
+        self.draw_stock_ui(False)
         buyRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.buyAnyBut = UIButton(relative_rect=buyRect,
@@ -30,8 +47,7 @@ class ShowStockUI:
                                 manager=self.manager)
         
     def show_choose_stock_to_auction(self):
-        if self.player is not None:
-            self.showedStock = 0
+        if self.player is not None:            
             self.draw_stock_ui("Cedole di" + self.player.get_name()+ "cosa vuoi mettere all'asta", False)
             stockRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
@@ -41,9 +57,8 @@ class ShowStockUI:
                                     object_id = 'STOCK_TO_AUCTION',
                                     manager=self.manager)
         
-    def show_choose_stock(self, title):
-        self.showedStock = 0
-        self.draw_stock_ui(title, True)
+    def show_choose_stock(self):        
+        self.draw_stock_ui(True)
         chooseRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.chooseBut = UIButton(relative_rect=chooseRect,
@@ -52,8 +67,7 @@ class ShowStockUI:
                                 object_id = 'CHOOSE_STOCK',
                                 manager=self.manager)
         
-    def show_buy_auctioned_stock(self):
-        self.showedStock = 0
+    def show_buy_auctioned_stock(self):        
         self.draw_stock_ui("Sei l'unico partecipante all'asta vuoi comprare o lasciare alla banca?", True)
         buy_auct_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
@@ -74,8 +88,7 @@ class ShowStockUI:
                                 object_id = 'LEAVE_AUCT_STOCK',
                                 manager=self.manager)
         
-    def show_bankrupt_stock(self):
-        self.showedStock = 0
+    def show_bankrupt_stock(self):        
         self.draw_stock_ui("Sei in banca rotta a vendi o metti all'asta?", False)
         bankrupt_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
@@ -93,9 +106,8 @@ class ShowStockUI:
                                 object_id = 'LEAVE_BANK_BANKRUPT',
                                 manager=self.manager)
         
-    def show_move_to_stock(self, title):
-        self.showedStock = 0
-        self.draw_stock_ui(title, False)
+    def show_move_to_stock(self):        
+        self.draw_stock_ui(False)
         chooseRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.chooseMoveBut = UIButton(relative_rect=chooseRect,
@@ -107,12 +119,12 @@ class ShowStockUI:
     def get_showed_stock(self):
         return self.stocks[self.showedStock]
 
-    def draw_stock_ui(self, title, close):
+    def draw_stock_ui(self, close):
         panel_rect = pygame.Rect((WIDTH // 2 - STOCK_UI_WIDTH // 2, 20), (STOCK_UI_WIDTH, STOCK_UI_HEIGHT))
         self.stocksUi = UIPanel(panel_rect, starting_height= 2, manager=self.manager)
         
         title_rect = pygame.Rect((STOCK_UI_WIDTH // 2 - STOCK_UI_TITLE_WIDTH // 2, 10), (STOCK_UI_TITLE_WIDTH, STOCK_UI_TITLE_HEIGHT))
-        UILabel(title_rect, title, manager=self.manager, container=self.stocksUi)
+        UILabel(title_rect, self.title, manager=self.manager, container=self.stocksUi)
 
         nextRect = pygame.Rect((STOCK_UI_WIDTH - 30 - STOCK_UI_BUT_WIDTH, STOCK_UI_HEIGHT // 2 - STOCK_UI_BUT_HEIGHT // 2), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
         prevRect = pygame.Rect((30, STOCK_UI_HEIGHT // 2 - STOCK_UI_BUT_HEIGHT // 2), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))

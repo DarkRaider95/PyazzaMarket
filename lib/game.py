@@ -173,8 +173,8 @@ class Game:
         #bankrupt logic
         if curr_player.is_in_debt():
             if len(curr_player.get_stocks()) > 0:
-                self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), curr_player)
-                self.showStockUI.show_bankrupt_stock()
+                self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), "BANKRUPT_STOCK", curr_player)
+                self.showStockUI.draw()
             else:
                 self.is_debt_solved(curr_player)
         else:#check if others are in debt after our turn due to some event
@@ -231,8 +231,7 @@ class Game:
                 and event.ui_element == self.__gameUI.showStocks
             ):
                 self.disable_actions()
-                self.showStockUI = ShowStockUI(self, curr_player.get_stocks())
-                self.showStockUI.show_stocks_ui("Le cedole di " + curr_player.get_name())
+                self.showStockUI = self, curr_player.get_stocks(), "SHOW_STOCKS", None, "Le cedole di " + curr_player.get_name())                
             elif (
                 hasattr(self.__gameUI, "eventBut")
                 and event.ui_element == self.__gameUI.eventBut
@@ -333,13 +332,13 @@ class Game:
             self.currentAuction.start_auction()
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
-            self.showStockUI = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
+            self.showStockUI = ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0])
             self.currentAuction = None
-            self.showStockUI.show_buy_auctioned_stock()
+            self.showStockUI.draw()
             if len(self.__auctions) > 0: #if the second player has at least one stock
                 self.currentAuction = self.__auctions.pop(0)
                 stock = self.currentAuction.get_stock()
-                self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
+                self.listShowStockToAuction.append(ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0]))
                 self.currentAuction = None
 
     def manage_auction_events(self, event):
@@ -427,24 +426,24 @@ class Game:
             for player in self.get_players():
                 # if they have stock I have to create panel to show stock
                 if len(player.get_stocks()) > 0:
-                    self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), player))
+                    self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), "STOCK_TO_AUCTION", player))
 
             if(len(self.listShowStockToAuction) > 0):
                 self.disable_actions()
                 showStock = self.listShowStockToAuction.pop(0)
                 self.showStockUI = showStock
-                showStock.show_choose_stock_to_auction()
+                showStock.draw()
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.__board.get_availble_stocks()
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self, stocks)
-            self.showStockUI.show_move_to_stock("Scegli su quale cedola vuoi spostarti")
+            self.showStockUI = ShowStockUI(self, stocks, "MOVE_TO_STOCK", None, "Scegli su quale cedola vuoi spostarti")
+            self.showStockUI.draw()
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             if len(stocks) > 0:                
-                self.showStockUI = ShowStockUI(self, stocks, player)
-                self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
+                self.showStockUI = ShowStockUI(self, stocks, player, "SHOW_CHOOSE_STOCK", None, "Scegli quale vuoi comprare")
+                self.showStockUI.draw()
             else:
                 self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
         elif cell.cellType == SIX_HUNDRED_TYPE:
@@ -465,8 +464,8 @@ class Game:
         elif event.evenType == BUY_ANTHING_EVENT:
             stocks = Stock.get_stocks()
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self, stocks)
-            self.showStockUI.show_buy_anything_stock("Scegli quale vuoi comprare (Nessuno puo' opporsi alla vendita)")
+            self.showStockUI = ShowStockUI(self, stocks, "BUY_ANYTHING", None, "Scegli quale vuoi comprare (Nessuno puo' opporsi alla vendita)")
+            self.showStockUI.draw()
         elif event.evenType == STOP_1:
             player.set_skip_turn(True)
         elif event.evenType == FREE_PENALTY:
@@ -625,8 +624,8 @@ class Game:
     def is_debt_solved(self, player: Player):
         if player.is_in_debt():
             if len(player.get_stocks()) > 0:
-                self.showStockUI = ShowStockUI(self, player.get_stocks(), player)
-                self.showStockUI.show_bankrupt_stock()
+                self.showStockUI = ShowStockUI(self, player.get_stocks(), "BANKRUPT_STOCK", player)
+                self.showStockUI.draw()
             else:
                 self.renable_actions()
                 self.showStockUI = None
