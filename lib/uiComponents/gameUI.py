@@ -111,7 +111,7 @@ class GameUI:
             turn_rect,
             "Turno di " + currentPlayer.get_name(),
             manager=self.manager,
-            container=leaderboard,
+            container=leaderboard
         )
         # ADDING SQUARE BALANCE LABEL
         balance_rect = pygame.Rect((position_x, 50), label_dimension)

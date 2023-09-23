@@ -29,6 +29,9 @@ To fix:
 - aste
     - salvare i balance all'inizio delle aste per evitare che il primo che riceve i soldi dell'asta sia avvantaggiato sugli altri
 
+- controllare i clock.tick
+- controllare che bargain venga eseguito dopo eventuale incidente siccome il bilancio virtuale viene aggiornato all'apertura della finestra
+
 To do list codice:
 - fare getters and setters
     - mettere private le variabili
