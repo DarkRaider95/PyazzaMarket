@@ -443,7 +443,7 @@ class Game:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             if len(stocks) > 0:                
-                self.showStockUI = ShowStockUI(self, stocks, player, "SHOW_CHOOSE_STOCK", None, "Scegli quale vuoi comprare")
+                self.showStockUI = ShowStockUI(self, stocks, "SHOW_CHOOSE_STOCK", player, "Scegli quale vuoi comprare")
                 self.showStockUI.draw()
             else:
                 self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")

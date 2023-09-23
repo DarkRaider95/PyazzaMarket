@@ -69,7 +69,7 @@ def check_for_penalty(cells, players, player_number):  # testare per vedere se r
     elif not own_by_the_player:  # if it is not owned by the player we check if it is owned by another player
         for player in players:
             for stock in player.get_stocks():
-                if cell.position == stock.get_position():
+                if cell.get_position() == stock.get_position():
                     penality = player.compute_penalty(stock)
                     #if current_player doesn't have enough money he will be put in debt
                     if current_player.get_balance() < penality:

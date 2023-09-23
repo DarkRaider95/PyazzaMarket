@@ -47,8 +47,9 @@ class ShowStockUI:
                                 manager=self.manager)
         
     def show_choose_stock_to_auction(self):
-        if self.player is not None:            
-            self.draw_stock_ui("Cedole di" + self.player.get_name()+ "cosa vuoi mettere all'asta", False)
+        if self.player is not None:
+            self.title = "Cedole di" + self.player.get_name()+ "cosa vuoi mettere all'asta"
+            self.draw_stock_ui(False)
             stockRect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 10, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
             self.stockToAuction = UIButton(relative_rect=stockRect,
@@ -67,8 +68,9 @@ class ShowStockUI:
                                 object_id = 'CHOOSE_STOCK',
                                 manager=self.manager)
         
-    def show_buy_auctioned_stock(self):        
-        self.draw_stock_ui("Sei l'unico partecipante all'asta vuoi comprare o lasciare alla banca?", True)
+    def show_buy_auctioned_stock(self):
+        self.title = "Sei l'unico partecipante all'asta vuoi comprare o lasciare alla banca?"
+        self.draw_stock_ui(True)
         buy_auct_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.buy_auct_stock = UIButton(relative_rect=buy_auct_rect,
@@ -88,8 +90,9 @@ class ShowStockUI:
                                 object_id = 'LEAVE_AUCT_STOCK',
                                 manager=self.manager)
         
-    def show_bankrupt_stock(self):        
-        self.draw_stock_ui("Sei in banca rotta a vendi o metti all'asta?", False)
+    def show_bankrupt_stock(self):
+        self.title = "Sei in banca rotta a vendi o metti all'asta?"
+        self.draw_stock_ui(False)
         bankrupt_rect = pygame.Rect((STOCK_UI_WIDTH - STOCK_UI_BUT_WIDTH - 200, STOCK_UI_HEIGHT - STOCK_UI_BUT_HEIGHT - 10), (STOCK_UI_BUT_WIDTH, STOCK_UI_BUT_HEIGHT))
 
         self.auction_bankrupt = UIButton(relative_rect=bankrupt_rect,
