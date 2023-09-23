@@ -231,7 +231,8 @@ class Game:
                 and event.ui_element == self.__gameUI.showStocks
             ):
                 self.disable_actions()
-                self.showStockUI = self, curr_player.get_stocks(), "SHOW_STOCKS", None, "Le cedole di " + curr_player.get_name())                
+                self.showStockUI =  ShowStockUI(self, curr_player.get_stocks(), "SHOW_STOCKS", None, "Le cedole di " + curr_player.get_name())
+                self.showStockUI.draw()
             elif (
                 hasattr(self.__gameUI, "eventBut")
                 and event.ui_element == self.__gameUI.eventBut
