@@ -60,7 +60,7 @@ class Cell:
         self.cell_y = cell_y
         self.cellImage = cellImage
         self.cellType = cellType
-        self.position = position
+        self.__position = position
 
     def draw(self, screen):
         # if it's not a corner draw a cell
@@ -131,3 +131,6 @@ class Cell:
     def add_stock(self, stock):
         if self.__stocks is not None:
             self.__stocks.append(stock)
+
+    def get_position(self):
+        return self.__position

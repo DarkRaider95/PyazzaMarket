@@ -1,7 +1,7 @@
 from lib.constants import INITIAL_BALANCE
 from lib.car import Car
 import time
-from typing import Optional
+from typing import Optional, List
 from lib.stock import Stock
 
 class Player:
@@ -35,7 +35,7 @@ class Player:
             value += stock.get_stock_value()
 
         return value
-    
+
     def add_stock(self, stock):
         self.__stocks.append(stock)
         self.__stocks = sorted(self.__stocks, key=lambda x: x.get_position())
@@ -52,32 +52,38 @@ class Player:
         stock_to_remove_index = None
 
         same_color_cells = self.same_color_count(choosen_stock.color)
-        if same_color_cells >= 3: # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
+        if (
+            same_color_cells >= 3
+        ):  # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
             return choosen_stock.get_penalty()[same_color_cells - 1]
-        elif same_color_cells == 2: # we check if the player own two stocks of the same company
-            stocks = self.__stocks.copy() # create a copy of stocks
-            
-            for i, stock in enumerate(stocks): # cycle for pop choosen_stock
+        elif (
+            same_color_cells == 2
+        ):  # we check if the player own two stocks of the same company
+            stocks = self.__stocks.copy()  # create a copy of stocks
+
+            for i, stock in enumerate(stocks):  # cycle for pop choosen_stock
                 if stock.get_position() == choosen_stock.get_position():
                     stock_to_remove_index = i
             if stock_to_remove_index is not None:
                 stocks.pop(stock_to_remove_index)
 
-            for stock in stocks: # if the stock is the same return the right penalty
+            for stock in stocks:  # if the stock is the same return the right penalty
                 if stock.get_name() == choosen_stock.get_name():
                     return choosen_stock.get_penalty()[1]
-        return choosen_stock.get_penalty()[0] # this will return if the stock of the company is only one
-    
+        return choosen_stock.get_penalty()[
+            0
+        ]  # this will return if the stock of the company is only one
+
     def get_stock_by_pos(self, stock_pos) -> Optional[Stock]:
         for stock in self.__stocks:
             if stock.get_position() == stock_pos:
                 return stock
-            
+
         return None
-    
+
     def remove_stock(self, chosen_stock):
         stock_to_remove_index = None
-        
+
         for i, stock in enumerate(self.__stocks):
             if stock.get_position() == chosen_stock.get_position():
                 stock_to_remove_index = i
@@ -91,66 +97,66 @@ class Player:
 
     # all the getters and setters are below
 
-    def get_stocks(self): # pragma: no cover
+    def get_stocks(self):  # pragma: no cover
         return self.__stocks.copy()
-    
-    def get_stocks_names(self): # pragma: no cover
+
+    def get_stocks_names(self):  # pragma: no cover
         return [stock.get_name() for stock in self.__stocks]
-    
-    def set_skip_turn(self, skip): # pragma: no cover
+
+    def set_skip_turn(self, skip):  # pragma: no cover
         self.__set_skip_turn = skip
 
-    def get_skip_turn(self): # pragma: no cover
+    def get_skip_turn(self):  # pragma: no cover
         return self.__set_skip_turn
     
-    def freePenalty(self, free): # pragma: no cover
+    def set_free_penalty(self, free): # pragma: no cover
         self.__freePenalty = free
 
-    def get_free_penalty(self): # pragma: no cover
+    def get_free_penalty(self):  # pragma: no cover
         return self.__freePenalty
-    
-    def set_free_martini(self, free): # pragma: no cover
+
+    def set_free_martini(self, free):  # pragma: no cover
         self.__free_martini = free
 
-    def get_free_martini(self): # pragma: no cover
+    def get_free_martini(self):  # pragma: no cover
         return self.__free_martini
 
-    def get_balance(self): # pragma: no cover
+    def get_balance(self):  # pragma: no cover
         return self.__balance
-    
-    def get_name(self): # pragma: no cover
+
+    def get_name(self):  # pragma: no cover
         return self.__playerName
-    
-    def change_balance(self, balance): # pragma: no cover
+
+    def change_balance(self, balance):  # pragma: no cover
         self.__balance += balance
 
-    def get_position(self): # pragma: no cover
+    def get_position(self):  # pragma: no cover
         return self.__position
-    
-    def get_old_position(self): # pragma: no cover
+
+    def get_old_position(self):  # pragma: no cover
         return self.__old_position
-    
-    def get_car(self): # pragma: no cover
+
+    def get_car(self):  # pragma: no cover
         return self.__car
-    
-    def get_is_bot(self): # pragma: no cover
+
+    def get_is_bot(self):  # pragma: no cover
         return self.__is_bot
-    
+
     def get_debts(self):
         return self.__debts
-    
+
     def add_debt(self, debt):
         self.__debts.append(debt)
 
     def erase_debts(self):
         self.__debts = []
         self.__in_debt_with = None
-    
+
     def set_in_debt_with(self, creditor):
         if self.__in_debt_with is None:
             self.__in_debt_with = []
 
         self.__in_debt_with.append(creditor)
-        
+
     def get_in_debt_with(self):
         return self.__in_debt_with

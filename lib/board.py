@@ -157,7 +157,7 @@ class Board:
 
     def get_stock_if_available(self, stockPos):
         for cell in self.__cells:
-            if(cell.get_stocks() is not None and len(cell.get_stocks()) > 0 and stockPos == cell.position):
+            if(cell.get_stocks() is not None and len(cell.get_stocks()) > 0 and stockPos == cell.get_position()):
                 return cell.sell_stock()
             
         return None

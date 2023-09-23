@@ -25,12 +25,12 @@ To fix:
     - in questo modo nel loop principale controllo se ci sono alert o gui da mostrare
     - se ci sono le disegno una alla volta
     - decidiamo poi la priorità delle gui e degli alert
-- dopo chiusura della compra vendita di azioni nella casella fermata libera senza comprare nulla i tasti rimangono bloccati
 - fare le cedole uguali a quelle vere
 - aste
-    - se rimane un solo giocatore che ha fatto l'offerta è costretto a comprare la cedola
-    - se nessuno ha offerto allora si possono ritirare tutti e la cedola va alla banca
     - salvare i balance all'inizio delle aste per evitare che il primo che riceve i soldi dell'asta sia avvantaggiato sugli altri
+
+- controllare i clock.tick
+- controllare che bargain venga eseguito dopo eventuale incidente siccome il bilancio virtuale viene aggiornato all'apertura della finestra
 
 To do list codice:
 - fare getters and setters

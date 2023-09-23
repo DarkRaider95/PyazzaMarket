@@ -1,6 +1,7 @@
 import pygame
 
 from lib.auction import Auction
+from lib.stock import Stock
 from lib.uiComponents.bargainUI import BargainUI
 from lib.uiComponents.showStockUI import ShowStockUI
 from lib.uiComponents.gameUI import GameUI
@@ -22,6 +23,7 @@ from collections import deque
 import time
 import random
 from lib.dice_overlay import DiceOverlay
+from lib.uiComponents.takeSomeoneWithYouUI import TakeSomeoneWithYouUI
 from state_manager.actions_status import ActionsStatus
 from ai.bot import Bot
 from typing import Optional
@@ -54,6 +56,7 @@ class Game:
         self.showStockUI: Optional[ShowStockUI] = None
         self.bargain_ui: Optional[BargainUI] = None
         self.__alert_messages = []
+        self.current_window = None
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -120,6 +123,9 @@ class Game:
                 self.manage_events(event)
                 self.__gameUI.manager.process_events(event)
 
+            if self.bargain_ui:
+                self.update_graphic()
+
     def set_skip_turn(self):  # pragma: no cover
         curr_player = self.__players[self.__current_player_index]
         while curr_player.get_skip_turn():
@@ -128,6 +134,8 @@ class Game:
                 self.get_players()
             )
             curr_player = self.__players[self.__current_player_index]
+
+        self.__gameUI.updateTurnLabel(curr_player)
 
     def turn(self):
         tiro_doppio = False
@@ -153,9 +161,14 @@ class Game:
             # curr_player.move(10)
             self.enable_buy_button(cell, curr_player)
             # we need to create a copy of the list in order to perform some edit of the list later
-            check_for_penalty(
+            isFree = check_for_penalty(
                 self.__board.get_cells(), self.get_players(), self.__current_player_index
             )
+
+            if isFree == "FREE":
+                self.__alert_messages.append("Non paghi la penalità!")
+            elif isFree == "FREE_MARTINI":
+                self.__alert_messages.append("Non paghi il martini!")
         # case special cell
         else:
             self.special_cell_logic(cell, curr_player)
@@ -163,8 +176,8 @@ class Game:
         #bankrupt logic
         if curr_player.is_in_debt():
             if len(curr_player.get_stocks()) > 0:
-                self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), curr_player)
-                self.showStockUI.show_bankrupt_stock()
+                self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), "BANKRUPT_STOCK", curr_player)
+                self.showStockUI.draw()
             else:
                 self.is_debt_solved(curr_player)
         else:#check if others are in debt after our turn due to some event
@@ -221,8 +234,8 @@ class Game:
                 and event.ui_element == self.__gameUI.showStocks
             ):
                 self.disable_actions()
-                self.showStockUI = ShowStockUI(self, curr_player.get_stocks())
-                self.showStockUI.show_stocks_ui("Le cedole di " + curr_player.get_name())
+                self.showStockUI =  ShowStockUI(self, curr_player.get_stocks(), "SHOW_STOCKS", None, "Le cedole di " + curr_player.get_name())
+                self.showStockUI.draw()
             elif (
                 hasattr(self.__gameUI, "eventBut")
                 and event.ui_element == self.__gameUI.eventBut
@@ -270,17 +283,19 @@ class Game:
                 )
             elif self.bargain_ui is not None:
                 self.bargain_ui.manage_bargain_events(event)
+            elif self.current_window is not None:
+                self.current_window.manage_events(event)
             else:  # pragma: no cover
                 print("Evento non gestito")
             self.update_graphic()
-        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
-            if self.bargain_ui is not None:
-                self.bargain_ui.manage_bargain_events(event)
-            self.update_graphic()
-        elif event.type == pygame.KEYDOWN and self.__test:
+        elif (event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED or event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED) and self.bargain_ui is not None:
+            # here no update graphic is needed since il already active when the bargain ui is active
+            self.bargain_ui.manage_bargain_events(event)        
+        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED and self.current_window is not None:
+            self.current_window.manage_events(event)            
+        elif event.type == pygame.KEYDOWN and self.__test and not self.bargain_ui:
             if event.key == pygame.K_0:  # or pygame.K_KP0:
                 self.set_test_dice(0)
-                print("Test dice set to 0")
             elif event.key == pygame.K_1:  # or pygame.K_KP1:
                 self.set_test_dice(1)
             elif event.key == pygame.K_2:  # or pygame.K_KP2:
@@ -319,13 +334,13 @@ class Game:
             self.currentAuction.start_auction()
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
-            self.showStockUI = ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0])
+            self.showStockUI = ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0])
             self.currentAuction = None
-            self.showStockUI.show_buy_auctioned_stock()
+            self.showStockUI.draw()
             if len(self.__auctions) > 0: #if the second player has at least one stock
                 self.currentAuction = self.__auctions.pop(0)
                 stock = self.currentAuction.get_stock()
-                self.listShowStockToAuction.append(ShowStockUI(self, [stock], self.currentAuction.get_bidders()[0]))
+                self.listShowStockToAuction.append(ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0]))
                 self.currentAuction = None
 
     def manage_auction_events(self, event):
@@ -413,24 +428,24 @@ class Game:
             for player in self.get_players():
                 # if they have stock I have to create panel to show stock
                 if len(player.get_stocks()) > 0:
-                    self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), player))
+                    self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), "STOCK_TO_AUCTION", player))
 
             if(len(self.listShowStockToAuction) > 0):
                 self.disable_actions()
                 showStock = self.listShowStockToAuction.pop(0)
                 self.showStockUI = showStock
-                showStock.show_choose_stock_to_auction()
+                showStock.draw()
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.__board.get_availble_stocks()
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self, stocks)
-            self.showStockUI.show_move_to_stock("Scegli su quale cedola vuoi spostarti")
+            self.showStockUI = ShowStockUI(self, stocks, "MOVE_TO_STOCK", None, "Scegli su quale cedola vuoi spostarti")
+            self.showStockUI.draw()
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             if len(stocks) > 0:                
-                self.showStockUI = ShowStockUI(self, stocks, player)
-                self.showStockUI.show_choose_stock("Scegli quale vuoi comprare")
+                self.showStockUI = ShowStockUI(self, stocks, "SHOW_CHOOSE_STOCK", player, "Scegli quale vuoi comprare")
+                self.showStockUI.draw()
             else:
                 self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
         elif cell.cellType == SIX_HUNDRED_TYPE:
@@ -449,17 +464,14 @@ class Game:
         if event.evenType == COLOR_EVENT:
             pass
         elif event.evenType == BUY_ANTHING_EVENT:
-            stocks = self.__board.get_availble_stocks()
-            for p in self.__players:
-                if p != player:
-                    stocks.extend(player.get_stocks())
+            stocks = Stock.get_stocks()
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self, stocks)
-            self.showStockUI.show_buy_anything_stock("Scegli quale vuoi comprare (Nessuno può opporsi alla vendita)")
+            self.showStockUI = ShowStockUI(self, stocks, "BUY_ANYTHING", None, "Scegli quale vuoi comprare (Nessuno puo' opporsi alla vendita)")
+            self.showStockUI.draw()
         elif event.evenType == STOP_1:
             player.set_skip_turn(True)
         elif event.evenType == FREE_PENALTY:
-            player.freePenalty(True)
+            player.set_free_penalty(True)
         elif event.evenType == FREE_PENALTY_MARTINI:
             player.set_free_martini(True)
         elif event.evenType == EVERYONE_FIFTY_EVENT:
@@ -470,12 +482,18 @@ class Game:
             )
             previousPlayer = self.__players[previousPlayerIndex]
             previousPlayer.set_position(39)
-            playerOwnStock = who_owns_stock(self.get_players(), 39)[
-                0
-            ]  # bisogna ragionare come gestire questo caso se ci sono più giocatori quale penalità prendo quella più alta o quella più bassa?
-            stock = playerOwnStock.get_stock_by_pos(39)
-            amount = playerOwnStock.compute_penalty(stock)
-            previousPlayer.change_balance(amount)
+            #get owners of the stocks
+            playersOwnStock = who_owns_stock(self.get_players(), 39)
+
+            if len(playersOwnStock) > 0: #if there are owners I do the logic of the event
+                stock1 = playersOwnStock[0].get_stock_by_pos(39)
+                amount = playersOwnStock[0].compute_penalty(stock1)
+
+                if len(playersOwnStock) > 1:# if there is more than one owner I sum the penalties
+                    stock2 = playersOwnStock[1].get_stock_by_pos(39)
+                    amount += playersOwnStock[1].compute_penalty(stock2)                
+
+                previousPlayer.change_balance(amount)
         elif event.evenType == NEXT_PLAYER_PAY:
             nextPlayerIndex = (self.__current_player_index + 1) % len(self.__players)
             nextPlayer = self.__players[nextPlayerIndex]
@@ -486,7 +504,15 @@ class Game:
             if stock is not None:
                 player.add_stock(stock)
             else:
-                player.change_balance(effectData["amount"])
+                amount = effectData["amount"]
+                square_balance = self.get_square_balance()
+                if amount < self.get_square_balance():
+                    self.set_square_balance(-effectData["amount"])
+                    player.change_balance(effectData["amount"])
+                else:
+                    self.set_square_balance(-square_balance)
+                    player.change_balance(square_balance)
+
         elif event.evenType == GET_EVENT:
             effectData = event.effectData
 
@@ -542,7 +568,10 @@ class Game:
                 player.change_balance(-stock.get_original_value())
             else:
                 print("BUY CASE START NEGOTIATION")
-                pass  # avviare trattativa con proprietario
+                stock = Stock.get_stock_by_position(effectData["stockIndex"])
+                owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
+                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
+                self.game.bargain_ui.draw()
 
         # rotate the events list
         self.events.rotate(-1)
@@ -564,18 +593,24 @@ class Game:
             )
             player.change_balance(passAmount)
 
-        if effectData["someone"]:  # implement interface to choose someone
+        if effectData["someone"]:
             print("GOTO SOMEONE CASE")
-            pass
+            self.current_window = TakeSomeoneWithYouUI(self, self.get_other_players(player), effectData["destination"])
+            self.current_window.draw()            
 
         if effectData["buy"]:
-            stock = self.__board.get_stock_if_available(effectData["destination"])  #TODO call buy stock logic in this way the bankrupt and everything should be already implemented
+            stock = self.__board.get_stock_if_available(effectData["destination"])
             if stock is not None:
-                player.add_stock(stock)
-                player.change_balance(-stock.get_original_value())
+                buy_stock_from_cell(self.__board.get_cells(), player, effectData["destination"])
             else:
                 print("GOTO BUY CASE START NEGOTIATION")
-                pass  # implement gui to start negotiation with owner
+                stock = Stock.get_stock_by_position(effectData["destination"])
+                owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
+                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
+                self.game.bargain_ui.draw()        
+
+        if effectData["possiblebuy"]:#enable buy button if possible buy
+            self.enable_buy_button(self.__board.get_cell(effectData["destination"]), player)            
 
         if effectData["get"] is not None:
             player.change_balance(effectData["get"])
@@ -591,8 +626,8 @@ class Game:
     def is_debt_solved(self, player: Player):
         if player.is_in_debt():
             if len(player.get_stocks()) > 0:
-                self.showStockUI = ShowStockUI(self, player.get_stocks(), player)
-                self.showStockUI.show_bankrupt_stock()
+                self.showStockUI = ShowStockUI(self, player.get_stocks(), "BANKRUPT_STOCK", player)
+                self.showStockUI.draw()
             else:
                 self.renable_actions()
                 self.showStockUI = None
