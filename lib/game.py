@@ -291,7 +291,7 @@ class Game:
                 self.current_panel = None
             elif (
                 hasattr(self.current_panel, "launchOverlayDiceBut")
-                and event.ui_element == self.__gameUI.launchOverlayDiceBut
+                and event.ui_element == self.current_panel.launchOverlayDiceBut
             ):
                 self.dice_overlay.launch_but_pressed()
             #elif self.currentAuction is not None:
@@ -484,7 +484,7 @@ class Game:
             six_hundred_logic(player)
         elif cell.cellType == CHANCE_TYPE:
             self.disable_actions()
-            self.panels_to_show.append(DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi", "Riserva monetaria", self.actions_status, False))
+            self.panels_to_show.append(DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi", "Riserva monetaria", self.__actions_status, False))
             #self.__gameUI.drawDiceOverlay(
             #    self.__players[self.__current_player_index].get_name() + " tira dadi",
             #    "Riserva monetaria",
@@ -646,7 +646,7 @@ class Game:
                 self.panels_to_show.append(self.game.bargain_ui)
                 #self.game.bargain_ui.draw()
 
-        if effectData["possiblebuy"]:#enable buy button if possible buy
+        if effectData["possibleBuy"]:#enable buy button if possible buy
             self.enable_buy_button(self.__board.get_cell(effectData["destination"]), player)            
 
         if effectData["get"] is not None:
@@ -752,3 +752,6 @@ class Game:
         return list(filter(
             lambda obj: obj.get_name() != player.get_name(), self.get_players()
         ))
+
+    def get_auctions(self): # pragma: no cover
+        return self.__auctions

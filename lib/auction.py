@@ -266,12 +266,12 @@ class Auction:
         ):
             self.raise_bid()
         elif (
-            hasattr(self.currentAuction, "lowerBid")
+            hasattr(self, "lowerBid")
             and event.ui_element == self.lowerBid
         ):
             self.lower_bid()
         elif (
-            hasattr(self.currentAuction, "bidBut")
+            hasattr(self, "bidBut")
             and event.ui_element == self.bidBut
         ):
             self.bid_but()
@@ -279,12 +279,12 @@ class Auction:
                 finished_auction_logic(self.__board, self)
                 self.open_next_if_present()
         elif (
-            hasattr(self.currentAuction, "nextBidder")
+            hasattr(self, "nextBidder")
             and event.ui_element == self.nextBidder
         ):
             self.pass_bid()
         elif (
-            hasattr(self.currentAuction, "retireAuction")
+            hasattr(self, "retireAuction")
             and event.ui_element == self.retireAuction
         ):
             self.retire_auction()
@@ -293,11 +293,12 @@ class Auction:
                 self.open_next_if_present()
                 
     def open_next_if_present(self):
+        auctions = self.__game.get_auctions()
         # if there are other auctions open next otherwise close it
-        if len(self.__auctions) > 0:
+        if len(auctions) > 0:
             self.auctionUI.kill()
             self.screen.fill(BLACK)
-            self.__game.currentAuction = self.__game.__auctions.pop(0)
+            self.__game.currentAuction = auctions.pop(0)
             self.__game.current_panel = None
             self.__game.panels_to_show.append(self.__game.currentAuction)
             #self.currentAuction.draw()
