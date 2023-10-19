@@ -105,6 +105,7 @@ class Game:
         self.__gameUI.draw_stockboard(self.get_players())
 
         self.dice_overlay.draw()
+        #self.current_panel = self.dice_overlay
 
         #self.__gameUI.drawDiceOverlay(
         #    self.__players[self.__current_player_index].get_name() + " tira dadi",
@@ -284,16 +285,28 @@ class Game:
                     self.__players[self.__current_player_index]
                 )
             elif (
-                hasattr(self.current_panel, "closeDiceOverlayBut")
+                hasattr(self.dice_overlay, "launchOverlayDiceBut")
+                and event.ui_element == self.dice_overlay.launchOverlayDiceBut
+            ):
+                self.dice_overlay.launch_but_pressed()
+                self.dice_overlay = None
+            elif (
+                hasattr(self.current_panel, "close_die_overlay_but")
                 and event.ui_element == self.current_panel.close_die_overlay_but
             ):
-                self.dice_overlay.close_dice_overlay()
+                self.current_panel.closeDiceOverlay(self.get_players(), self.__gameUI)
+                self.current_panel = None
+            elif (
+                hasattr(self.current_panel, "closeDiceOverlayBut")
+                and event.ui_element == self.current_panel.closeDiceOverlayBut
+            ):
+                self.current_panel.closeDiceOverlay(self.get_players(), self.__gameUI)
                 self.current_panel = None
             elif (
                 hasattr(self.current_panel, "launchOverlayDiceBut")
                 and event.ui_element == self.current_panel.launchOverlayDiceBut
             ):
-                self.dice_overlay.launch_but_pressed()
+                self.current_panel.launch_but_pressed()
             #elif self.currentAuction is not None:
             #    self.manage_auction_events(event)
             #elif self.showStockUI is not None:
@@ -336,7 +349,7 @@ class Game:
                 self.set_test_dice(9)
             elif event.key == pygame.K_SPACE:
                 self.__test_dice = (0, 0)
-                self.__gameUI.update_dice((1, 1))
+                self.__gameUI.update_dice((1, 1))                
             elif event.key == pygame.K_RETURN:
                 if self.__test_dice != (0, 0):
                     if self.dice_overlay.overlay_on():
@@ -429,6 +442,9 @@ class Game:
     def set_test_dice(self, value):
         if self.__test_dice[0] == 0:
             self.__test_dice = (value, 0)
+            #case dice overlay and one die
+            if hasattr(self.current_panel, "__establishing_players_order") and self.current_panel.__establishing_players_order and not self.current_panel.twoDices:
+                self.current_panel.update_dice(self.__test_dice)
         elif self.__test_dice[1] == 0:
             self.__test_dice = (self.__test_dice[0], value)
             self.__gameUI.update_dice(self.__test_dice)
@@ -484,7 +500,7 @@ class Game:
             six_hundred_logic(player)
         elif cell.cellType == CHANCE_TYPE:
             self.disable_actions()
-            self.panels_to_show.append(DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi", "Riserva monetaria", self.__actions_status, False))
+            self.panels_to_show.append(DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi", "Riserva monetaria", self.__actions_status, False, False))
             #self.__gameUI.drawDiceOverlay(
             #    self.__players[self.__current_player_index].get_name() + " tira dadi",
             #    "Riserva monetaria",

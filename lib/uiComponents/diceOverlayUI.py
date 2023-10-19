@@ -6,10 +6,10 @@ import time
 
 class DiceOverlay:
     #TODO remove variables that aren't needed
-    def __init__(self, __game, message, title, actions_status, twoDices=True) -> None:
+    def __init__(self, __game, message, title, actions_status, twoDices=True, establishing_players_order = True) -> None:
         self.__gameUI = __game.get_gameUI()
         self.__game = __game
-        self.__establishing_players_order = True # we use this variable to understand when we have launched the __game for the first time
+        self.__establishing_players_order = establishing_players_order # we use this variable to understand when we have launched the __game for the first time
         self.__highestScore = 0 # we save the score for deciding which is the play with the highest score that will start first
         self.__who_will_start = 0 # we save the index of the player that will start first
         self.__same_score = False # we use this variable to understand if we need to throw the dice again for decide who will start first
@@ -92,7 +92,7 @@ class DiceOverlay:
                 relative_rect=close_rect,
                 text="Chiudi",
                 container=self.diceOverlay,
-                object_id="CLOSE_DICE_OVERLAY",
+                object_id="CLOSE_DIE_OVERLAY",
                 manager=self.manager,
             )
             self.close_die_overlay_but.disable()
