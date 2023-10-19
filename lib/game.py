@@ -289,7 +289,6 @@ class Game:
                 and event.ui_element == self.dice_overlay.launchOverlayDiceBut
             ):
                 self.dice_overlay.launch_but_pressed()
-                self.dice_overlay = None
             elif (
                 hasattr(self.current_panel, "close_die_overlay_but")
                 and event.ui_element == self.current_panel.close_die_overlay_but
