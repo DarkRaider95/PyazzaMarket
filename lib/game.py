@@ -619,7 +619,7 @@ class Game:
                 print("BUY CASE START NEGOTIATION")
                 stock = Stock.get_stock_by_position(effectData["stockIndex"])
                 owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
-                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
+                self.game.bargain_ui = BargainUI(self.__gameUI.manager, self.screen, player, owners, self)
                 self.panels_to_show.append(self.game.bargain_ui)
                 #self.game.bargain_ui.draw()
 

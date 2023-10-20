@@ -217,6 +217,7 @@ class BargainUI:
     def close_ui(self):
         self.bargain_ui.kill()
         self.game.bargain_ui = None
+        self.game.current_panel = None
 
     def manage_events(self, event, players=None, current_player=None):
         if (

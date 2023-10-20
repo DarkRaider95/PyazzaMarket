@@ -184,6 +184,7 @@ class ShowStockUI:
             self.screen.fill(BLACK)
             if curr_player.get_position() == 5: # check if the 
                 self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, self.game.get_other_players(self.player), self.game)
+                self.game.current_panel = self.game.bargain_ui
                 self.game.bargain_ui.draw()
             else:
                 self.action_status.renable_actions()
@@ -196,6 +197,7 @@ class ShowStockUI:
             self.gameUI.draw_dices()
             self.gameUI.updateAllPlayerLables(players)
             self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, self.game.get_other_players(self.player), self.game)
+            self.game.current_panel = self.game.bargain_ui
             self.game.bargain_ui.draw()      
         elif hasattr(self, "chooseMoveBut") and event.ui_element == self.chooseMoveBut: # pragma: no cover
             chosen_stock = self.get_showed_stock()
