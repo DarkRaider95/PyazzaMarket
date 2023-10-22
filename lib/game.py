@@ -645,8 +645,8 @@ class Game:
 
         if effectData["someone"]:
             print("GOTO SOMEONE CASE")
-            self.current_panel = TakeSomeoneWithYouUI(self, self.get_other_players(player), effectData["destination"])
-            self.panels_to_show.append(self.current_panel)
+            panel = TakeSomeoneWithYouUI(self, self.get_other_players(player), effectData["destination"])
+            self.panels_to_show.append(panel)
             #self.current_panel.draw()
 
         if effectData["buy"]:
