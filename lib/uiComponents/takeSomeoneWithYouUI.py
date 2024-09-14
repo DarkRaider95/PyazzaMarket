@@ -73,7 +73,7 @@ class TakeSomeoneWithYouUI:
         self.screen.fill(BLACK)
         self.game.renable_actions()
 
-    def manage_events(self, event):
+    def manage_events(self, event, players, current_player):
         if (
             hasattr(self, "player_selector")
             and event.ui_element == self.player_selector

@@ -321,7 +321,7 @@ class Game:
             self.update_graphic()
         elif (event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED or event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED) and self.current_panel is not None:
             # here no update graphic is needed since il already active when the bargain ui is active
-            self.current_panel.manage_events(event)
+            self.current_panel.manage_events(event, self.get_players(), curr_player)
             self.update_graphic()
         #elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED and self.current_panel is not None:
         #    self.current_panel.manage_events(event)            

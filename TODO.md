@@ -23,6 +23,7 @@
 - non si legge la descrizione del titolo nella finestra delle aste
 - non si legge la label del bottone per mettere all'asta la cedola
 - aggiungere lunghezza massima nome giocatore
+- controllare se c'è la logica del perdi un giro
 
 ## Non sappiamo se fare 
 - controllare i clock.tick
