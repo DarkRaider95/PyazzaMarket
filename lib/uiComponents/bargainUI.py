@@ -214,11 +214,12 @@ class BargainUI:
 
         self.draw_give_or_receive()
   
-    def close_bargain_ui(self):
+    def close_ui(self):
         self.bargain_ui.kill()
         self.game.bargain_ui = None
+        self.game.current_panel = None
 
-    def manage_bargain_events(self, event):
+    def manage_events(self, event, players=None, current_player=None):
         if (
             hasattr(self, "player_selector")
             and event.ui_element == self.player_selector
@@ -246,13 +247,13 @@ class BargainUI:
         ):  # pragma: no cover
             # process the bargains and close the window
             self.process_bargains()
-            self.close_bargain_ui()
+            self.close_ui()
             self.screen.fill(BLACK)
             self.game.renable_actions()
         elif (
             hasattr(self, "close_butt") and event.ui_element == self.close_butt
         ):  # pragma: no cover
-            self.close_bargain_ui()
+            self.close_ui()
             self.screen.fill(BLACK)
             self.game.renable_actions()
         elif hasattr(self, "money_excange") and event.ui_element == self.money_excange:

@@ -3,7 +3,7 @@ import pytest
 import pygame
 from lib.constants import *
 from pytest import MonkeyPatch
-from lib.dice_overlay import DiceOverlay
+from lib.uiComponents.diceOverlayUI import DiceOverlay
 
 # we need to do pygame.init() in order to be able to run pygame
 pygame.init()

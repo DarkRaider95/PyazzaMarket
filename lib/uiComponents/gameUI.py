@@ -285,53 +285,53 @@ class GameUI:
             else:
                 action.disable()
 
-    def showEventUi(self, event):
-        self.showedEvent = event
-        self.drawEventUi()
-
-    def drawEventUi(self):
-        panel_rect = pygame.Rect(
-            (WIDTH // 2 - EVENT_UI_WIDTH // 2, 20), (EVENT_UI_WIDTH, EVENT_UI_HEIGHT)
-        )
-        self.eventUi = UIPanel(panel_rect, starting_height=2, manager=self.manager)
-
-        title_rect = pygame.Rect(
-            (EVENT_UI_WIDTH // 2 - EVENT_UI_TITLE_WIDTH // 2, 10),
-            (EVENT_UI_TITLE_WIDTH, EVENT_UI_TITLE_HEIGHT),
-        )
-        UILabel(title_rect, "EVENTI", manager=self.manager, container=self.eventUi)
-
-        eventRect = pygame.Rect(
-            (
-                EVENT_UI_WIDTH - 30 - EVENT_UI_BUT_WIDTH,
-                EVENT_UI_HEIGHT // 2 - EVENT_UI_BUT_HEIGHT // 2,
-            ),
-            (EVENT_UI_BUT_WIDTH, EVENT_UI_BUT_WIDTH),
-        )
-
-        self.eventBut = UIButton(
-            relative_rect=eventRect,
-            text="OK",
-            container=self.eventUi,
-            object_id="EVENT_OK",
-            manager=self.manager,
-        )
-
-        eventImageRect = pygame.Rect(
-            (EVENT_UI_WIDTH // 2 - EVENT_WIDTH // 2, 60), (EVENT_WIDTH, EVENT_HEIGHT)
-        )
-
-        self.showedEvent.draw()
-        self.eventImage = UIImage(
-            eventImageRect,
-            self.showedEvent.surface,
-            container=self.eventUi,
-            manager=self.manager,
-        )
-
-    def closeEventUi(self):
-        self.eventUi.kill()
-
+#    def showEventUi(self, event):
+#        self.showedEvent = event
+#        self.drawEventUi()
+#
+#    def drawEventUi(self):
+#        panel_rect = pygame.Rect(
+#            (WIDTH // 2 - EVENT_UI_WIDTH // 2, 20), (EVENT_UI_WIDTH, EVENT_UI_HEIGHT)
+#        )
+#        self.eventUi = UIPanel(panel_rect, starting_height=2, manager=self.manager)
+#
+#        title_rect = pygame.Rect(
+#            (EVENT_UI_WIDTH // 2 - EVENT_UI_TITLE_WIDTH // 2, 10),
+#            (EVENT_UI_TITLE_WIDTH, EVENT_UI_TITLE_HEIGHT),
+#        )
+#        UILabel(title_rect, "EVENTI", manager=self.manager, container=self.eventUi)
+#
+#        eventRect = pygame.Rect(
+#            (
+#                EVENT_UI_WIDTH - 30 - EVENT_UI_BUT_WIDTH,
+#                EVENT_UI_HEIGHT // 2 - EVENT_UI_BUT_HEIGHT // 2,
+#            ),
+#            (EVENT_UI_BUT_WIDTH, EVENT_UI_BUT_WIDTH),
+#        )
+#
+#        self.eventBut = UIButton(
+#            relative_rect=eventRect,
+#            text="OK",
+#            container=self.eventUi,
+#            object_id="EVENT_OK",
+#            manager=self.manager,
+#        )
+#
+#        eventImageRect = pygame.Rect(
+#            (EVENT_UI_WIDTH // 2 - EVENT_WIDTH // 2, 60), (EVENT_WIDTH, EVENT_HEIGHT)
+#        )
+#
+#        self.showedEvent.draw()
+#        self.eventImage = UIImage(
+#            eventImageRect,
+#            self.showedEvent.surface,
+#            container=self.eventUi,
+#            manager=self.manager,
+#        )
+#
+#    def closeEventUi(self):
+#        self.eventUi.kill()
+#
     def drawAlert(self, message):
         surface = pygame.Rect(
             ((WIDTH - ALERT_WIDTH) // 2, (HEIGHT - ALERT_HEIGHT) // 2),
@@ -372,85 +372,85 @@ class GameUI:
         self.updateStockboard(players, time.time(), dice)
         self.__actions_status.renable_actions()
 
-    def drawDiceOverlay(self, message, title, twoDices=True):
-        surface = pygame.Rect(
-            ((WIDTH - DICE_OVERLAY_WIDTH) // 2, (HEIGHT - DICE_OVERLAY_HEIGHT) // 2),
-            (DICE_OVERLAY_WIDTH, DICE_OVERLAY_HEIGHT),
-        )
-        self.diceOverlay = UIPanel(surface, starting_height=2, manager=self.manager)
-
-        title_rect = pygame.Rect(
-            ((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 10),
-            (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT),
-        )
-        UILabel(title_rect, title, manager=self.manager, container=self.diceOverlay)
-
-        message_rect = pygame.Rect(
-            ((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 30),
-            (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT),
-        )
-        UILabel(message_rect, message, manager=self.manager, container=self.diceOverlay)
-
-        close_rect = pygame.Rect(
-            (
-                DICE_OVERLAY_WIDTH - ALERT_BUT_WIDTH - 20,
-                DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10,
-            ),
-            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
-        )
-
-        if twoDices:
-            imgRect = pygame.Rect(
-                (DICE_OVERLAY_WIDTH // 2 - DICE_WIDTH, 65),
-                (DICE_WIDTH * 2, DICE_HEIGHT),
-            )
-            diceSurface = self.createDiceSurface(twoDices)
-            self.diceOverlayImg = UIImage(
-                imgRect, diceSurface, manager=self.manager, container=self.diceOverlay
-            )
-
-            self.closeDiceOverlayBut = UIButton(
-                relative_rect=close_rect,
-                text="Chiudi",
-                container=self.diceOverlay,
-                object_id="CLOSE_DICE_OVERLAY",
-                manager=self.manager,
-            )
-            self.closeDiceOverlayBut.disable()
-        else:
-            imgRect = pygame.Rect(
-                ((DICE_OVERLAY_WIDTH - DICE_WIDTH) // 2, 65), (DICE_WIDTH, DICE_HEIGHT)
-            )
-            diceSurface = self.createDiceSurface(twoDices)
-            self.diceOverlayImg = UIImage(
-                imgRect, diceSurface, manager=self.manager, container=self.diceOverlay
-            )
-            self.close_die_overlay_but = UIButton(
-                relative_rect=close_rect,
-                text="Chiudi",
-                container=self.diceOverlay,
-                object_id="CLOSE_DICE_OVERLAY",
-                manager=self.manager,
-            )
-            self.close_die_overlay_but.disable()
-
-
-        self.__actions_status.disable_actions()
-
-        throw_rect = pygame.Rect(
-            (20, DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10),
-            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
-        )
-        self.launchOverlayDiceBut = UIButton(
-            relative_rect=throw_rect,
-            text="Lancia",
-            container=self.diceOverlay,
-            object_id="CLOSE_DICE_OVERLAY",
-            manager=self.manager,
-        )
-
-        self.twoDices = twoDices
-
+#    def drawDiceOverlay(self, message, title, twoDices=True):
+#        surface = pygame.Rect(
+#            ((WIDTH - DICE_OVERLAY_WIDTH) // 2, (HEIGHT - DICE_OVERLAY_HEIGHT) // 2),
+#            (DICE_OVERLAY_WIDTH, DICE_OVERLAY_HEIGHT),
+#        )
+#        self.diceOverlay = UIPanel(surface, starting_height=2, manager=self.manager)
+#
+#        title_rect = pygame.Rect(
+#            ((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 10),
+#            (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT),
+#        )
+#        UILabel(title_rect, title, manager=self.manager, container=self.diceOverlay)
+#
+#        message_rect = pygame.Rect(
+#            ((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 30),
+#            (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT),
+#        )
+#        UILabel(message_rect, message, manager=self.manager, container=self.diceOverlay)
+#
+#        close_rect = pygame.Rect(
+#            (
+#                DICE_OVERLAY_WIDTH - ALERT_BUT_WIDTH - 20,
+#                DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10,
+#            ),
+#            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
+#        )
+#
+#        if twoDices:
+#            imgRect = pygame.Rect(
+#                (DICE_OVERLAY_WIDTH // 2 - DICE_WIDTH, 65),
+#                (DICE_WIDTH * 2, DICE_HEIGHT),
+#            )
+#            diceSurface = self.createDiceSurface(twoDices)
+#            self.diceOverlayImg = UIImage(
+#                imgRect, diceSurface, manager=self.manager, container=self.diceOverlay
+#            )
+#
+#            self.closeDiceOverlayBut = UIButton(
+#                relative_rect=close_rect,
+#                text="Chiudi",
+#                container=self.diceOverlay,
+#                object_id="CLOSE_DICE_OVERLAY",
+#                manager=self.manager,
+#            )
+#            self.closeDiceOverlayBut.disable()
+#        else:
+#            imgRect = pygame.Rect(
+#                ((DICE_OVERLAY_WIDTH - DICE_WIDTH) // 2, 65), (DICE_WIDTH, DICE_HEIGHT)
+#            )
+#            diceSurface = self.createDiceSurface(twoDices)
+#            self.diceOverlayImg = UIImage(
+#                imgRect, diceSurface, manager=self.manager, container=self.diceOverlay
+#            )
+#            self.close_die_overlay_but = UIButton(
+#                relative_rect=close_rect,
+#                text="Chiudi",
+#                container=self.diceOverlay,
+#                object_id="CLOSE_DICE_OVERLAY",
+#                manager=self.manager,
+#            )
+#            self.close_die_overlay_but.disable()
+#
+#
+#        self.__actions_status.disable_actions()
+#
+#        throw_rect = pygame.Rect(
+#            (20, DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10),
+#            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
+#        )
+#        self.launchOverlayDiceBut = UIButton(
+#            relative_rect=throw_rect,
+#            text="Lancia",
+#            container=self.diceOverlay,
+#            object_id="CLOSE_DICE_OVERLAY",
+#            manager=self.manager,
+#        )
+#
+#        self.twoDices = twoDices
+#
     def createDiceSurface(self, twoDices=True):
         if twoDices:  # guardare se si può aggiornare solo la superficie con blit
             diceSurface = pygame.Surface((DICE_WIDTH * 2, DICE_HEIGHT))
@@ -461,21 +461,21 @@ class GameUI:
             diceSurface.blit(self.image_dice_1, (0, 0))
         return diceSurface
 
-    def updateDiceOverlay(self, score):
-        self.update_dice(score)
-        self.diceOverlayImg.set_image(self.createDiceSurface(self.twoDices))
-        self.launchOverlayDiceBut.disable()
-        if hasattr(self, "close_die_overlay_but"):
-            self.close_die_overlay_but.enable()
-        if hasattr(self, "closeDiceOverlayBut"):
-            self.closeDiceOverlayBut.enable()
-
-    def closeDiceOverlay(self, players, dice):
+#    def updateDiceOverlay(self, score):
+#        self.update_dice(score)
+#        self.diceOverlayImg.set_image(self.createDiceSurface(self.twoDices))
+#        self.launchOverlayDiceBut.disable()
+#        if hasattr(self, "close_die_overlay_but"):
+#            self.close_die_overlay_but.enable()
+#        if hasattr(self, "closeDiceOverlayBut"):
+#            self.closeDiceOverlayBut.enable()
+#
+#    def closeDiceOverlay(self, players, dice):
         # since screen.fill(BLACK) is already on updateStockboard and
         # dice.draw also we directly call that function
-        self.diceOverlay.kill()
-        self.updateStockboard(players, time.time(), dice)
-        self.__actions_status.renable_actions()
+#        self.diceOverlay.kill()
+#        self.updateStockboard(players, time.time(), dice)
+#        self.__actions_status.renable_actions()
 
     def draw_dices(self):
         surface = self.createDiceSurface()

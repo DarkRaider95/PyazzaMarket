@@ -1,0 +1,11 @@
+htmlcov/
+.vscode/
+.pytest_cache/
+.github/
+.coverage
+LICENSE
+obs_screen_record.sh
+*.jpg
+*png
+assets/
+ai/

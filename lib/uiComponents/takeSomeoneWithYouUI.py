@@ -67,9 +67,9 @@ class TakeSomeoneWithYouUI:
             manager=self.manager,
         )
 
-    def close_take_someone_ui(self):
+    def close_ui(self):
         self.take_someone_ui.kill()
-        self.game.current_window = None
+        self.game.current_panel = None
         self.screen.fill(BLACK)
         self.game.renable_actions()
 
@@ -84,7 +84,7 @@ class TakeSomeoneWithYouUI:
             and event.ui_element == self.take_someone_butt
         ):  # pragma: no cover
             self.__selected_player.set_position(self.__position)
-            self.close_take_someone_ui()
+            self.close_ui()
         self.game.update_graphic()
 
     def get_player(self, player_name):

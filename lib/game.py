@@ -3,6 +3,7 @@ import pygame
 from lib.auction import Auction
 from lib.stock import Stock
 from lib.uiComponents.bargainUI import BargainUI
+from lib.uiComponents.eventUI import EventUI
 from lib.uiComponents.showStockUI import ShowStockUI
 from lib.uiComponents.gameUI import GameUI
 from lib.constants import (
@@ -22,7 +23,7 @@ import pygame_gui
 from collections import deque
 import time
 import random
-from lib.dice_overlay import DiceOverlay
+from lib.uiComponents.diceOverlayUI import DiceOverlay
 from lib.uiComponents.takeSomeoneWithYouUI import TakeSomeoneWithYouUI
 from state_manager.actions_status import ActionsStatus
 from ai.bot import Bot
@@ -56,7 +57,14 @@ class Game:
         self.showStockUI: Optional[ShowStockUI] = None
         self.bargain_ui: Optional[BargainUI] = None
         self.__alert_messages = []
-        self.current_window = None
+        self.current_panel = None
+        self.panels_to_show = []
+
+        Player.last_stock_update = time.time()
+        for player in players:
+            self.__players.append(
+                Player(player["name"], player["color"], player["bot"])
+            )
 
         if gui:
             # when we run the ai we don't need to initialize the gui
@@ -64,14 +72,8 @@ class Game:
             pygame.display.set_caption("PyazzaMarket")
             self.__board = Board()
             self.__gameUI = GameUI(self.screen, self.clock, self.__actions_status)
-            self.dice_overlay = DiceOverlay(self)
-        self.__bot = Bot(self)
-
-        Player.last_stock_update = time.time()
-        for player in players:
-            self.__players.append(
-                Player(player["name"], player["color"], player["bot"])
-            )
+            self.dice_overlay = DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi","Decisione turni", self.__actions_status)
+        self.__bot = Bot(self)        
 
     def update_graphic(self):
         # Now we update at all turn the stockboard for avoiding
@@ -102,10 +104,13 @@ class Game:
         )
         self.__gameUI.draw_stockboard(self.get_players())
 
-        self.__gameUI.drawDiceOverlay(
-            self.__players[self.__current_player_index].get_name() + " tira dadi",
-            "Decisione turni",
-        )
+        self.dice_overlay.draw()
+        #self.current_panel = self.dice_overlay
+
+        #self.__gameUI.drawDiceOverlay(
+        #    self.__players[self.__current_player_index].get_name() + " tira dadi",
+        #    "Decisione turni",
+        #)
         # we will handle the next players in the while loop
 
         for index, player in enumerate(self.get_players()):
@@ -123,8 +128,22 @@ class Game:
                 self.manage_events(event)
                 self.__gameUI.manager.process_events(event)
 
+            if len(self.panels_to_show) > 0 or len(self.__alert_messages) > 0:
+                self.draw_window()
+                self.update_graphic()
+
             if self.bargain_ui:
                 self.update_graphic()
+        
+    def draw_window(self):
+        if len(self.__alert_messages) > 0:
+            self.__gameUI.drawAlert(self.__alert_messages.pop(0))
+            self.current_panel = self.__gameUI.alertUi
+        
+        if self.current_panel is None:
+            self.current_panel = self.panels_to_show.pop(0)
+            self.current_panel.draw()
+        
 
     def set_skip_turn(self):  # pragma: no cover
         curr_player = self.__players[self.__current_player_index]
@@ -190,8 +209,8 @@ class Game:
         elif crash:
             self.__alert_messages.append("Incidente!")
 
-        if self.__alert_messages:
-            self.__gameUI.drawAlert(self.__alert_messages.pop(0))
+        #if self.__alert_messages:
+            #self.__gameUI.drawAlert(self.__alert_messages.pop(0))
         self.__gameUI.updateAllPlayerLables(self.get_players())
 
     def manage_events(self, event):
@@ -235,28 +254,28 @@ class Game:
             ):
                 self.disable_actions()
                 self.showStockUI =  ShowStockUI(self, curr_player.get_stocks(), "SHOW_STOCKS", None, "Le cedole di " + curr_player.get_name())
-                self.showStockUI.draw()
+                self.panels_to_show.append(self.showStockUI)
+                #self.showStockUI.draw()
             elif (
-                hasattr(self.__gameUI, "eventBut")
-                and event.ui_element == self.__gameUI.eventBut
+                hasattr(self.current_panel, "eventBut")
+                and event.ui_element == self.current_panel.eventBut
             ):
                 self.events_logic(curr_player)
-                self.__gameUI.closeEventUi()
+                self.current_panel.close_ui() #close panel of the event
                 self.screen.fill(BLACK)
                 self.__gameUI.draw_dices()
                 self.__gameUI.updateAllPlayerLables(self.get_players())
+                self.current_panel = None
                 self.renable_actions()
             elif (
                 hasattr(self.__gameUI, "closeAlertBut")
                 and event.ui_element == self.__gameUI.closeAlertBut
             ):
                 self.__gameUI.closeAlert(self.get_players(), self.__gameUI)
-                # qui bisogna testare se questa funziona o meno, forse bisogna aggiunge un update della leaderboard
-                if self.__alert_messages:
-                    self.__gameUI.drawAlert(self.__alert_messages.pop(0))
+                self.current_panel = None
             elif (
-                hasattr(self.__gameUI, "closeDiceOverlayBut")
-                and event.ui_element == self.__gameUI.closeDiceOverlayBut
+                hasattr(self.dice_overlay, "closeDiceOverlayBut")
+                and event.ui_element == self.dice_overlay.closeDiceOverlayBut
             ):
                 self.dice_overlay.close_dice_overlay()
                 if not self.dice_overlay.overlay_on():
@@ -266,33 +285,46 @@ class Game:
                     self.__players[self.__current_player_index]
                 )
             elif (
-                hasattr(self.__gameUI, "close_die_overlay_but")
-                and event.ui_element == self.__gameUI.close_die_overlay_but
-            ):
-                self.dice_overlay.close_dice_overlay()
-            elif (
-                hasattr(self.__gameUI, "launchOverlayDiceBut")
-                and event.ui_element == self.__gameUI.launchOverlayDiceBut
+                hasattr(self.dice_overlay, "launchOverlayDiceBut")
+                and event.ui_element == self.dice_overlay.launchOverlayDiceBut
             ):
                 self.dice_overlay.launch_but_pressed()
-            elif self.currentAuction is not None:
-                self.manage_auction_events(event)
-            elif self.showStockUI is not None:
-                self.showStockUI.manage_stock_events(
-                    event, self.get_players(), curr_player
-                )
-            elif self.bargain_ui is not None:
-                self.bargain_ui.manage_bargain_events(event)
-            elif self.current_window is not None:
-                self.current_window.manage_events(event)
+            elif (
+                hasattr(self.current_panel, "close_die_overlay_but")
+                and event.ui_element == self.current_panel.close_die_overlay_but
+            ):
+                self.current_panel.closeDiceOverlay(self.get_players(), self.__gameUI)
+                self.current_panel = None
+            elif (
+                hasattr(self.current_panel, "closeDiceOverlayBut")
+                and event.ui_element == self.current_panel.closeDiceOverlayBut
+            ):
+                self.current_panel.closeDiceOverlay(self.get_players(), self.__gameUI)
+                self.current_panel = None
+            elif (
+                hasattr(self.current_panel, "launchOverlayDiceBut")
+                and event.ui_element == self.current_panel.launchOverlayDiceBut
+            ):
+                self.current_panel.launch_but_pressed()
+            #elif self.currentAuction is not None:
+            #    self.manage_auction_events(event)
+            #elif self.showStockUI is not None:
+            #    self.showStockUI.manage_stock_events(
+            #        event, self.get_players(), curr_player
+            #    )
+            #elif self.bargain_ui is not None:
+            #    self.bargain_ui.manage_bargain_events(event)
+            elif self.current_panel is not None:
+                self.current_panel.manage_events(event, self.get_players(), curr_player)
             else:  # pragma: no cover
                 print("Evento non gestito")
             self.update_graphic()
-        elif (event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED or event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED) and self.bargain_ui is not None:
+        elif (event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED or event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED) and self.current_panel is not None:
             # here no update graphic is needed since il already active when the bargain ui is active
-            self.bargain_ui.manage_bargain_events(event)        
-        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED and self.current_window is not None:
-            self.current_window.manage_events(event)            
+            self.current_panel.manage_events(event)
+            self.update_graphic()
+        #elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED and self.current_panel is not None:
+        #    self.current_panel.manage_events(event)            
         elif event.type == pygame.KEYDOWN and self.__test and not self.bargain_ui:
             if event.key == pygame.K_0:  # or pygame.K_KP0:
                 self.set_test_dice(0)
@@ -316,7 +348,7 @@ class Game:
                 self.set_test_dice(9)
             elif event.key == pygame.K_SPACE:
                 self.__test_dice = (0, 0)
-                self.__gameUI.update_dice((1, 1))
+                self.__gameUI.update_dice((1, 1))                
             elif event.key == pygame.K_RETURN:
                 if self.__test_dice != (0, 0):
                     if self.dice_overlay.overlay_on():
@@ -331,16 +363,19 @@ class Game:
         self.currentAuction = self.__auctions.pop(0)        
         # if there are more than two players I can start the auction
         if len(self.currentAuction.get_bidders()) >= 2:
-            self.currentAuction.start_auction()
+            self.panels_to_show.append(self.currentAuction)
+            #self.currentAuction.draw()
         else:# otherwise I show a panel to choose if the player wants to buy the stock since he is the only bidder
             stock = self.currentAuction.get_stock()
             self.showStockUI = ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0])
+            self.panels_to_show.append(self.showStockUI)
             self.currentAuction = None
-            self.showStockUI.draw()
+            #self.showStockUI.draw()
             if len(self.__auctions) > 0: #if the second player has at least one stock
                 self.currentAuction = self.__auctions.pop(0)
                 stock = self.currentAuction.get_stock()
-                self.listShowStockToAuction.append(ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0]))
+                #self.listShowStockToAuction.append(ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0]))
+                self.panels_to_show.append(ShowStockUI(self, [stock], "BUY_AUCTIONED_STOCK", self.currentAuction.get_bidders()[0]))
                 self.currentAuction = None
 
     def manage_auction_events(self, event):
@@ -367,10 +402,12 @@ class Game:
                         self.currentAuction.auctionUI.kill()
                         self.screen.fill(BLACK)
                         self.currentAuction = self.__auctions.pop(0)
-                        self.currentAuction.start_auction()
+                        self.panels_to_show.append(self.currentAuction)
+                        #self.currentAuction.draw()
                     else:
                         self.currentAuction.auctionUI.kill()
                         self.currentAuction = None
+                        self.current_panel = None
                         self.screen.fill(BLACK)
                         self.__gameUI.updateAllPlayerLables(self.get_players())
                         self.renable_actions()
@@ -391,10 +428,12 @@ class Game:
                         self.currentAuction.auctionUI.kill()
                         self.screen.fill(BLACK)
                         self.currentAuction = self.__auctions.pop(0)
-                        self.currentAuction.start_auction()
+                        self.panels_to_show.append(self.currentAuction)
+                        #self.currentAuction.draw()
                     else:
                         self.currentAuction.auctionUI.kill()
                         self.currentAuction = None
+                        self.current_panel = None
                         self.screen.fill(BLACK)
                         self.__gameUI.updateAllPlayerLables(self.get_players())
                         self.renable_actions()
@@ -402,6 +441,9 @@ class Game:
     def set_test_dice(self, value):
         if self.__test_dice[0] == 0:
             self.__test_dice = (value, 0)
+            #case dice overlay and one die
+            if hasattr(self.current_panel, "__establishing_players_order") and self.current_panel.__establishing_players_order and not self.current_panel.twoDices:
+                self.current_panel.update_dice(self.__test_dice)
         elif self.__test_dice[1] == 0:
             self.__test_dice = (self.__test_dice[0], value)
             self.__gameUI.update_dice(self.__test_dice)
@@ -417,7 +459,8 @@ class Game:
             start_logic(player)
         elif cell.cellType == EVENTS_TYPE:
             self.disable_actions()
-            self.__gameUI.showEventUi(self.events[0])
+            self.panels_to_show.append(EventUI(self.events[0], self.__gameUI.manager))
+            #self.__gameUI.showEventUi(self.events[0])
         elif cell.cellType == STOCKS_PRIZE_TYPE:
             if len(player.get_stocks()) > 0:
                 stock_prize_logic(player)
@@ -428,35 +471,40 @@ class Game:
             for player in self.get_players():
                 # if they have stock I have to create panel to show stock
                 if len(player.get_stocks()) > 0:
-                    self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), "STOCK_TO_AUCTION", player))
+                    self.panels_to_show.append(ShowStockUI(self, player.get_stocks(), "STOCK_TO_AUCTION", player))
+                    #self.listShowStockToAuction.append(ShowStockUI(self, player.get_stocks(), "STOCK_TO_AUCTION", player))
 
             if(len(self.listShowStockToAuction) > 0):
                 self.disable_actions()
-                showStock = self.listShowStockToAuction.pop(0)
-                self.showStockUI = showStock
-                showStock.draw()
+                #showStock = self.listShowStockToAuction.pop(0)
+                self.showStockUI = self.panels_to_show[0]
+                #showStock.draw()
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.__board.get_availble_stocks()
             self.disable_actions()
             self.showStockUI = ShowStockUI(self, stocks, "MOVE_TO_STOCK", None, "Scegli su quale cedola vuoi spostarti")
-            self.showStockUI.draw()
+            self.panels_to_show.append(self.showStockUI)
+            #self.showStockUI.draw()
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
             if len(stocks) > 0:                
                 self.showStockUI = ShowStockUI(self, stocks, "SHOW_CHOOSE_STOCK", player, "Scegli quale vuoi comprare")
-                self.showStockUI.draw()
+                self.panels_to_show.append(self.showStockUI)
+                #self.showStockUI.draw()
             else:
-                self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
+                self.__alert_messages.append("Non hai abbastanza soldi per comprare le cedole disponibili!")
+                #self.__gameUI.drawAlert("Non hai abbastanza soldi per comprare le cedole disponibili!")
         elif cell.cellType == SIX_HUNDRED_TYPE:
             six_hundred_logic(player)
         elif cell.cellType == CHANCE_TYPE:
             self.disable_actions()
-            self.__gameUI.drawDiceOverlay(
-                self.__players[self.__current_player_index].get_name() + " tira dadi",
-                "Riserva monetaria",
-                False,
-            )
+            self.panels_to_show.append(DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi", "Riserva monetaria", self.__actions_status, False, False))
+            #self.__gameUI.drawDiceOverlay(
+            #    self.__players[self.__current_player_index].get_name() + " tira dadi",
+            #    "Riserva monetaria",
+            #    False,
+            #)
 
     def events_logic(self, player):
         event = self.events[0]
@@ -467,7 +515,8 @@ class Game:
             stocks = Stock.get_stocks()
             self.disable_actions()
             self.showStockUI = ShowStockUI(self, stocks, "BUY_ANYTHING", None, "Scegli quale vuoi comprare (Nessuno puo' opporsi alla vendita)")
-            self.showStockUI.draw()
+            self.panels_to_show.append(self.showStockUI)
+            #self.showStockUI.draw()
         elif event.evenType == STOP_1:
             player.set_skip_turn(True)
         elif event.evenType == FREE_PENALTY:
@@ -570,8 +619,9 @@ class Game:
                 print("BUY CASE START NEGOTIATION")
                 stock = Stock.get_stock_by_position(effectData["stockIndex"])
                 owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
-                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
-                self.game.bargain_ui.draw()
+                self.game.bargain_ui = BargainUI(self.__gameUI.manager, self.screen, player, owners, self)
+                self.panels_to_show.append(self.game.bargain_ui)
+                #self.game.bargain_ui.draw()
 
         # rotate the events list
         self.events.rotate(-1)
@@ -595,8 +645,9 @@ class Game:
 
         if effectData["someone"]:
             print("GOTO SOMEONE CASE")
-            self.current_window = TakeSomeoneWithYouUI(self, self.get_other_players(player), effectData["destination"])
-            self.current_window.draw()            
+            panel = TakeSomeoneWithYouUI(self, self.get_other_players(player), effectData["destination"])
+            self.panels_to_show.append(panel)
+            #self.current_panel.draw()
 
         if effectData["buy"]:
             stock = self.__board.get_stock_if_available(effectData["destination"])
@@ -607,9 +658,10 @@ class Game:
                 stock = Stock.get_stock_by_position(effectData["destination"])
                 owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
                 self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
-                self.game.bargain_ui.draw()        
+                self.panels_to_show.append(self.game.bargain_ui)
+                #self.game.bargain_ui.draw()
 
-        if effectData["possiblebuy"]:#enable buy button if possible buy
+        if effectData["possibleBuy"]:#enable buy button if possible buy
             self.enable_buy_button(self.__board.get_cell(effectData["destination"]), player)            
 
         if effectData["get"] is not None:
@@ -620,23 +672,26 @@ class Game:
     def add_auction(self, player, stock):
         players = self.get_other_players(player)
         self.__auctions.append(
-            Auction(self.__gameUI.manager, self.screen, player, players, stock)
+            Auction(self.__gameUI.manager, self.screen, player, players, stock, self.__board, self, self.__gameUI)
         )
 
     def is_debt_solved(self, player: Player):
         if player.is_in_debt():
             if len(player.get_stocks()) > 0:
                 self.showStockUI = ShowStockUI(self, player.get_stocks(), "BANKRUPT_STOCK", player)
-                self.showStockUI.draw()
+                self.panels_to_show.append(self.showStockUI)
+                #self.showStockUI.draw()
             else:
                 self.renable_actions()
                 self.showStockUI = None
+                self.current_panel = None
                 solve_larger_debts(player, self)
                 self.kill_player(player)
                 self.is_there_some_player_in_bankrupt()
         else:
             self.renable_actions()
             self.showStockUI = None
+            self.current_panel = None
             solve_bankrupt(player, self)
             self.is_there_some_player_in_bankrupt()
 
@@ -649,7 +704,8 @@ class Game:
     #removing the player from the list of players the GUI should update automatically
     def kill_player(self, player):
         if len(self.get_players()) > 2:
-            self.__gameUI.drawAlert(player.get_name() + " è andato in banca rotta!")
+            self.__alert_messages.append(player.get_name() + " è andato in banca rotta!")
+            #self.__gameUI.drawAlert(player.get_name() + " è andato in banca rotta!")
 
         players = self.get_other_players(player)
         self.__players = players
@@ -660,7 +716,8 @@ class Game:
             self.__current_player_index = 0
 
         if len(self.get_players()) == 1:
-            self.__gameUI.drawAlert(self.get_players()[0].get_name() + " ha vinto la partita!")
+            #self.__gameUI.drawAlert(self.get_players()[0].get_name() + " ha vinto la partita!")
+            self.__alert_messages.append(player.get_name() + " è andato in banca rotta!")
 
     def disable_actions(self):  # pragma: no cover
         """This function disable the action in the status manager and in the ui"""
@@ -710,3 +767,6 @@ class Game:
         return list(filter(
             lambda obj: obj.get_name() != player.get_name(), self.get_players()
         ))
+
+    def get_auctions(self): # pragma: no cover
+        return self.__auctions

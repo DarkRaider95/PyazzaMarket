@@ -1,10 +1,11 @@
 import pygame
 from pygame_gui.elements import UIButton, UIPanel, UILabel
 from lib.constants import *
+from lib.gameLogic import finished_auction_logic
 
 
 class Auction:
-    def __init__(self, manager, screen, owner, bidders, stock):
+    def __init__(self, manager, screen, owner, bidders, stock, board, game, game_ui):
         self.startPrice = 0
         self.endPrice = 0
         self.current_bid = 0
@@ -19,11 +20,11 @@ class Auction:
         self.startPrice = self.__stock.get_new_value()
         self.current_bid = self.__stock.get_new_value()
         self.__winner = None
+        self.__board = board
+        self.__game = game
+        self.__game_ui = game_ui
 
-    def start_auction(self):
-        self.draw_auction()
-
-    def draw_auction(self):
+    def draw(self):
         currBidderName = self.__bidders[self.current_bidder].get_name()
 
         panel_rect = pygame.Rect(
@@ -257,6 +258,57 @@ class Auction:
             self.currentBidText.set_text(str(self.current_bid))
             self.disable_retire()
 
+
+    def manage_events(self, event, players=None, curr_player=None):        
+        if (
+            hasattr(self, "raiseBid")
+            and event.ui_element == self.raiseBid
+        ):
+            self.raise_bid()
+        elif (
+            hasattr(self, "lowerBid")
+            and event.ui_element == self.lowerBid
+        ):
+            self.lower_bid()
+        elif (
+            hasattr(self, "bidBut")
+            and event.ui_element == self.bidBut
+        ):
+            self.bid_but()
+            if self.is_finished():
+                finished_auction_logic(self.__board, self)
+                self.open_next_if_present()
+        elif (
+            hasattr(self, "nextBidder")
+            and event.ui_element == self.nextBidder
+        ):
+            self.pass_bid()
+        elif (
+            hasattr(self, "retireAuction")
+            and event.ui_element == self.retireAuction
+        ):
+            self.retire_auction()
+            if self.is_finished():
+                finished_auction_logic(self.__board, self)
+                self.open_next_if_present()
+                
+    def open_next_if_present(self):
+        auctions = self.__game.get_auctions()
+        # if there are other auctions open next otherwise close it
+        if len(auctions) > 0:
+            self.auctionUI.kill()
+            self.screen.fill(BLACK)
+            self.__game.currentAuction = auctions.pop(0)
+            self.__game.current_panel = None
+            self.__game.panels_to_show.append(self.__game.currentAuction)
+            #self.currentAuction.draw()
+        else:
+            self.auctionUI.kill()
+            self.__game.currentAuction = None
+            self.__game.current_panel = None
+            self.screen.fill(BLACK)
+            self.__game_ui.updateAllPlayerLables(self.__game.get_players())
+            self.__game.renable_actions()
 
     def find_max_bid(self):
         max_value = self.bids[0]
