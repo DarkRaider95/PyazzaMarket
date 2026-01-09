@@ -10,6 +10,8 @@ class ActionsStatus:
         self.__buy_property = False
         self.__show_stock = False
         self.__pass_turn = False
+        self.__save_game = True
+        self.__quit_game = True
         self.__saved_actions = []
         self.disabled = 0
 
@@ -100,7 +102,23 @@ class ActionsStatus:
     def get_pass_turn(self) -> bool:
         """Return the value of the pass_turn boolean"""
         return self.__pass_turn
-    
+
+    def set_save_game(self, value: bool) -> None:
+        """Set the value of the save_game boolean"""
+        self.__save_game = value
+
+    def set_quit_game(self, value: bool) -> None:
+        """Set the value of the quit_game boolean"""
+        self.__quit_game = value
+
+    def get_save_game(self) -> bool:
+        """Return the value of the save_game boolean"""
+        return self.__save_game
+
+    def get_quit_game(self) -> bool:
+        """Return the value of the quit_game boolean"""
+        return self.__quit_game
+
     def get_saved_actions(self) -> list:
         """Return the list of the saved actions"""
         return self.__saved_actions.copy()

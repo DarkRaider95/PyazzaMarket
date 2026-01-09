@@ -8,6 +8,7 @@ class Player:
     last_stock_update = None
 
     def __init__(self, playerName, car, bot):
+        print(f"DEBUG Player.__init__: playerName={playerName}, car={car}, bot={bot}")
         self.__playerName = playerName
         self.__balance = INITIAL_BALANCE
         self.__position = 0
@@ -138,6 +139,11 @@ class Player:
 
     def get_car(self):  # pragma: no cover
         return self.__car
+
+    def get_car_color_name(self):  # pragma: no cover
+        """Return the color name of the car (RED, BLUE, BLACK, YELLOW)"""
+        from lib.constants import CAR_PATH_TO_COLOR
+        return CAR_PATH_TO_COLOR.get(self.__car.car_path, "UNKNOWN")
 
     def get_is_bot(self):  # pragma: no cover
         return self.__is_bot

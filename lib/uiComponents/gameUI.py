@@ -83,6 +83,26 @@ class GameUI:
             manager=self.manager,
         )
 
+        self.saveButton = UIButton(
+            relative_rect=pygame.Rect(
+                ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 250, BUTTON_WIDTH, BUTTON_HEIGHT
+            ),
+            text="Salva partita",
+            container=actions_UI,
+            object_id="SAVE",
+            manager=self.manager,
+        )
+
+        self.quitButton = UIButton(
+            relative_rect=pygame.Rect(
+                ACTIONS_WIDTH // 2 - BUTTON_WIDTH // 2, 300, BUTTON_WIDTH, BUTTON_HEIGHT
+            ),
+            text="Abbandona",
+            container=actions_UI,
+            object_id="QUIT_GAME",
+            manager=self.manager,
+        )
+
         self.buyButton.disable()
         self.passButton.disable()
         self.showStocks.disable()
@@ -92,6 +112,8 @@ class GameUI:
             self.buyButton,
             self.showStocks,
             self.passButton,
+            self.saveButton,
+            self.quitButton,
         ]
 
     def draw_leaderboard(self, players, squareBalance, currentPlayer):
@@ -109,7 +131,7 @@ class GameUI:
         turn_rect = pygame.Rect((position_x, 30), label_dimension)
         self.turnName = UILabel(
             turn_rect,
-            "Turno di " + currentPlayer.get_name(),
+            "Turno di " + currentPlayer.get_name() + " (" + currentPlayer.get_car_color_name() + ")",
             manager=self.manager,
             container=leaderboard
         )
@@ -139,7 +161,9 @@ class GameUI:
             label = UILabel(
                 player_label_rect,
                 player.get_name()
-                + " : "
+                + " ("
+                + player.get_car_color_name()
+                + ") : "
                 + str(player.get_balance())
                 + " | "
                 + str(player.stock_value()),
@@ -152,7 +176,7 @@ class GameUI:
         self.squareBalanceLabel.set_text("Riserva di piazza : " + str(squareBalance))
 
     def updateTurnLabel(self, currentPlayer):
-        self.turnName.set_text("Turno di " + currentPlayer.get_name())
+        self.turnName.set_text("Turno di " + currentPlayer.get_name() + " (" + currentPlayer.get_car_color_name() + ")")
 
     def draw_stockboard(self, players):
         # DRAWING THE BOARD
@@ -211,7 +235,11 @@ class GameUI:
             title_rect = pygame.Rect(
                 (position_x, offset + CELL_HEIGHT + (max_stock * 20)), (label_dimension)
             )
-            nameLabel = UILabel(title_rect, player.get_name(), manager=self.manager)
+            nameLabel = UILabel(
+                title_rect,
+                player.get_name() + " (" + player.get_car_color_name() + ")",
+                manager=self.manager
+            )
             self.stockboardLabels.append(nameLabel)
             if len(player.get_stocks()) == 0:
                 player_label_rect = pygame.Rect(
@@ -269,7 +297,9 @@ class GameUI:
         for i, player in enumerate(sorted_players):
             self.playerLabels[i].set_text(
                 player.get_name()
-                + " : "
+                + " ("
+                + player.get_car_color_name()
+                + ") : "
                 + str(player.get_balance())
                 + " | "
                 + str(player.stock_value())

@@ -44,23 +44,23 @@ class DiceOverlay:
         self.diceOverlay = UIPanel(surface, starting_height=2, manager=self.manager)
 
         title_rect = pygame.Rect(
-            ((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 10),
-            (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT),
+            ((DICE_OVERLAY_WIDTH - DICE_OVERLAY_MESSAGE_WIDTH) // 2, 10),
+            (DICE_OVERLAY_MESSAGE_WIDTH, DICE_OVERLAY_MESSAGE_HEIGHT),
         )
         UILabel(title_rect, self.title, manager=self.manager, container=self.diceOverlay)
 
         message_rect = pygame.Rect(
-            ((DICE_OVERLAY_WIDTH - ALERT_MESSAGE_WIDTH) // 2, 30),
-            (ALERT_MESSAGE_WIDTH, ALERT_MESSAGE_HEIGHT),
+            ((DICE_OVERLAY_WIDTH - DICE_OVERLAY_MESSAGE_WIDTH) // 2, 40),
+            (DICE_OVERLAY_MESSAGE_WIDTH, DICE_OVERLAY_MESSAGE_HEIGHT),
         )
         UILabel(message_rect, self.message, manager=self.manager, container=self.diceOverlay)
 
         close_rect = pygame.Rect(
             (
-                DICE_OVERLAY_WIDTH - ALERT_BUT_WIDTH - 20,
-                DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10,
+                DICE_OVERLAY_WIDTH - DICE_OVERLAY_BUT_WIDTH - 20,
+                DICE_OVERLAY_HEIGHT - DICE_OVERLAY_BUT_HEIGHT - 10,
             ),
-            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
+            (DICE_OVERLAY_BUT_WIDTH, DICE_OVERLAY_BUT_HEIGHT),
         )
 
         if self.twoDices:
@@ -102,8 +102,8 @@ class DiceOverlay:
         self.__actions_status.disable_actions()
 
         throw_rect = pygame.Rect(
-            (20, DICE_OVERLAY_HEIGHT - ALERT_BUT_HEIGHT - 10),
-            (ALERT_BUT_WIDTH, ALERT_BUT_HEIGHT),
+            (20, DICE_OVERLAY_HEIGHT - DICE_OVERLAY_BUT_HEIGHT - 10),
+            (DICE_OVERLAY_BUT_WIDTH, DICE_OVERLAY_BUT_HEIGHT),
         )
         self.launchOverlayDiceBut = UIButton(
             relative_rect=throw_rect,

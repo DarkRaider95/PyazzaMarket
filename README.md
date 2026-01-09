@@ -34,8 +34,43 @@ It's the Python edition of an Italian game from the 90s called Piazza Mercato. P
 # License
 The software is released under the GNU General Public License (GPL) which can be found in the file [LICENSE](https://github.com/DarkRaider95/PyazzaMarket/blob/main/LICENSE) in the same directory as this file.
 
-# Dependecies
-- pygame
-- pygame-gui
-- pytest
-- black (code styling)
+# Installation
+
+## Dependencies
+Install all required dependencies using:
+```bash
+pip install -r requirements.txt
+```
+
+The main dependencies are:
+- pygame (game engine)
+- pygame-gui (GUI framework)
+- pytest (testing framework)
+- pytest-cov (test coverage)
+
+## Running the game
+```bash
+python main.py
+```
+
+For test mode (allows manual dice input):
+```bash
+python main.py --test
+```
+
+# New Features
+
+## Save/Load System
+- **Save Game**: Click the "Salva partita" button to save the current game state
+- **Load Game**: Click the "Carica partita" button to load the most recent save
+- Save files are stored in the `saves/` directory in JSON format
+- Each save includes: player data, stock ownership, game state, and event queue
+
+## Player Name Length Limit
+- Player names are now limited to 15 characters maximum
+- This applies to all players in the menu
+
+## Duplicate Car Selection Prevention
+- The game now prevents two players from selecting the same car color
+- An error message will be displayed if duplicate cars are detected
+- The game won't start until all players have unique cars

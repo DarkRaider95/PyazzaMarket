@@ -1,4 +1,5 @@
 import pygame
+import os
 
 from lib.auction import Auction
 from lib.stock import Stock
@@ -29,6 +30,7 @@ from state_manager.actions_status import ActionsStatus
 from ai.bot import Bot
 from typing import Optional
 from lib.player import Player
+from lib.save_manager import SaveManager
 
 class Game:
     def __init__(self, width, height, clock, players, test=False, gui=True):
@@ -59,6 +61,7 @@ class Game:
         self.__alert_messages = []
         self.current_panel = None
         self.panels_to_show = []
+        self.is_loaded_game = False  # Flag to skip initial dice overlay
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -104,7 +107,9 @@ class Game:
         )
         self.__gameUI.draw_stockboard(self.get_players())
 
-        self.dice_overlay.draw()
+        # Only show dice overlay for turn order if this is a new game
+        if not self.is_loaded_game:
+            self.dice_overlay.draw()
         #self.current_panel = self.dice_overlay
 
         #self.__gameUI.drawDiceOverlay(
@@ -256,6 +261,27 @@ class Game:
                 self.showStockUI =  ShowStockUI(self, curr_player.get_stocks(), "SHOW_STOCKS", None, "Le cedole di " + curr_player.get_name())
                 self.panels_to_show.append(self.showStockUI)
                 #self.showStockUI.draw()
+            elif (
+                hasattr(self.__gameUI, "saveButton")
+                and event.ui_element == self.__gameUI.saveButton
+            ):
+                try:
+                    filepath = SaveManager.save_game(self)
+                    self.__alert_messages.append(f"Partita salvata: {os.path.basename(filepath)}")
+                except Exception as e:
+                    self.__alert_messages.append(f"Errore nel salvataggio: {str(e)}")
+            elif (
+                hasattr(self.__gameUI, "quitButton")
+                and event.ui_element == self.__gameUI.quitButton
+            ):
+                # Quit the game and return to main menu
+                self.running = False
+                pygame.quit()
+                # Restart the game
+                import subprocess
+                import sys
+                subprocess.Popen([sys.executable, "main.py"])
+                sys.exit()
             elif (
                 hasattr(self.current_panel, "eventBut")
                 and event.ui_element == self.current_panel.eventBut

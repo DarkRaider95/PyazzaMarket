@@ -3,6 +3,7 @@ import sys
 from pygame_gui import UIManager
 from pygame_gui.elements import UITextEntryLine, UIButton, UIDropDownMenu
 import pygame_gui
+from lib.save_manager import SaveManager
 from lib.constants import (
     WIDTH,
     HEIGHT,
@@ -12,6 +13,8 @@ from lib.constants import (
     CAR_BLUE,
     CAR_RED,
     CAR_YELLOW,
+    CAR_COLORS_MAP,
+    CAR_PATH_TO_COLOR,
     FPS
 )
 
@@ -41,9 +44,17 @@ class Menu:
             manager=self.manager,
         )
 
+        # Bottone "Carica partita"
+        self.load_button = UIButton(
+            relative_rect=pygame.Rect(WIDTH // 2 - 100, 510, 200, 50),
+            text="Carica partita",
+            object_id="LOAD",
+            manager=self.manager,
+        )
+
         # Bottone "Chiudi gioco"
         self.quit_button = UIButton(
-            relative_rect=pygame.Rect(WIDTH // 2 - 100, 510, 200, 50),
+            relative_rect=pygame.Rect(WIDTH // 2 - 100, 570, 200, 50),
             text="Chiudi gioco",
             object_id="QUIT",
             manager=self.manager,
@@ -72,6 +83,7 @@ class Menu:
             object_id="PLAYER1",
             initial_text="Player1",
         )
+        entry_line1.set_text_length_limit(15)
 
         entry_line2 = UITextEntryLine(
             relative_rect=pygame.Rect(WIDTH // 2 - 185, 300 + 50 * 2, 300, 40),
@@ -79,6 +91,7 @@ class Menu:
             object_id="PLAYER2",
             initial_text="Player2",
         )
+        entry_line2.set_text_length_limit(15)
 
         car_line1 = UIDropDownMenu(
             relative_rect=pygame.Rect(WIDTH // 2 + 115, 300 + 50, 80, 40),
@@ -117,6 +130,9 @@ class Menu:
         ]
 
         self.font = pygame.font.Font(None, 32)
+        self.error_message = None
+        self.error_message_timer = 0
+        self.loaded_game_state = None
 
     def show_start_menu(self):
         while self.running:
@@ -134,8 +150,36 @@ class Menu:
                     elif event.ui_element == self.start_button:
                         print("start")
                         # start game
-                        self.running = False
-                        self.update_player()
+                        if not self.check_duplicate_cars():
+                            self.running = False
+                            self.update_player()
+                        else:
+                            # Show error message for duplicate car selection
+                            self.show_error_message("Errore: due giocatori non possono avere la stessa macchina!")
+
+                    elif event.ui_element == self.load_button:
+                        # Load game
+                        saves = SaveManager.list_saves()
+                        if len(saves) > 0:
+                            filepath = saves[0][2]
+                            try:
+                                self.loaded_game_state = SaveManager.load_game(filepath)
+                                self.running = False
+                                # Extract players from loaded game state
+                                self.players = []
+                                for player_data in self.loaded_game_state["players"]:
+                                    # Use the saved car_path directly, with fallback to RED
+                                    car_path = player_data.get("car_path", CAR_RED)
+
+                                    self.players.append({
+                                        "name": player_data["name"],
+                                        "color": car_path,
+                                        "bot": player_data["is_bot"]
+                                    })
+                            except Exception as e:
+                                self.show_error_message(f"Errore nel caricamento: {str(e)}")
+                        else:
+                            self.show_error_message("Nessun salvataggio trovato!")
 
                     # Bottone "-" per diminuire il numero di giocatori
                     elif event.ui_element == self.minus_button and self.num_players > 2:
@@ -168,6 +212,7 @@ class Menu:
                             object_id="PLAYER" + str(self.num_players),
                             initial_text="Player" + str(self.num_players),
                         )
+                        entry_line.set_text_length_limit(15)
                         car_line = UIDropDownMenu(
                             relative_rect=pygame.Rect(
                                 WIDTH // 2 + 115,
@@ -213,6 +258,12 @@ class Menu:
 
             self.manager.update(time_delta)
 
+            # Update error message timer
+            if self.error_message is not None:
+                self.error_message_timer -= time_delta
+                if self.error_message_timer <= 0:
+                    self.error_message = None
+
             self.screen.fill(WHITE)
 
             # Visualizza il numero di giocatori
@@ -241,19 +292,19 @@ class Menu:
                 (WIDTH // 2 - player_names_text.get_width() // 2, 300),
             )
 
+            # Display error message if present
+            if self.error_message is not None:
+                error_font = pygame.font.Font(None, 28)
+                error_text = error_font.render(self.error_message, True, (255, 0, 0))
+                error_rect = error_text.get_rect(center=(WIDTH // 2, 150))
+                pygame.draw.rect(self.screen, WHITE, error_rect.inflate(20, 10))
+                pygame.draw.rect(self.screen, (255, 0, 0), error_rect.inflate(20, 10), 2)
+                self.screen.blit(error_text, error_rect)
+
             pygame.display.flip()
 
     def color_to_costant(self, color) -> str:
-        colors = [
-            {"color": "RED", "costant": CAR_RED},
-            {"color": "BLACK", "costant": CAR_BLACK},
-            {"color": "BLUE", "costant": CAR_BLUE},
-            {"color": "YELLOW", "costant": CAR_YELLOW},
-        ]
-        for c in colors:
-            if c["color"] == color:
-                return c["costant"]
-        return CAR_RED
+        return CAR_COLORS_MAP.get(color, CAR_RED)
 
     def bot_to_bool(self, bot) -> bool:
         if bot == "BOT":
@@ -264,9 +315,39 @@ class Menu:
         for i, entry in enumerate(self.entry_lines):
             self.players[i]["name"] = entry.text
         for i, car in enumerate(self.car_lines):
-            self.players[i]["color"] = self.color_to_costant(car.selected_option)
+            selected_color = car.selected_option
+            # Handle case where selected_option returns a tuple (color, color)
+            if isinstance(selected_color, tuple):
+                selected_color = selected_color[0]
+            color_path = self.color_to_costant(selected_color)
+            print(f"DEBUG: Player {i} - selected_color: {selected_color}, color_path: {color_path}")
+            self.players[i]["color"] = color_path
         for i, ai in enumerate(self.ai_lines):
             if ai == None:
                 self.players[i]["bot"] = False
             else:
-                self.players[i]["bot"] = self.bot_to_bool(ai.selected_option)
+                bot_option = ai.selected_option
+                # Handle case where selected_option returns a tuple
+                if isinstance(bot_option, tuple):
+                    bot_option = bot_option[0]
+                self.players[i]["bot"] = self.bot_to_bool(bot_option)
+        print(f"DEBUG: Final players list: {self.players}")
+
+    def check_duplicate_cars(self) -> bool:
+        """Check if two or more players have selected the same car color.
+        Returns True if duplicates found, False otherwise."""
+        selected_colors = []
+        for car_line in self.car_lines:
+            color = car_line.selected_option
+            # Handle case where selected_option returns a tuple
+            if isinstance(color, tuple):
+                color = color[0]
+            if color in selected_colors:
+                return True
+            selected_colors.append(color)
+        return False
+
+    def show_error_message(self, message: str) -> None:
+        """Display an error message for 3 seconds."""
+        self.error_message = message
+        self.error_message_timer = 3.0

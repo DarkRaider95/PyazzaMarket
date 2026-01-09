@@ -20,6 +20,12 @@ def main():
         game = Game(WIDTH, HEIGHT, clock, menu.players, True)
     else:
         game = Game(WIDTH, HEIGHT, clock, menu.players)
+
+    # If a game was loaded, restore its state
+    if menu.loaded_game_state is not None:
+        from lib.save_manager import SaveManager
+        SaveManager.restore_game_state(game, menu.loaded_game_state)
+
     game.start()
     pygame.quit()
 

@@ -3,6 +3,7 @@ from lib.constants import *
 
 class Car:
     def __init__(self, car):
+        self.car_path = car  # Store the original path
         self.original_image = pygame.image.load(car)
         self.original_image = pygame.transform.scale(self.original_image, (CAR_WIDTH, CAR_HEIGHT))
         self.image = pygame.transform.rotate(self.original_image, 90)
