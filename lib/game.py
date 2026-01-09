@@ -33,7 +33,7 @@ from lib.player import Player
 from lib.save_manager import SaveManager
 
 class Game:
-    def __init__(self, width, height, clock, players, test=False, gui=True):
+    def __init__(self, width, height, clock, players, test=False, gui=True, disable_integrated_bot=False):
         self.clock = clock
         self.width = width
         self.height = height
@@ -62,6 +62,7 @@ class Game:
         self.current_panel = None
         self.panels_to_show = []
         self.is_loaded_game = False  # Flag to skip initial dice overlay
+        self.__disable_integrated_bot = disable_integrated_bot  # Flag to disable integrated bot during stress test
 
         Player.last_stock_update = time.time()
         for player in players:
@@ -125,7 +126,8 @@ class Game:
         while self.running:
             self.clock.tick(FPS)
 
-            if self.__players[self.__current_player_index].get_is_bot():
+            # Only use integrated bot if not disabled (e.g., during stress test)
+            if not self.__disable_integrated_bot and self.__players[self.__current_player_index].get_is_bot():
                 self.__bot.play()
                 self.update_graphic()
 
@@ -650,9 +652,9 @@ class Game:
                 print("BUY CASE START NEGOTIATION")
                 stock = Stock.get_stock_by_position(effectData["stockIndex"])
                 owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
-                self.game.bargain_ui = BargainUI(self.__gameUI.manager, self.screen, player, owners, self)
-                self.panels_to_show.append(self.game.bargain_ui)
-                #self.game.bargain_ui.draw()
+                self.bargain_ui = BargainUI(self.__gameUI.manager, self.screen, player, owners, self)
+                self.panels_to_show.append(self.bargain_ui)
+                #self.bargain_ui.draw()
 
         # rotate the events list
         self.events.rotate(-1)
@@ -704,9 +706,9 @@ class Game:
                 print("GOTO BUY CASE START NEGOTIATION")
                 stock = Stock.get_stock_by_position(effectData["destination"])
                 owners = who_owns_stock_by_name(self.get_players(), stock.get_name())
-                self.game.bargain_ui = BargainUI(self.manager, self.screen, self.player, owners, self.game)
-                self.panels_to_show.append(self.game.bargain_ui)
-                #self.game.bargain_ui.draw()
+                self.bargain_ui = BargainUI(self.__gameUI.manager, self.screen, player, owners, self)
+                self.panels_to_show.append(self.bargain_ui)
+                #self.bargain_ui.draw()
 
         if effectData["possibleBuy"]:#enable buy button if possible buy
             self.enable_buy_button(self.__board.get_cell(effectData["destination"]), player)            

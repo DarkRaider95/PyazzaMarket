@@ -226,11 +226,16 @@ class DiceOverlay:
     def close_dice_overlay(self): # pragma: no cover
         if self.__establish_player_again:
             self.closeDiceOverlay(self.__game.get_players(), self.__gameUI)
-            self.__game.set_current_player_index(self.__copy_of_second_round_who_start.pop(0)) 
-            self.__gameUI.updateTurnLabel(self.__game.get_current_player())
-            #self.__game.panels_to_show.append(DiceOverlay(self.__game, self.__game.get_current_player().get_name() + ' tira dadi', 'Decisione turni', self.__actions_status))
-            self.message = self.__game.get_current_player().get_name() + ' tira dadi'
-            self.draw()
+            if len(self.__copy_of_second_round_who_start) > 0:
+                self.__game.set_current_player_index(self.__copy_of_second_round_who_start.pop(0))
+                self.__gameUI.updateTurnLabel(self.__game.get_current_player())
+                #self.__game.panels_to_show.append(DiceOverlay(self.__game, self.__game.get_current_player().get_name() + ' tira dadi', 'Decisione turni', self.__actions_status))
+                self.message = self.__game.get_current_player().get_name() + ' tira dadi'
+                self.draw()
+            else:
+                # All players in the second round have thrown - determine winner
+                self.__establish_player_again = False
+                self.__establishing_players_order = False
         elif self.__establishing_players_order:
             self.closeDiceOverlay(self.__game.get_players(), self.__gameUI)
             self.__game.set_current_player_index((self.__game.get_current_player_index() + 1) % len(self.__game.get_players()))

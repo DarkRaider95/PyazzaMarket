@@ -74,3 +74,39 @@ python main.py --test
 - The game now prevents two players from selecting the same car color
 - An error message will be displayed if duplicate cars are detected
 - The game won't start until all players have unique cars
+
+# 🧪 Testing & Debugging
+
+## Stress Testing System
+The project includes a comprehensive stress testing system for automated testing and bug hunting.
+
+### Quick Start
+```bash
+# Run 10 quick tests
+./test_runner.sh quick
+
+# Or use Python (cross-platform)
+python test_runner.py quick
+```
+
+### Find and Debug Errors
+```bash
+# Run stress tests
+./test_runner.sh intensive --headless
+
+# Find logs with errors
+./test_runner.sh find-errors
+
+# Replay a game to reproduce the error
+./test_runner.sh replay stress_test_logs/game_with_error.json
+```
+
+### Features
+- ✅ Automated game execution with bots
+- ✅ Detailed logging of all actions
+- ✅ Reproducible games using seeds
+- ✅ Crash reporting with full game state
+- ✅ Replay system for debugging
+- ✅ Headless mode for fast testing
+
+📖 **For complete documentation, see [STRESS_TEST_README.md](STRESS_TEST_README.md)**

@@ -48,5 +48,13 @@ class EventUI:
             manager=self.manager,
         )
 
+    def manage_events(self, event, players, curr_player):
+        """
+        Gestisce gli eventi del pannello EventUI.
+        EventUI gestisce il suo bottone OK direttamente in game.py,
+        quindi questo metodo è uno stub per compatibilità con il pattern delle altre UI.
+        """
+        pass
+
     def close_ui(self):
         self.eventUi.kill()

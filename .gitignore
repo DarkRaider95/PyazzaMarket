@@ -5,3 +5,10 @@ htmlcov/
 .coverage
 codebase.md
 venv/
+
+# Stress test logs
+stress_test_logs/
+test_output.log
+test_pid.txt
+errors_report.txt
+bug_report_*.txt
