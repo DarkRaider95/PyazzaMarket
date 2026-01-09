@@ -518,8 +518,22 @@ class StressTestRunner:
                             # Conta i giocatori ancora attivi nell'asta
                             active_bidders = len([b for b in game.current_panel.get_bidders() if hasattr(b, 'get_name')])
 
+                            # Controlla se il bot corrente ha l'offerta più alta
+                            max_bid_index = game.current_panel.find_max_bid() if hasattr(game.current_panel, 'find_max_bid') else -1
+                            current_bidder_index = game.current_panel.current_bidder
+                            has_highest_bid = (max_bid_index == current_bidder_index and sum(game.current_panel.bids) > 0)
+
+                            # Se ha l'offerta più alta, può SOLO passare (non può né rilanciare né ritirarsi)
+                            if has_highest_bid:
+                                action = 'pass'
+                                logger.log_action("bot", "pass_auction_highest_bid", {
+                                    "stock": auction_stock,
+                                    "bid": current_bid,
+                                    "reason": "has_highest_bid",
+                                    "balance": player_balance
+                                })
                             # Se ha passato 2-3 volte, ritirati automaticamente
-                            if game.current_panel._bot_auction_pass_count[player_name] >= 2:
+                            elif game.current_panel._bot_auction_pass_count[player_name] >= 2:
                                 action = 'retire'
                                 logger.log_action("bot", "auto_retire_auction", {
                                     "stock": auction_stock,

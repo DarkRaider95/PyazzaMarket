@@ -215,7 +215,12 @@ class Auction:
             self.currentBidderText.set_text(
                 "Offerta di " + self.__bidders[self.current_bidder].get_name()
             )
+            # Aggiorna current_bid al massimo delle offerte + incremento minimo per il prossimo bidder
+            max_bid = max(self.bids[self.find_max_bid()], self.startPrice)
+            self.current_bid = max_bid + 10
+            self.currentBidText.set_text(str(self.current_bid))
             self.disable_retire()
+            self.disable_bid()
         else:  # if there is only one bidder and he has bidded it means he has won the auction
             self.__winner = self.__bidders[0]
             self.__finished = True
@@ -244,8 +249,11 @@ class Auction:
             self.__finished = True
             self.__winner = self.__bidders[0]
         else:
+            # After removing a bidder, adjust current_bidder index if it's out of bounds
+            if self.current_bidder >= len(self.__bidders):
+                self.current_bidder = 0
             # the current bidder was the last I have to set 0 as the next bidder otherwise I don't have to change the index
-            if (
+            elif (
                 self.current_bidder == len(self.__bidders) - 1
                 or len(self.__bidders) == 1
             ):
@@ -257,6 +265,7 @@ class Auction:
             self.current_bid = max(self.bids[self.find_max_bid()], self.startPrice)
             self.currentBidText.set_text(str(self.current_bid))
             self.disable_retire()
+            self.disable_bid()
 
 
     def manage_events(self, event, players=None, curr_player=None):        
@@ -340,6 +349,13 @@ class Auction:
             self.retireAuction.disable()
         else:
             self.retireAuction.enable()
+
+    def disable_bid(self):
+        """Disabilita il bottone bid se il giocatore corrente ha già l'offerta più alta"""
+        if self.current_bidder == self.find_max_bid() and sum(self.bids) > 0:
+            self.bidBut.disable()
+        else:
+            self.bidBut.enable()
 
     def is_finished(self):
         return self.__finished
