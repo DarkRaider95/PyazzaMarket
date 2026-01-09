@@ -1,8 +1,10 @@
 # TODO
 ## Funziolità di gioco da implementare
 ### Eventi:
-- Grafica per scegliere accompagnatore
 - Evento delle cedole colorate
+    - controllo cedole colorate non ha funzionato
+    - abbiamo fatto che i dadi si chiudono da soli ma dobbiamo studiare come farlo meglio non fare handle color event finché non si 
+    chiude il dice overlay
 ### Aste
 - salvare i balance all'inizio delle aste per evitare che il primo che riceve i soldi dell'asta sia avvantaggiato sugli altri
 
@@ -24,6 +26,7 @@
 - non si legge la label del bottone per mettere all'asta la cedola
 - aggiungere lunghezza massima nome giocatore
 - controllare se c'è la logica del perdi un giro
+- controllare logica riserva di piazza lanciando 1 i soldi in piazza sono diminuiti
 
 ## Non sappiamo se fare 
 - controllare i clock.tick

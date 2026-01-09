@@ -5,7 +5,13 @@ htmlcov/
 .coverage
 LICENSE
 obs_screen_record.sh
-*.jpg
-*png
-assets/
 ai/
+lib/tests/
+.gitignore
+.aidigestignore
+PXL_20230629_184658415.NIGHT.jpg
+PyazzaMarketDesc.png
+StockExample.png
+README.md
+TODO.md
+**/__pycache__/

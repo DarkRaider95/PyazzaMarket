@@ -6,7 +6,7 @@ import time
 
 class DiceOverlay:
     #TODO remove variables that aren't needed
-    def __init__(self, __game, message, title, actions_status, twoDices=True, establishing_players_order = True) -> None:
+    def __init__(self, __game, message, title, actions_status, twoDices=True, establishing_players_order = True, color_event = False) -> None:
         self.__gameUI = __game.get_gameUI()
         self.__game = __game
         self.__establishing_players_order = establishing_players_order # we use this variable to understand when we have launched the __game for the first time
@@ -18,6 +18,7 @@ class DiceOverlay:
         self.__establish_player_again = False # this will be true in case of two or more player score the same number
         self.__test = self.__game.get_test()
         self.__actions_status = actions_status
+        self.color_event = color_event
         self.manager = self.__gameUI.get_manager()
         #dice images
         self.image_dice_1 = pygame.image.load(DICE_1)
@@ -173,12 +174,17 @@ class DiceOverlay:
             self.establish_players_order()
         elif self.__establish_player_again:
             self.restablish_player_order()
+        elif self.color_event:
+            score = roll()
+            self.updateDiceOverlay(score)
+            self.closeDiceOverlay(self.__game.get_players(), self.__gameUI)
+            self.__game.handle_color_event(sum(score))            
         else:
             # amount is the amount of money that the player has to pay or receive
             score, amount = chance_logic(self.__game.get_current_player(), self.__game.get_square_balance())
             self.updateDiceOverlay(score)
             self.__game.set_square_balance(amount)
-            self.__gameUI.update_dice(score)
+            #self.__gameUI.update_dice(score) probabilmente è duplicato e da rimuovere
 
     def establish_players_order(self): # pragma: no cover
         self.roll_dice()

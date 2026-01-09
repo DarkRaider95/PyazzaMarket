@@ -510,7 +510,12 @@ class Game:
         event = self.events[0]
 
         if event.evenType == COLOR_EVENT:
-            pass
+            stock_color_count = player.same_color_count(event.effectData['color'])
+            if stock_color_count > 1:
+                self.disable_actions()
+                self.panels_to_show.append(DiceOverlay(self, player.get_name() + " tira dadi", "Evento Colore", self.__actions_status, True, False, True))
+            else:
+                self.__alert_messages.append(f"Non hai cedole {event.effectData['color']} quindi l'evento non si applica!")
         elif event.evenType == BUY_ANTHING_EVENT:
             stocks = Stock.get_stocks()
             self.disable_actions()
@@ -625,6 +630,22 @@ class Game:
 
         # rotate the events list
         self.events.rotate(-1)
+
+    def handle_color_event(self, dice_score):
+        event = self.events[-1]
+        amount = event.effectData['amount']
+        current_player = self.__players[self.__current_player_index]
+        
+        if dice_score >= 8:
+            gain = amount * dice_score
+            current_player.change_balance(gain)
+            self.__alert_messages.append(f"{current_player.get_name()} ha fatto {dice_score} ha guadagnato {gain} scudi!")
+        else:
+            loss = amount * dice_score
+            current_player.change_balance(-loss)
+            self.__alert_messages.append(f"{current_player.get_name()} ha fatto {dice_score} ha perso {loss} scudi!")
+
+        self.__gameUI.updateAllPlayerLables(self.get_players())
 
     def go_event_logic(self, player, event):
         effectData = event.effectData

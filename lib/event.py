@@ -37,7 +37,13 @@ class Event:
 
         if 'color' in actionsAndValues:
             eventType = COLOR_EVENT
-            effectData = {'amount':int(actionsAndValues[2])}
+            color = actionsAndValues[1]
+            if color == "light":
+                color = "LIGHT_BLUE"
+            else:
+                color = color.upper()
+                
+            effectData = {'color': color,'amount':int(actionsAndValues[2])}
         elif eventName == 'buy_what_you_want':
             eventType = BUY_ANTHING_EVENT            
         elif eventName == 'stop_1':
