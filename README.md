@@ -33,9 +33,3 @@ It's the Python edition of an Italian game from the 90s called Piazza Mercato. P
 
 # License
 The software is released under the GNU General Public License (GPL) which can be found in the file [LICENSE](https://github.com/DarkRaider95/PyazzaMarket/blob/main/LICENSE) in the same directory as this file.
-
-# Dependecies
-- pygame
-- pygame-gui
-- pytest
-- black (code styling)
