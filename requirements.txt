@@ -1,9 +1,9 @@
 # PyazzaMarket - Requirements
 # Game Dependencies
-pygame-ce>=2.4.0,<2.6.0
-pygame-gui==0.6.10
+pygame-ce==2.5.3
+pygame-gui==0.6.14
 
 # Testing Dependencies
-pytest>=7.4.0
-pytest-cov>=4.1.0
-coverage>=7.2.0
+pytest==9.0.2
+pytest-cov==7.0.0
+coverage==7.13.1
