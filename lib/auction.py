@@ -331,18 +331,29 @@ class Auction:
 
     def remove_bidders_who_cant_afford(self):
         bidders_to_remove = []
-        bidders_length = len(self.__bidders)
 
         for index, bidder in enumerate(self.__bidders):
             if bidder.get_balance() < self.current_bid:
                 bidders_to_remove.append(index)
 
-        for remove_index in bidders_to_remove:
+        # If no bidders to remove, return early
+        if not bidders_to_remove:
+            return
+
+        # Remove bidders in reverse order to avoid index shifting issues
+        for remove_index in reversed(bidders_to_remove):
+            # Adjust current_bidder to maintain correct position in the sequence
+            if remove_index < self.current_bidder:
+                # Bidder removed was before current bidder, decrement index
+                self.current_bidder -= 1
+
             self.__bidders.pop(remove_index)
             self.bids.pop(remove_index)
 
-            if remove_index == bidders_length - 1 or len(self.__bidders) == 1:
-                self.current_bidder = 0
+        # After all removals, ensure current_bidder is valid
+        if len(self.__bidders) > 0 and self.current_bidder >= len(self.__bidders):
+            # Current bidder index is out of bounds, wrap to start
+            self.current_bidder = 0
 
     def disable_retire(self):
         if self.current_bidder == self.find_max_bid() and sum(self.bids) > 0:

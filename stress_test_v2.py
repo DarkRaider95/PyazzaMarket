@@ -305,20 +305,18 @@ class StressTestRunnerV2:
                 continue
 
             # PRIORITÀ 1: Gestisci pannelli aperti
+            # I pannelli in panels_to_show vengono automaticamente convertiti in current_panel da process_frame
             if game.current_panel is not None:
                 self.handle_panel(game, logger)
                 game.clock.tick(self.fps)
                 continue
 
-            # PRIORITÀ 2: Gestisci panels_to_show
-            if hasattr(game, 'panels_to_show') and len(game.panels_to_show) > 0:
-                game.clock.tick(self.fps)
-                continue
-
-            # PRIORITÀ 3: Gestisci alert messages
-            if hasattr(game, '_Game__alert_messages') and len(game._Game__alert_messages) > 0:
-                game.clock.tick(self.fps)
-                continue
+            # PRIORITÀ 2: Gestisci alert messages
+            # Gli alert messages vengono automaticamente convertiti in alertUi pannelli dal draw_window()
+            # quindi non facciamo nulla qui - il pannello sarà gestito sopra
+            # if hasattr(game, '_Game__alert_messages') and len(game._Game__alert_messages) > 0:
+            #     game.clock.tick(self.fps)
+            #     continue
 
             # PRIORITÀ 4: Azioni di gioco normali
             if not hasattr(game, '_Game__actions_status'):
@@ -411,12 +409,18 @@ class StressTestRunnerV2:
         # Pannello alert
         if hasattr(game._Game__gameUI, 'alertUi') and game.current_panel == game._Game__gameUI.alertUi:
             if hasattr(game._Game__gameUI, 'closeAlertBut'):
-                logger.log_action("bot", "close_alert", {})
+                logger.log_action("bot", "close_alert", {"message": "closing alert"})
                 click_event = pygame.event.Event(
                     pygame_gui.UI_BUTTON_PRESSED,
                     {'ui_element': game._Game__gameUI.closeAlertBut}
                 )
                 pygame.event.post(click_event)
+            else:
+                # Se non c'è il bottone closeAlertBut, forza la chiusura del pannello
+                logger.log_action("bot", "force_close_alert", {"reason": "no_close_button"})
+                if hasattr(game._Game__gameUI, 'closeAlert'):
+                    game._Game__gameUI.closeAlert(game.get_players(), game._Game__gameUI)
+                game.current_panel = None
             return
 
         # Pannello evento
@@ -472,8 +476,7 @@ class StressTestRunnerV2:
             hasattr(game.current_panel, 'auction_bankrupt') or
             hasattr(game.current_panel, 'leave_to_bank_bankrupt') or
             hasattr(game.current_panel, 'buyAnyBut')):
-            self.handle_stock_panel(game, logger)
-            return
+            return self.handle_stock_panel(game, logger)
 
         # Auction
         if hasattr(game.current_panel, 'retireAuction'):
@@ -499,6 +502,9 @@ class StressTestRunnerV2:
             )
             pygame.event.post(click_event)
             return
+
+        # Default - pannello non riconosciuto
+        return False
 
     def should_buy_stock(self, game: Game, logger: GameLogger) -> bool:
         """Decide se comprare uno stock."""
@@ -567,6 +573,10 @@ class StressTestRunnerV2:
         """Gestisce pannelli stock."""
         stock_name = game.current_panel.get_showed_stock().get_name() if hasattr(game.current_panel, 'get_showed_stock') else "unknown"
 
+        # Debug: verifica tipo pannello
+        panel_type = game.current_panel.type if hasattr(game.current_panel, 'type') else "unknown"
+        logger.log_action("bot", "handle_stock_panel_start", {"panel_type": panel_type, "stock": stock_name})
+
         # chooseMoveBut per MOVE_TO_STOCK
         if hasattr(game.current_panel, 'chooseMoveBut'):
             logger.log_action("bot", "choose_move_to_stock", {"stock": stock_name})
@@ -624,28 +634,34 @@ class StressTestRunnerV2:
                 pygame.event.post(click_event)
             return
 
-        # BUY_ANYTHING
+        # BUY_ANYTHING - Evento che permette di comprare qualsiasi cedola senza opposizione
+        # IMPORTANTE: questo pannello NON ha bottone close, il giocatore DEVE comprare qualcosa
         if hasattr(game.current_panel, 'buyAnyBut'):
             current_player = game.get_current_player()
             player_balance = current_player.get_balance()
             stock = game.current_panel.get_showed_stock() if hasattr(game.current_panel, 'get_showed_stock') else None
+            stock_name = stock.get_name() if stock and hasattr(stock, 'get_name') else "unknown"
             stock_price = stock.get_stock_value() if stock and hasattr(stock, 'get_stock_value') else 0
 
-            buy_probability = 0.4
+            # Decisione di acquisto: più probabile se può permetterselo
+            buy_probability = 0.5  # Default
             if stock_price == 0 or player_balance > stock_price * 5:
-                buy_probability = 0.7
+                buy_probability = 0.9  # Molto conveniente
             elif player_balance > stock_price * 3:
+                buy_probability = 0.7
+            elif player_balance > stock_price * 2:
                 buy_probability = 0.5
-            elif player_balance > stock_price * 1.5:
+            elif player_balance > stock_price * 1.2:
                 buy_probability = 0.3
-            elif player_balance > stock_price:
-                buy_probability = 0.15
+            elif player_balance >= stock_price:
+                buy_probability = 0.2  # Costoso ma comprabile
             else:
-                buy_probability = 0.0
+                buy_probability = 0.0  # Non può permetterselo
 
             random_value = game.dice_controller.seeded_random.rng.random()
 
-            if random_value < buy_probability:
+            if random_value < buy_probability and player_balance >= stock_price:
+                # Compra questa cedola
                 logger.log_action("bot", "buy_anything", {"stock": stock_name, "price": stock_price, "balance": player_balance})
                 click_event = pygame.event.Event(
                     pygame_gui.UI_BUTTON_PRESSED,
@@ -653,11 +669,12 @@ class StressTestRunnerV2:
                 )
                 pygame.event.post(click_event)
             else:
-                logger.log_action("bot", "skip_buy_anything", {"stock": stock_name, "reason": "too_expensive", "price": stock_price, "balance": player_balance})
-                if hasattr(game.current_panel, 'closeStock'):
+                # Non compra questa cedola, passa alla successiva
+                logger.log_action("bot", "skip_buy_anything_next", {"stock": stock_name, "price": stock_price, "balance": player_balance})
+                if hasattr(game.current_panel, 'nextStock'):
                     click_event = pygame.event.Event(
                         pygame_gui.UI_BUTTON_PRESSED,
-                        {'ui_element': game.current_panel.closeStock}
+                        {'ui_element': game.current_panel.nextStock}
                     )
                     pygame.event.post(click_event)
             return
@@ -698,6 +715,10 @@ class StressTestRunnerV2:
                         {'ui_element': game.current_panel.closeStock}
                     )
                     pygame.event.post(click_event)
+            return
+
+        # Default - pannello stock non riconosciuto
+        return False
 
     def handle_auction(self, game: Game, logger: GameLogger):
         """Gestisce le aste."""

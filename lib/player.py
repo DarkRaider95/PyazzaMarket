@@ -56,7 +56,9 @@ class Player:
         if (
             same_color_cells >= 3
         ):  # if the player has more than 3 stocks of the same color, we will check wich is the right panalty
-            return choosen_stock.get_penalty()[same_color_cells - 1]
+            # Limit the index to the maximum available penalty (last element of the penalty array)
+            penalty_index = min(same_color_cells - 1, len(choosen_stock.get_penalty()) - 1)
+            return choosen_stock.get_penalty()[penalty_index]
         elif (
             same_color_cells == 2
         ):  # we check if the player own two stocks of the same company
@@ -149,14 +151,18 @@ class Player:
         return self.__is_bot
 
     def get_debts(self):
+        if self.__debts is None:
+            return []
         return self.__debts
 
     def add_debt(self, debt):
+        if self.__debts is None:
+            self.__debts = []
         self.__debts.append(debt)
 
     def erase_debts(self):
         self.__debts = []
-        self.__in_debt_with = None
+        self.__in_debt_with = []
 
     def set_in_debt_with(self, creditor):
         if self.__in_debt_with is None:
@@ -165,4 +171,6 @@ class Player:
         self.__in_debt_with.append(creditor)
 
     def get_in_debt_with(self):
+        if self.__in_debt_with is None:
+            return []
         return self.__in_debt_with

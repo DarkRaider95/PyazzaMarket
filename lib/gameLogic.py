@@ -89,7 +89,7 @@ def stock_in_position_has_owner(position):
 
 #function to solve the debt
 def solve_bankrupt(debtor, game):
-    
+
     for creditor, debt in zip(debtor.get_in_debt_with(), debtor.get_debts()):
 
         if creditor == "BANK":

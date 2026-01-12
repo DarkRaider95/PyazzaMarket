@@ -246,7 +246,8 @@ class Game:
         if curr_player.is_in_debt():
             if len(curr_player.get_stocks()) > 0:
                 self.showStockUI = ShowStockUI(self, curr_player.get_stocks(), "BANKRUPT_STOCK", curr_player)
-                self.showStockUI.draw()
+                self.panels_to_show.append(self.showStockUI)
+                #self.showStockUI.draw()  # draw() verrà chiamato da draw_window()
             else:
                 self.is_debt_solved(curr_player)
         else:#check if others are in debt after our turn due to some event
@@ -553,9 +554,13 @@ class Game:
         elif cell.cellType == CHOOSE_STOCK_TYPE:
             stocks = self.__board.get_availble_stocks()
             self.disable_actions()
-            self.showStockUI = ShowStockUI(self, stocks, "MOVE_TO_STOCK", None, "Scegli su quale cedola vuoi spostarti")
-            self.panels_to_show.append(self.showStockUI)
-            #self.showStockUI.draw()
+            if len(stocks) > 0:
+                self.showStockUI = ShowStockUI(self, stocks, "MOVE_TO_STOCK", None, "Scegli su quale cedola vuoi spostarti")
+                self.panels_to_show.append(self.showStockUI)
+                #self.showStockUI.draw()
+            else:
+                self.__alert_messages.append("Non ci sono cedole disponibili!")
+                self.renable_actions()
         elif cell.cellType == FREE_STOP_TYPE:
             stocks = self.__board.get_purchasable_stocks(player.get_balance())
             self.disable_actions()
@@ -799,13 +804,29 @@ class Game:
             self.__alert_messages.append(player.get_name() + " è andato in banca rotta!")
             #self.__gameUI.drawAlert(player.get_name() + " è andato in banca rotta!")
 
+        # Find the index of the player being removed
+        removed_player_index = None
+        for i, p in enumerate(self.__players):
+            if p.get_name() == player.get_name():
+                removed_player_index = i
+                break
+
         players = self.get_other_players(player)
         self.__players = players
-        self.__gameUI.updateAllPlayerLables(self.get_players())
 
-        #fix index of current player
-        if(self.__current_player_index == len(self.__players) - 1):                        
-            self.__current_player_index = 0
+        # Adjust current_player_index based on which player was removed
+        if removed_player_index is not None:
+            if removed_player_index < self.__current_player_index:
+                # Player removed was before current player, decrement index
+                self.__current_player_index -= 1
+            elif removed_player_index == self.__current_player_index:
+                # Current player was removed, keep index (will point to next player)
+                # But if index is now out of bounds, wrap to 0
+                if self.__current_player_index >= len(self.__players):
+                    self.__current_player_index = 0
+            # If removed_player_index > current_player_index, no change needed
+
+        self.__gameUI.updateAllPlayerLables(self.get_players())
 
         if len(self.get_players()) == 1:
             #self.__gameUI.drawAlert(self.get_players()[0].get_name() + " ha vinto la partita!")
