@@ -79,7 +79,7 @@ class Game:
             self.dice_overlay = DiceOverlay(self, self.__players[self.__current_player_index].get_name() + " tira dadi","Decisione turni", self.__actions_status)
         self.__bot = Bot(self)        
 
-    def update_graphic(self):
+    def update_graphic(self, tick_clock=True):
         # Now we update at all turn the stockboard for avoiding
         self.__gameUI.updateStockboard(
             self.get_players(), Player.last_stock_update, self.__gameUI
@@ -91,11 +91,54 @@ class Game:
                 self.screen, player, i, len(self.get_players())
             )
 
-        time_delta = self.clock.tick(FPS) / 1000.0
-        self.__gameUI.manager.update(time_delta)
+        if tick_clock:
+            time_delta = self.clock.tick(FPS) / 1000.0
+            self.__gameUI.manager.update(time_delta)
         self.__gameUI.manager.draw_ui(self.screen)
         pygame.display.update()
 
+    def init_graphics(self):
+        """Inizializza la grafica del gioco (chiamare una volta all'inizio)."""
+        self.__board.draw(self.screen)
+        self.__gameUI.draw_dices()
+        self.__gameUI.draw_actions_ui()
+        self.__gameUI.draw_leaderboard(
+            self.get_players(),
+            self.__square_balance,
+            self.__players[self.__current_player_index],
+        )
+        self.__gameUI.draw_stockboard(self.get_players())
+
+        # Only show dice overlay for turn order if this is a new game
+        if not self.is_loaded_game:
+            self.dice_overlay.draw()
+
+        for index, player in enumerate(self.get_players()):
+            self.__board.draw_player_car(self.screen, player, index, len(self.__players))
+
+        self.update_graphic(tick_clock=False)
+
+    def process_frame(self, events, time_delta):
+        """
+        Processa un singolo frame del gioco.
+        Usato per controllo esterno del game loop (es. stress test).
+
+        Args:
+            events: Lista di eventi pygame da processare
+            time_delta: Delta time in secondi per questo frame
+        """
+        for event in events:
+            self.manage_events(event)
+            self.__gameUI.manager.process_events(event)
+
+        self.__gameUI.manager.update(time_delta)
+
+        if len(self.panels_to_show) > 0 or len(self.__alert_messages) > 0:
+            self.draw_window()
+            self.update_graphic(tick_clock=False)
+
+        if self.bargain_ui:
+            self.update_graphic(tick_clock=False)
 
     def start(self):  # pragma: no cover
         self.__board.draw(self.screen)
