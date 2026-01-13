@@ -1,10 +1,21 @@
-from lib.constants import INITIAL_BALANCE
+from lib.constants import INITIAL_BALANCE, BLUE, RED, GREEN, YELLOW, ORANGE, PINK, PURPLE, LIGHT_BLUE
 from lib.car import Car
 import time
 from typing import Optional, List
 from lib.stock import Stock
 
 class Player:
+    # Mapping da nome colore (stringa) a tupla RGB
+    COLOR_MAP = {
+        'BLUE': BLUE,
+        'RED': RED,
+        'GREEN': GREEN,
+        'YELLOW': YELLOW,
+        'ORANGE': ORANGE,
+        'PINK': PINK,
+        'PURPLE': PURPLE,
+        'LIGHT_BLUE': LIGHT_BLUE
+    }
     last_stock_update = None
 
     def __init__(self, playerName, car, bot):
@@ -43,6 +54,12 @@ class Player:
         Player.last_stock_update = time.time()
 
     def same_color_count(self, color):
+        # Converti la stringa colore in tupla RGB se necessario
+        # (gli eventi passano stringhe come 'BLUE', 'RED', ecc.)
+        # (compute_penalty passa direttamente stock.color che è già una tupla RGB)
+        if isinstance(color, str):
+            color = Player.COLOR_MAP.get(color, color)
+
         count = 0
         for stock in self.__stocks:
             if stock.color == color:

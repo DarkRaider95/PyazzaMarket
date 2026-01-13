@@ -33,7 +33,7 @@ from lib.player import Player
 from lib.save_manager import SaveManager
 
 class Game:
-    def __init__(self, width, height, clock, players, test=False, gui=True, disable_integrated_bot=False):
+    def __init__(self, width, height, clock, players, test=False, gui=True, disable_integrated_bot=False, custom_events=None):
         self.clock = clock
         self.width = width
         self.height = height
@@ -41,9 +41,14 @@ class Game:
         self.__actions_status = ActionsStatus()
         self.__players = []
         # creating events
-        events = Event.initialize_events()
-        self.events = deque(events)
-        random.shuffle(self.events)
+        if custom_events is not None:
+            # Use custom events list provided (useful for testing specific events)
+            self.events = deque(custom_events)
+        else:
+            # Normal game flow: initialize and shuffle all events
+            events = Event.initialize_events()
+            self.events = deque(events)
+            random.shuffle(self.events)
         self.__square_balance = 2000
         random.shuffle(QUOTATION)  # this function do an inplace shuffle to QUOTATION
         self.new_quotation = deque(
@@ -211,6 +216,7 @@ class Game:
         self.__actions_status.set_throw_dices(False)
         self.__actions_status.set_pass_turn(True)
         score = roll(self.__test, self.__test_dice)
+        self.__last_turn_dice_score = sum(score)  # Save for color events
         self.__gameUI.update_dice(score)
         # is double
         if is_double(score):
@@ -587,9 +593,11 @@ class Game:
 
         if event.evenType == COLOR_EVENT:
             stock_color_count = player.same_color_count(event.effectData['color'])
-            if stock_color_count > 1:
+
+            if stock_color_count > 0:
                 self.disable_actions()
-                self.panels_to_show.append(DiceOverlay(self, player.get_name() + " tira dadi", "Evento Colore", self.__actions_status, True, False, True))
+                # Single die for color event (twoDices=False)
+                self.panels_to_show.append(DiceOverlay(self, player.get_name() + " tira dado", "Evento Colore", self.__actions_status, False, False, True))
             else:
                 self.__alert_messages.append(f"Non hai cedole {event.effectData['color']} quindi l'evento non si applica!")
         elif event.evenType == BUY_ANTHING_EVENT:
@@ -707,19 +715,46 @@ class Game:
         # rotate the events list
         self.events.rotate(-1)
 
-    def handle_color_event(self, dice_score):
+    def handle_color_event(self, single_dice_score):
+        """
+        Gestisce l'evento colore.
+
+        Args:
+            single_dice_score: Risultato del singolo dado lanciato nell'evento
+
+        Logica:
+        - Se il tiro precedente (per muoversi) era >= 8: VINCI
+        - Se il tiro precedente (per muoversi) era < 8: PERDI
+        - L'importo è: numero_cedole_colore × amount × single_dice_score
+        """
         event = self.events[-1]
         amount = event.effectData['amount']
         current_player = self.__players[self.__current_player_index]
-        
-        if dice_score >= 8:
-            gain = amount * dice_score
-            current_player.change_balance(gain)
-            self.__alert_messages.append(f"{current_player.get_name()} ha fatto {dice_score} ha guadagnato {gain} scudi!")
+
+        # Conta le cedole dello stesso colore
+        stock_color_count = current_player.same_color_count(event.effectData['color'])
+
+        # Usa il tiro PRECEDENTE per determinare se vinci o perdi
+        previous_turn_score = getattr(self, '_Game__last_turn_dice_score', 0)
+
+        # Calcolo: numero_cedole × amount × single_dice
+        total_amount = stock_color_count * amount * single_dice_score
+
+        # Il tiro PRECEDENTE determina se vinci o perdi
+        if previous_turn_score >= 8:
+            # VINCI
+            current_player.change_balance(total_amount)
+            self.__alert_messages.append(
+                f"{current_player.get_name()} ha fatto {previous_turn_score} nel turno precedente (≥8), "
+                f"quindi VINCE {total_amount} scudi! ({stock_color_count} cedole × {amount} × {single_dice_score})"
+            )
         else:
-            loss = amount * dice_score
-            current_player.change_balance(-loss)
-            self.__alert_messages.append(f"{current_player.get_name()} ha fatto {dice_score} ha perso {loss} scudi!")
+            # PERDI
+            current_player.change_balance(-total_amount)
+            self.__alert_messages.append(
+                f"{current_player.get_name()} ha fatto {previous_turn_score} nel turno precedente (<8), "
+                f"quindi PERDE {total_amount} scudi! ({stock_color_count} cedole × {amount} × {single_dice_score})"
+            )
 
         self.__gameUI.updateAllPlayerLables(self.get_players())
 

@@ -20,13 +20,14 @@ from lib.game import Game
 from lib.game_logger import GameLogger
 from lib.seeded_random import SeededRandom, DiceController, EventController
 from lib.constants import WIDTH, HEIGHT, CAR_RED, CAR_BLUE, CAR_BLACK, CAR_YELLOW
+from lib.event import Event
 
 
 class StressTestRunnerV2:
     """Esegue stress test automatici del gioco usando frame-based timing."""
 
     def __init__(self, num_tests: int = 1, seed: Optional[int] = None,
-                 max_turns: int = 500, fps: int = 120):
+                 max_turns: int = 500, fps: int = 120, event_filter: Optional[str] = None):
         """
         Inizializza lo stress tester.
 
@@ -35,11 +36,13 @@ class StressTestRunnerV2:
             seed: Seed iniziale (incrementato per ogni test)
             max_turns: Numero massimo di turni per partita
             fps: Framerate del gioco (più alto = più veloce)
+            event_filter: Nome dell'evento da testare (es. "color_red_50.png" o pattern "color_*")
         """
         self.num_tests = num_tests
         self.base_seed = seed if seed is not None else int(time.time() * 1000) % (2**32)
         self.max_turns = max_turns
         self.fps = fps
+        self.event_filter = event_filter
         self.results = []
 
         # Crea directory per logs
@@ -188,6 +191,67 @@ class StressTestRunnerV2:
 
         return result
 
+    def filter_events(self, pattern: str) -> List:
+        """
+        Filtra gli eventi in base a un pattern.
+
+        Args:
+            pattern: Pattern del nome file (supporta wildcard * e ?)
+
+        Returns:
+            Lista di eventi filtrati
+        """
+        import fnmatch
+        from collections import deque
+
+        all_events = Event.initialize_events()
+
+        # Get the list of all files in the events directory
+        from lib.constants import EVENTS_DIR
+        files = os.listdir(EVENTS_DIR)
+
+        # Filtra i file che matchano il pattern
+        matched_files = fnmatch.filter(files, pattern)
+
+        if not matched_files:
+            print(f"⚠ Nessun evento trovato per il pattern '{pattern}'")
+            print(f"Eventi disponibili: {', '.join(files)}")
+            return all_events
+
+        print(f"✓ Trovati {len(matched_files)} eventi per il pattern '{pattern}':")
+        for f in matched_files:
+            print(f"  - {f}")
+
+        # Crea eventi solo per i file matchati
+        filtered_events = []
+        for event in all_events:
+            # Confronta con i file matchati controllando il tipo di evento
+            for matched_file in matched_files:
+                # Estrai il nome file dall'immagine dell'evento se possibile
+                if matched_file[:-4] in str(event.evenType):
+                    filtered_events.append(event)
+                    break
+
+        # Se non troviamo eventi con la logica sopra, creiamo eventi dai file matchati
+        if not filtered_events:
+            import pygame
+            from lib.constants import EVENT_WIDTH, EVENT_HEIGHT
+
+            for fileName in matched_files:
+                filePath = EVENTS_DIR + fileName
+                image = pygame.image.load(filePath)
+                image = pygame.transform.scale(image, (EVENT_WIDTH, EVENT_HEIGHT))
+                eventType, effectData = Event.parse_name(fileName)
+                filtered_events.append(Event(image, eventType, effectData))
+
+        # Ripeti gli eventi finché non ne hai abbastanza (almeno 10)
+        if len(filtered_events) < 10:
+            original_count = len(filtered_events)
+            while len(filtered_events) < 10:
+                filtered_events.extend(filtered_events[:original_count])
+
+        return filtered_events
+
     def create_test_game(self, width: int, height: int, clock, players: List[Dict],
                         seed: int, logger: GameLogger) -> Game:
         """
@@ -204,7 +268,13 @@ class StressTestRunnerV2:
         Returns:
             Istanza di Game configurata
         """
-        game = Game(width, height, clock, players, test=False, gui=True, disable_integrated_bot=True)
+        # Filtra eventi se specificato
+        custom_events = None
+        if self.event_filter:
+            custom_events = self.filter_events(self.event_filter)
+
+        game = Game(width, height, clock, players, test=False, gui=True,
+                   disable_integrated_bot=True, custom_events=custom_events)
 
         # Inietta il logger nel gioco
         game.logger = logger
@@ -214,8 +284,8 @@ class StressTestRunnerV2:
         game.dice_controller = DiceController(seeded_random)
         game.event_controller = EventController(seeded_random)
 
-        # Sovrascrivi il metodo events shuffle
-        if hasattr(game, 'events'):
+        # Sovrascrivi il metodo events shuffle solo se non stiamo usando eventi custom
+        if hasattr(game, 'events') and custom_events is None:
             game.events = game.event_controller.shuffle_events(game.events)
 
         return game
@@ -425,7 +495,15 @@ class StressTestRunnerV2:
 
         # Pannello evento
         if hasattr(game.current_panel, 'eventBut'):
-            logger.log_action("bot", "confirm_event", {"panel_type": "event"})
+            # Log dettagli evento
+            event_info = {"panel_type": "event"}
+            if hasattr(game, 'events') and len(game.events) > 0:
+                current_event = game.events[0]
+                event_info["event_type"] = current_event.evenType
+                event_info["event_data"] = current_event.effectData
+
+            logger.log_action("bot", "confirm_event", event_info)
+
             click_event = pygame.event.Event(
                 pygame_gui.UI_BUTTON_PRESSED,
                 {'ui_element': game.current_panel.eventBut}
@@ -433,15 +511,29 @@ class StressTestRunnerV2:
             pygame.event.post(click_event)
             return
 
-        # Dice overlay durante il gioco (es. riserva monetaria) - lancia e chiudi in sequenza
+        # Dice overlay durante il gioco (es. riserva monetaria, evento colore) - lancia e chiudi in sequenza
         if hasattr(game.current_panel, 'launchOverlayDiceBut'):
             # Usa un flag per tracciare se abbiamo già lanciato
             if not hasattr(game.current_panel, '_dice_launched'):
                 game.current_panel._dice_launched = False
 
+            # Determina il contesto (evento colore o altro)
+            context = "overlay"
+            is_color_event = False
+            if hasattr(game.current_panel, 'is_color_event') and game.current_panel.is_color_event:
+                context = "color_event"
+                is_color_event = True
+
             if not game.current_panel._dice_launched:
                 # Lancia il dado
-                logger.log_action("bot", "launch_dice", {"context": "overlay"})
+                log_data = {"context": context}
+                if is_color_event and hasattr(game, 'events') and len(game.events) > 0:
+                    current_event = game.events[0]
+                    log_data["color"] = current_event.effectData.get('color', 'unknown')
+                    log_data["amount"] = current_event.effectData.get('amount', 0)
+
+                logger.log_action("bot", "launch_dice", log_data)
+
                 click_event = pygame.event.Event(
                     pygame_gui.UI_BUTTON_PRESSED,
                     {'ui_element': game.current_panel.launchOverlayDiceBut}
@@ -450,8 +542,12 @@ class StressTestRunnerV2:
                 game.current_panel._dice_launched = True
             else:
                 # Chiudi dopo aver lanciato
+                log_data = {"context": context}
+                if is_color_event:
+                    log_data["note"] = "color_event_completed"
+
                 if hasattr(game.current_panel, 'closeDiceOverlayBut'):
-                    logger.log_action("bot", "close_dice_overlay", {})
+                    logger.log_action("bot", "close_dice_overlay", log_data)
                     click_event = pygame.event.Event(
                         pygame_gui.UI_BUTTON_PRESSED,
                         {'ui_element': game.current_panel.closeDiceOverlayBut}
@@ -459,7 +555,7 @@ class StressTestRunnerV2:
                     pygame.event.post(click_event)
                     game.current_panel._dice_launched = False
                 elif hasattr(game.current_panel, 'close_die_overlay_but'):
-                    logger.log_action("bot", "close_dice_overlay", {})
+                    logger.log_action("bot", "close_dice_overlay", log_data)
                     click_event = pygame.event.Event(
                         pygame_gui.UI_BUTTON_PRESSED,
                         {'ui_element': game.current_panel.close_die_overlay_but}
@@ -917,6 +1013,12 @@ Esempi d'uso:
 
   # Esegui test con limite di 200 turni
   python stress_test_v2.py -n 10 --max-turns 200
+
+  # Testa solo eventi colore (cedole colorate)
+  python stress_test_v2.py -n 5 --event "color_*.png"
+
+  # Testa un evento specifico
+  python stress_test_v2.py -n 3 --event "color_red_50.png"
         """
     )
 
@@ -944,6 +1046,12 @@ Esempi d'uso:
         default=120,
         help="Framerate del gioco - più alto = più veloce (default: 120)"
     )
+    parser.add_argument(
+        "--event",
+        type=str,
+        default=None,
+        help="Pattern del nome file dell'evento da testare (es. 'color_*.png' per eventi colore, 'color_red_50.png' per uno specifico)"
+    )
 
     args = parser.parse_args()
 
@@ -952,7 +1060,8 @@ Esempi d'uso:
         num_tests=args.num_tests,
         seed=args.seed,
         max_turns=args.max_turns,
-        fps=args.fps
+        fps=args.fps,
+        event_filter=args.event
     )
 
     tester.run_all_tests()

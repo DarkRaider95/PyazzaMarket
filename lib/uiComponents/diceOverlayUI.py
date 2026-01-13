@@ -178,7 +178,8 @@ class DiceOverlay:
             score = roll()
             self.updateDiceOverlay(score)
             self.closeDiceOverlay(self.__game.get_players(), self.__gameUI)
-            self.__game.handle_color_event(sum(score))            
+            # Use only the first die for color event (single die roll)
+            self.__game.handle_color_event(score[0])            
         else:
             # amount is the amount of money that the player has to pay or receive
             score, amount = chance_logic(self.__game.get_current_player(), self.__game.get_square_balance())
