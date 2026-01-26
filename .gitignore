@@ -5,6 +5,7 @@ htmlcov/
 .coverage
 codebase.md
 venv/
+pyazza/
 
 # Stress test logs
 stress_test_logs/

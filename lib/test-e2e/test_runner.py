@@ -4,13 +4,15 @@ Cross-platform test runner per PyazzaMarket.
 Alternativa Python allo script bash, funziona su Windows/Linux/Mac.
 """
 
-import os
-import sys
+## ci sono degli import non usati
+
+import argparse
 import glob
 import json
-import argparse
-import subprocess
+import os
 import random
+import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -18,11 +20,17 @@ from pathlib import Path
 class TestRunner:
     """Runner cross-platform per stress test."""
 
+    ## lo script è stato spostato controllare che l'init sia corretto
+
     def __init__(self):
         self.script_dir = Path(__file__).parent
         self.log_dir = self.script_dir / "stress_test_logs"
 
-    def run_stress_test(self, num_tests: int, extra_args: list = None, parallel: int = 1):
+    ## questa funzione è inutile, bisogna far si che run_parallel_tests accetti 1 come valore per il numero di processi da far girare
+
+    def run_stress_test(
+        self, num_tests: int, extra_args: list = None, parallel: int = 1
+    ):
         """Esegue stress test."""
         if parallel > 1:
             self.run_parallel_tests(num_tests, parallel, extra_args)
@@ -33,7 +41,8 @@ class TestRunner:
             cmd = [
                 sys.executable,
                 str(self.script_dir / "stress_test_v2.py"),
-                "-n", str(num_tests)
+                "-n",
+                str(num_tests),
             ]
 
             if extra_args:
@@ -50,12 +59,22 @@ class TestRunner:
                 print(f"✗ Errore durante l'esecuzione dei test")
                 sys.exit(1)
 
-    def run_parallel_tests(self, total_tests: int, num_processes: int, extra_args: list = None):
+    ## questa funzione contiene dei print() che non vanno bene se vuoi andare a capo usa \n
+    ## impostare none a list non è corretto
+    ## a cosa serve remaining_test? togli quella parte, se si fa un test in meno pace
+    ## questi seed vanno semplicemente tolti non funzionano
+    ## evita di generare codice in eccesso, per esempio non indicare all'utente quale sia la cartella dei log in continuazione è noto togli quel print
+
+    def run_parallel_tests(
+        self, total_tests: int, num_processes: int, extra_args: list = None
+    ):
         """Esegue test in parallelo su più processi."""
         tests_per_process = total_tests // num_processes
         remaining_tests = total_tests % num_processes
 
-        print(f"🔄 Esecuzione di {total_tests} test su {num_processes} processi paralleli")
+        print(
+            f"🔄 Esecuzione di {total_tests} test su {num_processes} processi paralleli"
+        )
         print(f"   {tests_per_process} test per processo", end="")
         if remaining_tests > 0:
             print(f" (+{remaining_tests} extra)")
@@ -79,20 +98,20 @@ class TestRunner:
             cmd = [
                 sys.executable,
                 str(self.script_dir / "stress_test_v2.py"),
-                "-n", str(num_tests),
-                "--seed", str(seed)
+                "-n",
+                str(num_tests),
+                "--seed",
+                str(seed),
             ]
 
             if extra_args:
                 cmd.extend(extra_args)
 
-            print(f"  [Processo {i+1}] Avvio {num_tests} test con seed {seed}...")
+            print(f"  [Processo {i + 1}] Avvio {num_tests} test con seed {seed}...")
             process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-            processes.append((i+1, process, num_tests))
+            processes.append((i + 1, process, num_tests))
 
         print()
         print("Attendi completamento dei processi...")
@@ -117,6 +136,8 @@ class TestRunner:
             print(f"⚠ Alcuni processi hanno riportato errori")
             print(f"Controlla i risultati in: {self.log_dir}")
 
+    ## elimina questa funzione, non va
+
     def run_replay(self, log_file: str, extra_args: list = None):
         """Esegue replay di una partita."""
         log_path = Path(log_file)
@@ -128,16 +149,14 @@ class TestRunner:
         print(f"🔄 Replay di: {log_file}")
         print()
 
-        cmd = [
-            sys.executable,
-            str(self.script_dir / "replay_game.py"),
-            str(log_path)
-        ]
+        cmd = [sys.executable, str(self.script_dir / "replay_game.py"), str(log_path)]
 
         if extra_args:
             cmd.extend(extra_args)
 
         subprocess.run(cmd)
+
+    ## cosa fa questa funzione? è un duplicato della precedente eliminala
 
     def analyze_log(self, log_file: str):
         """Analizza un file di log."""
@@ -154,10 +173,12 @@ class TestRunner:
             sys.executable,
             str(self.script_dir / "replay_game.py"),
             str(log_path),
-            "--analyze-only"
+            "--analyze-only",
         ]
 
         subprocess.run(cmd)
+
+    ## questa funzione può essere eliminata
 
     def find_errors(self):
         """Trova tutti i log con errori."""
@@ -178,7 +199,7 @@ class TestRunner:
             total_count += 1
 
             try:
-                with open(log_file, 'r', encoding='utf-8') as f:
+                with open(log_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
 
                 if data.get("errors"):
@@ -201,6 +222,8 @@ class TestRunner:
             print()
             print(f"💡 Usa 'python test_runner.py replay <log_file>' per rigiocare")
 
+    ## questa pure, non ha a che fare un lo scopo dello script
+
     def show_stats(self):
         """Mostra statistiche sui test."""
         print("�� Statistiche test eseguiti")
@@ -220,7 +243,7 @@ class TestRunner:
             total_logs += 1
 
             try:
-                with open(log_file, 'r', encoding='utf-8') as f:
+                with open(log_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if data.get("errors"):
                         error_logs += 1
@@ -243,11 +266,13 @@ class TestRunner:
         summaries = sorted(
             self.log_dir.glob("summary_*.txt"),
             key=lambda x: x.stat().st_mtime,
-            reverse=True
+            reverse=True,
         )[:5]
 
         for summary in summaries:
             print(f"  • {summary.name}")
+
+    ## pure questa la possiamo eliminare
 
     def clean_logs(self):
         """Pulisce i file di log."""
@@ -259,12 +284,20 @@ class TestRunner:
 
         response = input("Sei sicuro di voler cancellare tutti i log? [y/N] ")
 
-        if response.lower() == 'y':
+        if response.lower() == "y":
             import shutil
+
             shutil.rmtree(self.log_dir)
             print("✓ Log cancellati")
         else:
             print("Operazione annullata")
+
+
+## anche qui troppi print, toglili e usare \n
+## togli questa cosa di aver test intensive, quick e medium non ha senso è sempre lo stesso test
+## anche overnight e seed devono sparire, replay pure
+## togli tutti questi esempi e spiega all'utente quali sono i paremtri solo se passa --help
+## ci devono essere dei parametri di default che l'utente può sovrascrivere e basta, nessuna modalità speciale
 
 
 def main():
@@ -288,63 +321,121 @@ Esempi d'uso:
   python test_runner.py find-errors                        # Trova log con errori
   python test_runner.py replay logs/game.json              # Replay di una partita
   python test_runner.py stats                              # Mostra statistiche
-        """
+        """,
     )
 
-    subparsers = parser.add_subparsers(dest='command', help='Comando da eseguire')
+    subparsers = parser.add_subparsers(dest="command", help="Comando da eseguire")
 
     # Quick test
-    quick = subparsers.add_parser('quick', help='Esegui 10 test rapidi')
-    quick.add_argument('--fps', type=int, default=60, help='FPS del gioco (default: 60)')
-    quick.add_argument('--max-turns', type=int, default=500, help='Numero massimo di turni (default: 500)')
-    quick.add_argument('-j', '--parallel', type=int, default=1, help='Numero di processi paralleli (default: 1)')
+    quick = subparsers.add_parser("quick", help="Esegui 10 test rapidi")
+    quick.add_argument(
+        "--fps", type=int, default=60, help="FPS del gioco (default: 60)"
+    )
+    quick.add_argument(
+        "--max-turns",
+        type=int,
+        default=500,
+        help="Numero massimo di turni (default: 500)",
+    )
+    quick.add_argument(
+        "-j",
+        "--parallel",
+        type=int,
+        default=1,
+        help="Numero di processi paralleli (default: 1)",
+    )
 
     # Medium test
-    medium = subparsers.add_parser('medium', help='Esegui 50 test')
-    medium.add_argument('--fps', type=int, default=60, help='FPS del gioco (default: 60)')
-    medium.add_argument('--max-turns', type=int, default=500, help='Numero massimo di turni (default: 500)')
-    medium.add_argument('-j', '--parallel', type=int, default=1, help='Numero di processi paralleli (default: 1)')
+    medium = subparsers.add_parser("medium", help="Esegui 50 test")
+    medium.add_argument(
+        "--fps", type=int, default=60, help="FPS del gioco (default: 60)"
+    )
+    medium.add_argument(
+        "--max-turns",
+        type=int,
+        default=500,
+        help="Numero massimo di turni (default: 500)",
+    )
+    medium.add_argument(
+        "-j",
+        "--parallel",
+        type=int,
+        default=1,
+        help="Numero di processi paralleli (default: 1)",
+    )
 
     # Intensive test
-    intensive = subparsers.add_parser('intensive', help='Esegui 100 test')
-    intensive.add_argument('--headless', action='store_true', help='Senza GUI')
-    intensive.add_argument('--fps', type=int, default=60, help='FPS del gioco (default: 60)')
-    intensive.add_argument('--max-turns', type=int, default=500, help='Numero massimo di turni (default: 500)')
-    intensive.add_argument('-j', '--parallel', type=int, default=1, help='Numero di processi paralleli (default: 1)')
+    intensive = subparsers.add_parser("intensive", help="Esegui 100 test")
+    intensive.add_argument("--headless", action="store_true", help="Senza GUI")
+    intensive.add_argument(
+        "--fps", type=int, default=60, help="FPS del gioco (default: 60)"
+    )
+    intensive.add_argument(
+        "--max-turns",
+        type=int,
+        default=500,
+        help="Numero massimo di turni (default: 500)",
+    )
+    intensive.add_argument(
+        "-j",
+        "--parallel",
+        type=int,
+        default=1,
+        help="Numero di processi paralleli (default: 1)",
+    )
 
     # Overnight test
-    overnight = subparsers.add_parser('overnight', help='Esegui 1000 test')
-    overnight.add_argument('--headless', action='store_true', help='Senza GUI')
-    overnight.add_argument('--fps', type=int, default=60, help='FPS del gioco (default: 60)')
-    overnight.add_argument('--max-turns', type=int, default=500, help='Numero massimo di turni (default: 500)')
-    overnight.add_argument('-j', '--parallel', type=int, default=1, help='Numero di processi paralleli (default: 1)')
+    overnight = subparsers.add_parser("overnight", help="Esegui 1000 test")
+    overnight.add_argument("--headless", action="store_true", help="Senza GUI")
+    overnight.add_argument(
+        "--fps", type=int, default=60, help="FPS del gioco (default: 60)"
+    )
+    overnight.add_argument(
+        "--max-turns",
+        type=int,
+        default=500,
+        help="Numero massimo di turni (default: 500)",
+    )
+    overnight.add_argument(
+        "-j",
+        "--parallel",
+        type=int,
+        default=1,
+        help="Numero di processi paralleli (default: 1)",
+    )
 
     # Seed test
-    seed = subparsers.add_parser('seed', help='Test con seed specifico')
-    seed.add_argument('seed_value', type=int, help='Valore del seed')
-    seed.add_argument('--headless', action='store_true', help='Senza GUI')
-    seed.add_argument('--fps', type=int, default=60, help='FPS del gioco (default: 60)')
-    seed.add_argument('--max-turns', type=int, default=500, help='Numero massimo di turni (default: 500)')
+    seed = subparsers.add_parser("seed", help="Test con seed specifico")
+    seed.add_argument("seed_value", type=int, help="Valore del seed")
+    seed.add_argument("--headless", action="store_true", help="Senza GUI")
+    seed.add_argument("--fps", type=int, default=60, help="FPS del gioco (default: 60)")
+    seed.add_argument(
+        "--max-turns",
+        type=int,
+        default=500,
+        help="Numero massimo di turni (default: 500)",
+    )
 
     # Replay
-    replay = subparsers.add_parser('replay', help='Replay di una partita')
-    replay.add_argument('log_file', help='File di log da rigiocare')
-    replay.add_argument('-s', '--step-by-step', action='store_true',
-                       help='Modalità step-by-step')
-    replay.add_argument('--headless', action='store_true', help='Senza GUI')
+    replay = subparsers.add_parser("replay", help="Replay di una partita")
+    replay.add_argument("log_file", help="File di log da rigiocare")
+    replay.add_argument(
+        "-s", "--step-by-step", action="store_true", help="Modalità step-by-step"
+    )
+    replay.add_argument("--headless", action="store_true", help="Senza GUI")
 
     # Analyze
-    analyze = subparsers.add_parser('analyze', help='Analizza un log')
-    analyze.add_argument('log_file', help='File di log da analizzare')
+    analyze = subparsers.add_parser("analyze", help="Analizza un log")
+    analyze.add_argument("log_file", help="File di log da analizzare")
 
     # Find errors
-    subparsers.add_parser('find-errors', help='Trova log con errori')
+    subparsers.add_parser("find-errors", help="Trova log con errori")
 
     # Stats
-    subparsers.add_parser('stats', help='Mostra statistiche')
+    subparsers.add_parser("stats", help="Mostra statistiche")
 
     # Clean
-    subparsers.add_parser('clean', help='Pulisci i log')
+    subparsers.add_parser("clean", help="Pulisci i log")
 
     args = parser.parse_args()
 
@@ -355,74 +446,74 @@ Esempi d'uso:
     runner = TestRunner()
 
     # Esegui comando
-    if args.command == 'quick':
+    if args.command == "quick":
         extra = []
-        if hasattr(args, 'fps'):
-            extra.extend(['--fps', str(args.fps)])
-        if hasattr(args, 'max_turns'):
-            extra.extend(['--max-turns', str(args.max_turns)])
-        parallel = args.parallel if hasattr(args, 'parallel') else 1
+        if hasattr(args, "fps"):
+            extra.extend(["--fps", str(args.fps)])
+        if hasattr(args, "max_turns"):
+            extra.extend(["--max-turns", str(args.max_turns)])
+        parallel = args.parallel if hasattr(args, "parallel") else 1
         runner.run_stress_test(10, extra, parallel)
 
-    elif args.command == 'medium':
+    elif args.command == "medium":
         extra = []
-        if hasattr(args, 'fps'):
-            extra.extend(['--fps', str(args.fps)])
-        if hasattr(args, 'max_turns'):
-            extra.extend(['--max-turns', str(args.max_turns)])
-        parallel = args.parallel if hasattr(args, 'parallel') else 1
+        if hasattr(args, "fps"):
+            extra.extend(["--fps", str(args.fps)])
+        if hasattr(args, "max_turns"):
+            extra.extend(["--max-turns", str(args.max_turns)])
+        parallel = args.parallel if hasattr(args, "parallel") else 1
         runner.run_stress_test(50, extra, parallel)
 
-    elif args.command == 'intensive':
+    elif args.command == "intensive":
         extra = []
         if args.headless:
-            extra.append('--headless')
-        if hasattr(args, 'fps'):
-            extra.extend(['--fps', str(args.fps)])
-        if hasattr(args, 'max_turns'):
-            extra.extend(['--max-turns', str(args.max_turns)])
-        parallel = args.parallel if hasattr(args, 'parallel') else 1
+            extra.append("--headless")
+        if hasattr(args, "fps"):
+            extra.extend(["--fps", str(args.fps)])
+        if hasattr(args, "max_turns"):
+            extra.extend(["--max-turns", str(args.max_turns)])
+        parallel = args.parallel if hasattr(args, "parallel") else 1
         runner.run_stress_test(100, extra, parallel)
 
-    elif args.command == 'overnight':
+    elif args.command == "overnight":
         extra = []
         if args.headless:
-            extra.append('--headless')
-        if hasattr(args, 'fps'):
-            extra.extend(['--fps', str(args.fps)])
-        if hasattr(args, 'max_turns'):
-            extra.extend(['--max-turns', str(args.max_turns)])
-        parallel = args.parallel if hasattr(args, 'parallel') else 1
+            extra.append("--headless")
+        if hasattr(args, "fps"):
+            extra.extend(["--fps", str(args.fps)])
+        if hasattr(args, "max_turns"):
+            extra.extend(["--max-turns", str(args.max_turns)])
+        parallel = args.parallel if hasattr(args, "parallel") else 1
         runner.run_stress_test(1000, extra, parallel)
 
-    elif args.command == 'seed':
-        extra = ['--seed', str(args.seed_value)]
+    elif args.command == "seed":
+        extra = ["--seed", str(args.seed_value)]
         if args.headless:
-            extra.append('--headless')
-        if hasattr(args, 'fps'):
-            extra.extend(['--fps', str(args.fps)])
-        if hasattr(args, 'max_turns'):
-            extra.extend(['--max-turns', str(args.max_turns)])
+            extra.append("--headless")
+        if hasattr(args, "fps"):
+            extra.extend(["--fps", str(args.fps)])
+        if hasattr(args, "max_turns"):
+            extra.extend(["--max-turns", str(args.max_turns)])
         runner.run_stress_test(1, extra)
 
-    elif args.command == 'replay':
+    elif args.command == "replay":
         extra = []
         if args.step_by_step:
-            extra.append('-s')
+            extra.append("-s")
         if args.headless:
-            extra.append('--headless')
+            extra.append("--headless")
         runner.run_replay(args.log_file, extra)
 
-    elif args.command == 'analyze':
+    elif args.command == "analyze":
         runner.analyze_log(args.log_file)
 
-    elif args.command == 'find-errors':
+    elif args.command == "find-errors":
         runner.find_errors()
 
-    elif args.command == 'stats':
+    elif args.command == "stats":
         runner.show_stats()
 
-    elif args.command == 'clean':
+    elif args.command == "clean":
         runner.clean_logs()
 
 
