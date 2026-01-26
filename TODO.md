@@ -9,8 +9,6 @@
 - salvare i balance all'inizio delle aste per evitare che il primo che riceve i soldi dell'asta sia avvantaggiato sugli altri
 
 ### Funzionalità generali
- - ✅ aggiungere tasto salva, per salvare stato partita
- - ✅ add requirements.txt
  - aggiungere un logger
  - sistemare la grafica responsive
     - (non si sa bene) usare valori negativi dove possibile
@@ -21,10 +19,8 @@
 ## To FIX
 - macchine
   - due nuove macchine
-  - ✅ messaggio in caso di doppia selezione della stessa macchina
 - non si legge la descrizione del titolo nella finestra delle aste
 - non si legge la label del bottone per mettere all'asta la cedola
-- ✅ aggiungere lunghezza massima nome giocatore
 - controllare se c'è la logica del perdi un giro
 - controllare logica riserva di piazza lanciando 1 i soldi in piazza sono diminuiti
 
