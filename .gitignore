@@ -13,3 +13,5 @@ test_output.log
 test_pid.txt
 errors_report.txt
 bug_report_*.txt
+
+CLAUDE.md
